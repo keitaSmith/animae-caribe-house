@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Animae Caribe House — Next.js starter files
 
-## Getting Started
+This ZIP is the Next.js version of the starter. Use it after creating the app with `create-next-app`.
 
-First, run the development server:
+## Create the project
+
+```bash
+npx create-next-app@latest animae-caribe-house
+cd animae-caribe-house
+```
+
+Recommended answers:
+
+```txt
+TypeScript: Yes or No — this starter uses JSX, both are fine in a normal Next setup
+ESLint: Yes
+Tailwind CSS: Yes is okay, but this starter uses regular CSS for now
+src/ directory: Yes
+App Router: Yes
+Turbopack: Yes is okay
+Customize import alias: No
+```
+
+## Install the starter
+
+1. Delete the generated `src` folder from the new Next project.
+2. Copy this ZIP's `src` folder into the project.
+3. Copy this ZIP's `public/assets` and `public/videos` folders into the project's `public` folder.
+4. Run:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Hero video
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Place optimized hero video files here:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```txt
+public/videos/hero-showreel.webm
+public/videos/hero-showreel.mp4
+```
 
-## Learn More
+The starter includes a poster background, so it will still look fine before the video files are added.
 
-To learn more about Next.js, take a look at the following resources:
+## Main files to edit
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```txt
+src/data/site.js        Contact details, showreel URL, shop URL
+src/data/stats.js       Animated stat numbers
+src/data/partners.js    Partner placeholders
+src/data/projects.js    Featured work cards
+src/data/articles.js    News/article placeholders
+src/styles/index.css    Main styling
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This starter uses normal CSS rather than Tailwind classes. Tailwind can still be added/refactored later, but regular CSS keeps the starter easy to inspect and customize.

@@ -1,0 +1,34 @@
+import { site } from '../data/site';
+import ButtonLink from './ButtonLink';
+import { ArrowRightIcon, PlayIcon } from './Icons';
+
+export default function Hero() {
+  return (
+    <section className="hero-section" id="home" aria-label="Animae Caribe House introduction">
+      <video className="hero-video" autoPlay muted loop playsInline poster="/assets/hero-poster.webp">
+        <source src="/videos/hero-showreel.webm" type="video/webm" />
+        <source src="/videos/hero-showreel.mp4" type="video/mp4" />
+      </video>
+      <div className="hero-poster" style={{ backgroundImage: 'url(/assets/hero-poster.webp)' }} />
+      <div className="hero-scrim" />
+
+      <div className="container hero-content">
+        <div className="glass-panel hero-card reveal-up">
+          <span className="eyebrow">Caribbean animation · digital culture · creative community</span>
+          <img className="hero-logo" src="/assets/animae-house-logo-white.png" alt="Animae Caribe House" />
+          <p className="hero-copy">
+            A cinematic digital home for animated stories, creative production, community building and Caribbean imagination.
+          </p>
+          <div className="hero-actions">
+            <ButtonLink href="#featured-work" variant="primary">
+              <ArrowRightIcon /> Check our work
+            </ButtonLink>
+            <ButtonLink href={site.showreelUrl} variant="soft" external>
+              <PlayIcon /> Watch showreel
+            </ButtonLink>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
