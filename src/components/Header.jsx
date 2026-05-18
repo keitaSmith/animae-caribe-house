@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { navItems, site } from '../data/site';
@@ -8,10 +8,30 @@ import { PlayIcon } from './Icons';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname() || '/';
 
+  useEffect(() => {
+    const syncScrollState = () => {
+      setIsScrolled(window.scrollY > 24);
+    };
+
+    syncScrollState();
+    window.addEventListener('scroll', syncScrollState, { passive: true });
+
+    return () => window.removeEventListener('scroll', syncScrollState);
+  }, []);
+
+  const headerClassName = [
+    'site-header',
+    isScrolled ? 'is-scrolled' : 'is-top',
+    menuOpen ? 'menu-open' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <header className="site-header">
+    <header className={headerClassName}>
       <Link className="brand-mark" href="/" aria-label="Animae Caribe House home">
         <img src="/assets/animae-logo-mark.png" alt="" />
         <span>Animae Caribe House</span>

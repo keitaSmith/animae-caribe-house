@@ -13,8 +13,8 @@ export default function Hero() {
       <div className="hero-scrim" />
 
       <div className="container hero-content">
-        <div className="glass-panel hero-card reveal-up">
-          <span className="eyebrow">Caribbean animation · digital culture · creative community</span>
+        <div className="hero-card reveal-up">
+          <span className="eyebrow">Caribbean animation / digital culture / creative community</span>
           <img className="hero-logo" src="/assets/animae-house-logo-white.png" alt="Animae Caribe House" />
           <p className="hero-copy">
             A cinematic digital home for animated stories, creative production, community building and Caribbean imagination.
