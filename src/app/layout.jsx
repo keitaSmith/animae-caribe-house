@@ -1,6 +1,5 @@
 import '../styles/index.css';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import SiteShell from '../components/SiteShell';
 
 export const metadata = {
   title: 'Animae Caribe House | Where Digital Creatives Find Community',
@@ -12,11 +11,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <div className="site-shell">
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </div>
+        <SiteShell>{children}</SiteShell>
       </body>
     </html>
   );

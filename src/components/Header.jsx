@@ -3,13 +3,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { navItems, site } from '../data/site';
+import { navItems } from '../data/site';
 import { PlayIcon } from './Icons';
+import { useShowreel } from './ShowreelProvider';
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
+  const { openShowreel } = useShowreel();
   const pathname = usePathname() || '/';
   const isHomePage = pathname === '/';
 
@@ -98,16 +100,18 @@ export default function Header() {
             {item.label}
           </Link>
         ))}
-        <a
+        <button
           className={showreelClassName}
-          href={site.showreelUrl}
-          target="_blank"
-          rel="noreferrer"
+          type="button"
           aria-hidden={!showHeaderShowreel}
           tabIndex={showHeaderShowreel ? 0 : -1}
+          onClick={() => {
+            openShowreel();
+            setMenuOpen(false);
+          }}
         >
           <PlayIcon /> Watch showreel
-        </a>
+        </button>
       </nav>
     </header>
   );

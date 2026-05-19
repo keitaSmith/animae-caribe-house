@@ -1,9 +1,19 @@
 "use client";
 
 import MuxPlayer from "@mux/mux-player-react";
+import { useShowreel } from "./ShowreelProvider";
+
+const HERO_SHOWREEL_CLIP = {
+  assetStartTime: 5,
+  assetEndTime: 55,
+  // extraSourceParams: {
+  //   asset_start_time: 5,
+  //   asset_end_time: 55,
+  // },
+};
 
 export default function MuxHeroShowreel() {
-  const playbackId = process.env.NEXT_PUBLIC_MUX_SHOWREEL_PLAYBACK_ID;
+  const { playbackId, isBackgroundPaused } = useShowreel();
 
   if (!playbackId) {
     return null;
@@ -15,10 +25,16 @@ export default function MuxHeroShowreel() {
         className="hero-video-player"
         playbackId={playbackId}
         autoPlay="muted"
+        // startTime={HERO_SHOWREEL_CLIP.startTime}
+        assetStartTime={HERO_SHOWREEL_CLIP.assetStartTime}
+        assetEndTime={HERO_SHOWREEL_CLIP.assetEndTime}
+        // extraSourceParams={HERO_SHOWREEL_CLIP.extraSourceParams}
         muted
         loop
+        paused={isBackgroundPaused}
         playsInline
         streamType="on-demand"
+        thumbnailTime={28}
         nohotkeys
         aria-hidden="true"
         tabIndex={-1}

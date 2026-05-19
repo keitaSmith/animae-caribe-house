@@ -1,10 +1,13 @@
-import { site } from '../data/site';
+'use client';
+
 import ButtonLink from './ButtonLink';
 import { ArrowRightIcon, PlayIcon } from './Icons';
 import MuxHeroShowreel from './MuxHeroShowreel';
+import { useShowreel } from './ShowreelProvider';
 
 export default function Hero() {
-  const hasMuxShowreel = Boolean(process.env.NEXT_PUBLIC_MUX_SHOWREEL_PLAYBACK_ID);
+  const { openShowreel, playbackId } = useShowreel();
+  const hasMuxShowreel = Boolean(playbackId);
 
   return (
     <section className="hero-section" id="home" aria-label="Animae Caribe House introduction">
@@ -23,7 +26,7 @@ export default function Hero() {
             <ButtonLink href="#featured-work" variant="soft">
               <ArrowRightIcon /> Check our work
             </ButtonLink>
-            <ButtonLink href={site.showreelUrl} variant="primary" external>
+            <ButtonLink variant="primary" onClick={openShowreel} type="button">
               <PlayIcon /> Watch showreel
             </ButtonLink>
           </div>
