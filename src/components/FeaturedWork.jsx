@@ -5,11 +5,11 @@ import { ArrowRightIcon } from './Icons';
 export default function FeaturedWork() {
   return (
     <section className="section featured-work" id="featured-work">
-      <div className="container section-heading-row">
-        <div>
-          <span className="section-kicker">Featured work</span>
-          <h2>Project windows today. Full case studies tomorrow.</h2>
-        </div>
+      <div className="container featured-work-header centered">
+        <h2>Featured Projects</h2>
+        <p>
+          A curated look at the stories, visual worlds and creative experiments taking shape inside Animae Caribe House.
+        </p>
         <ButtonLink href="/portfolio" variant="outline">
           View portfolio <ArrowRightIcon />
         </ButtonLink>

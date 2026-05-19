@@ -9,7 +9,9 @@ import { PlayIcon } from './Icons';
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [heroInView, setHeroInView] = useState(true);
   const pathname = usePathname() || '/';
+  const isHomePage = pathname === '/';
 
   useEffect(() => {
     const syncScrollState = () => {
@@ -22,6 +24,41 @@ export default function Header() {
     return () => window.removeEventListener('scroll', syncScrollState);
   }, []);
 
+  useEffect(() => {
+    if (!isHomePage) return undefined;
+
+    let observer;
+    let frameId = 0;
+
+    const attachObserver = () => {
+      const hero = document.getElementById('home');
+      if (!hero) return;
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setHeroInView(entry.isIntersecting);
+        },
+        {
+          threshold: 0.08,
+        }
+      );
+
+      observer.observe(hero);
+    };
+
+    frameId = window.requestAnimationFrame(attachObserver);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [isHomePage]);
+
   const headerClassName = [
     'site-header',
     isScrolled ? 'is-scrolled' : 'is-top',
@@ -29,6 +66,8 @@ export default function Header() {
   ]
     .filter(Boolean)
     .join(' ');
+  const showHeaderShowreel = !isHomePage || !heroInView;
+  const showreelClassName = ['nav-showreel', showHeaderShowreel ? 'is-visible' : 'is-hidden'].join(' ');
 
   return (
     <header className={headerClassName}>
@@ -59,7 +98,14 @@ export default function Header() {
             {item.label}
           </Link>
         ))}
-        <a className="nav-showreel" href={site.showreelUrl} target="_blank" rel="noreferrer">
+        <a
+          className={showreelClassName}
+          href={site.showreelUrl}
+          target="_blank"
+          rel="noreferrer"
+          aria-hidden={!showHeaderShowreel}
+          tabIndex={showHeaderShowreel ? 0 : -1}
+        >
           <PlayIcon /> Watch showreel
         </a>
       </nav>

@@ -53,7 +53,7 @@ function StatCard({ stat }) {
   const { ref, value } = useCountUp(stat.value);
 
   return (
-    <article className="stat-card glass-card" ref={ref}>
+    <article className="stat-card" ref={ref}>
       <strong>
         {value}
         {stat.suffix}
@@ -66,7 +66,7 @@ function StatCard({ stat }) {
 export default function StatsSection() {
   return (
     <section className="section stats-section">
-      <div className="container narrow-heading centered">
+      <div className="container narrow-heading centered stats-intro">
         <span className="section-kicker">Reach and impact</span>
         <h2>Numbers that can grow with the story.</h2>
         <p>

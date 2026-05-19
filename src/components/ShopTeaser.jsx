@@ -6,7 +6,7 @@ export default function ShopTeaser() {
   return (
     <section className="section shop-teaser">
       <div className="container image-copy-grid reverse">
-        <div className="glass-panel content-panel">
+        <div className="content-panel flat-content-panel">
           <span className="section-kicker">Shop</span>
           <h2>Carry the creative energy beyond the screen.</h2>
           <p>
@@ -18,7 +18,7 @@ export default function ShopTeaser() {
           </ButtonLink>
         </div>
         <div className="image-frame product-frame">
-          <img src="/assets/shop-product-placeholder.svg" alt="Featured shop product placeholder" />
+          <img src="/assets/shop.webp" alt="Animae Caribe House shop feature" />
         </div>
       </div>
     </section>

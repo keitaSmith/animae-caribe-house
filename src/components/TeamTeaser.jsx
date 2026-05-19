@@ -6,9 +6,9 @@ export default function TeamTeaser() {
     <section className="section team-teaser">
       <div className="container image-copy-grid">
         <div className="image-frame team-image-frame">
-          <img src="/assets/studio-placeholder.webp" alt="Animae Caribe House team placeholder" />
+          <img src="/assets/team.webp" alt="Animae Caribe House team" />
         </div>
-        <div className="glass-panel content-panel">
+        <div className="content-panel flat-content-panel">
           <span className="section-kicker">The team</span>
           <h2>The people behind the pixels, stories and community.</h2>
           <p>

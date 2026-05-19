@@ -20,10 +20,10 @@ export default function Hero() {
             A cinematic digital home for animated stories, creative production, community building and Caribbean imagination.
           </p>
           <div className="hero-actions">
-            <ButtonLink href="#featured-work" variant="primary">
+            <ButtonLink href="#featured-work" variant="soft">
               <ArrowRightIcon /> Check our work
             </ButtonLink>
-            <ButtonLink href={site.showreelUrl} variant="soft" external>
+            <ButtonLink href={site.showreelUrl} variant="primary" external>
               <PlayIcon /> Watch showreel
             </ButtonLink>
           </div>
