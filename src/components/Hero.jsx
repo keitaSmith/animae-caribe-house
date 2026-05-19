@@ -1,14 +1,12 @@
 import { site } from '../data/site';
 import ButtonLink from './ButtonLink';
 import { ArrowRightIcon, PlayIcon } from './Icons';
+import MuxHeroShowreel from './MuxHeroShowreel';
 
 export default function Hero() {
   return (
     <section className="hero-section" id="home" aria-label="Animae Caribe House introduction">
-      <video className="hero-video" autoPlay muted loop playsInline poster="/assets/hero-poster.webp">
-        <source src="/videos/hero-showreel.webm" type="video/webm" />
-        <source src="/videos/hero-showreel.mp4" type="video/mp4" />
-      </video>
+      <MuxHeroShowreel />
       <div className="hero-poster" style={{ backgroundImage: 'url(/assets/hero-poster.webp)' }} />
       <div className="hero-scrim" />
 
