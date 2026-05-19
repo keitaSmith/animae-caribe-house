@@ -1,4 +1,11 @@
-export const featuredProjects = [
+export type FeaturedProject = {
+  title: string;
+  category: string;
+  image: string;
+  description: string;
+};
+
+export const featuredProjects: FeaturedProject[] = [
   {
     title: 'Stories in motion',
     category: 'Featured Work',

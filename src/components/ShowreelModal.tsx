@@ -6,7 +6,7 @@ import { useShowreel } from './ShowreelProvider';
 
 export default function ShowreelModal() {
   const { playbackId, isShowreelOpen, closeShowreel } = useShowreel();
-  const closeButtonRef = useRef(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (!isShowreelOpen) {
@@ -26,7 +26,7 @@ export default function ShowreelModal() {
 
     closeButtonRef.current?.focus();
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         closeShowreel();
       }
@@ -53,7 +53,7 @@ export default function ShowreelModal() {
       aria-label="Play the Animae Caribe House showreel"
       onClick={closeShowreel}
     >
-      <div className="showreel-modal-shell" onClick={(event) => event.stopPropagation()}>
+      <div className="showreel-modal-shell" onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>
         <button
           ref={closeButtonRef}
           className="showreel-modal-close"

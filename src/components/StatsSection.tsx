@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { stats } from '../data/stats';
+import { stats, type Stat } from '../data/stats';
 
-function useCountUp(targetValue, duration = 1400) {
+function useCountUp(targetValue: number, duration = 1400) {
   const [value, setValue] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const node = ref.current;
@@ -29,10 +29,10 @@ function useCountUp(targetValue, duration = 1400) {
   useEffect(() => {
     if (!hasStarted) return undefined;
 
-    let animationFrame;
+    let animationFrame = 0;
     const startTime = performance.now();
 
-    const animate = (currentTime) => {
+    const animate = (currentTime: number) => {
       const progress = Math.min((currentTime - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setValue(Math.round(eased * targetValue));
@@ -49,7 +49,11 @@ function useCountUp(targetValue, duration = 1400) {
   return { ref, value };
 }
 
-function StatCard({ stat }) {
+type StatCardProps = {
+  stat: Stat;
+};
+
+function StatCard({ stat }: StatCardProps) {
   const { ref, value } = useCountUp(stat.value);
 
   return (

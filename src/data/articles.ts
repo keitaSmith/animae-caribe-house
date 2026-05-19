@@ -1,4 +1,11 @@
-export const articles = [
+export type Article = {
+  title: string;
+  date: string;
+  category: string;
+  excerpt: string;
+};
+
+export const articles: Article[] = [
   {
     title: 'Welcome to Animae Caribe House',
     date: 'Coming soon',

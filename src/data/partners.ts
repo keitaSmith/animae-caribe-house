@@ -1,4 +1,9 @@
-export const partners = [
+export type Partner = {
+  name: string;
+  src: string;
+};
+
+export const partners: Partner[] = [
   {
     name: 'Cariri',
     src: '/assets/partners/cariri.webp',

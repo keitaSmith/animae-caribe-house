@@ -1,4 +1,10 @@
-export const stats = [
+export type Stat = {
+  value: number;
+  suffix: string;
+  label: string;
+};
+
+export const stats: Stat[] = [
   {
     value: 20,
     suffix: '+',

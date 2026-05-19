@@ -1,10 +1,23 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
-const ShowreelContext = createContext(null);
+type ShowreelContextValue = {
+  playbackId?: string;
+  isShowreelOpen: boolean;
+  isBackgroundPaused: boolean;
+  openShowreel: () => void;
+  closeShowreel: () => void;
+};
 
-export function ShowreelProvider({ children }) {
+const ShowreelContext = createContext<ShowreelContextValue | null>(null);
+
+type ShowreelProviderProps = {
+  children: ReactNode;
+};
+
+export function ShowreelProvider({ children }: ShowreelProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const playbackId = process.env.NEXT_PUBLIC_MUX_SHOWREEL_PLAYBACK_ID;
 

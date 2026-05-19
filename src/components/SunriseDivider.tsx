@@ -1,9 +1,10 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function SunriseDivider() {
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const frameRef = useRef(0);
   const [progress, setProgress] = useState(0);
 
@@ -52,7 +53,7 @@ export default function SunriseDivider() {
       style={{
         '--sunrise-progress': visualProgress,
         '--sunrise-skyline-progress': progress,
-      }}
+      } as CSSProperties}
     >
       <div className="container sunrise-divider-copy">
         <span className="section-kicker">We Animate in Sunshine</span>

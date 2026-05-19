@@ -1,6 +1,25 @@
+import type { MouseEventHandler, ReactNode } from 'react';
 import Link from 'next/link';
 
-export default function ButtonLink({ href, children, variant = 'primary', external = false, onClick, type = 'button' }) {
+type ButtonVariant = 'primary' | 'soft' | 'outline';
+
+type ButtonLinkProps = {
+  href?: string;
+  children: ReactNode;
+  variant?: ButtonVariant;
+  external?: boolean;
+  onClick?: MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
+  type?: 'button' | 'submit' | 'reset';
+};
+
+export default function ButtonLink({
+  href,
+  children,
+  variant = 'primary',
+  external = false,
+  onClick,
+  type = 'button',
+}: ButtonLinkProps) {
   const className = `button button-${variant}`;
   const opensNewTab = external || href?.startsWith('mailto:');
 

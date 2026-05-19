@@ -1,7 +1,14 @@
 "use client";
 
+import type { ComponentProps, ComponentType } from "react";
 import MuxPlayer from "@mux/mux-player-react";
 import { useShowreel } from "./ShowreelProvider";
+
+type HeroMuxPlayerProps = ComponentProps<typeof MuxPlayer> & {
+  tabIndex?: number;
+};
+
+const HeroMuxPlayer = MuxPlayer as ComponentType<HeroMuxPlayerProps>;
 
 const HERO_SHOWREEL_CLIP = {
   assetStartTime: 5,
@@ -21,7 +28,7 @@ export default function MuxHeroShowreel() {
 
   return (
     <div className="hero-video hero-video-layer" aria-hidden="true">
-      <MuxPlayer
+      <HeroMuxPlayer
         className="hero-video-player"
         playbackId={playbackId}
         autoPlay="muted"
