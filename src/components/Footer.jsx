@@ -15,11 +15,12 @@ export default function Footer() {
         <div className="footer-copy">
           <span className="section-kicker">Contact</span>
           <h2>Ready to build, animate or collaborate?</h2>
+          <p>Animate in Sunshine With Us</p>
           <p>
             Reach out to Animae Caribe House for project conversations, creative partnerships, article updates and community opportunities.
           </p>
           <div className="contact-list">
-            <a href={`mailto:${site.contact.email}`}>
+            <a href={`mailto:${site.contact.email}`} target="_blank" rel="noreferrer">
               <MailIcon /> {site.contact.email}
             </a>
             <a href={`tel:${site.contact.phone.replace(/[^+\d]/g, '')}`}>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 export default function ButtonLink({ href, children, variant = 'primary', external = false, onClick, type = 'button' }) {
   const className = `button button-${variant}`;
+  const opensNewTab = external || href?.startsWith('mailto:');
 
   if (!href) {
     return (
@@ -11,7 +12,7 @@ export default function ButtonLink({ href, children, variant = 'primary', extern
     );
   }
 
-  if (external) {
+  if (opensNewTab) {
     return (
       <a className={className} href={href} target="_blank" rel="noreferrer" onClick={onClick}>
         {children}

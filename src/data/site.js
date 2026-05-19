@@ -2,7 +2,6 @@ export const site = {
   name: 'Animae Caribe House',
   tagline: 'Where Digital Creatives Find Community',
   showreelUrl: 'https://www.youtube.com/',
-  shopUrl: 'https://example.com/',
   twixalotUrl: 'https://twixalot.com',
   contact: {
     email: 'hello@animaecaribehouse.com',

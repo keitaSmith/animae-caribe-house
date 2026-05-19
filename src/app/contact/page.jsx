@@ -18,7 +18,7 @@ export default function Contact() {
             Keep this page direct and human. No form is needed for launch — just clear contact details and a warm invitation to reach out.
           </p>
           <div className="contact-list large">
-            <a href={`mailto:${site.contact.email}`}>
+            <a href={`mailto:${site.contact.email}`} target="_blank" rel="noreferrer">
               <MailIcon /> {site.contact.email}
             </a>
             <a href={`tel:${site.contact.phone.replace(/[^+\d]/g, '')}`}>

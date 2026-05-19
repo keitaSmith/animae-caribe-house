@@ -1,6 +1,6 @@
 import { featuredProjects } from '../data/projects';
 import ButtonLink from './ButtonLink';
-import { ArrowRightIcon } from './Icons';
+import { ArrowRightIcon, MailIcon } from './Icons';
 
 export default function FeaturedWork() {
   return (
@@ -9,10 +9,16 @@ export default function FeaturedWork() {
         <h2>Featured Projects</h2>
         <p>
           A curated look at the stories, visual worlds and creative experiments taking shape inside Animae Caribe House.
+          We Animate in Sunshine.
         </p>
-        <ButtonLink href="/portfolio" variant="outline">
-          View portfolio <ArrowRightIcon />
-        </ButtonLink>
+        <div className="featured-work-actions">
+          <ButtonLink href="/portfolio" variant="outline">
+            View portfolio <ArrowRightIcon />
+          </ButtonLink>
+          <ButtonLink href="mailto:info@animaecaribehouse.com" variant="soft">
+            <MailIcon /> Get in touch
+          </ButtonLink>
+        </div>
       </div>
 
       <div className="container work-grid">

@@ -11,7 +11,7 @@ const faqItems = [
   {
     question: 'How do I schedule an appointment?',
     answer:
-      "Scheduling an appointment is easy! Just shoot us an email at info@animaecaribe.com or fill out the contact form above. We're all about making connections simple and fast - hit us up, and let's get your ideas moving. Your next big project starts with a click!",
+      "Scheduling an appointment is easy! Just shoot us an email at info@animaecaribehouse.com or fill out the contact form above. We're all about making connections simple and fast - hit us up, and let's get your ideas moving. Your next big project starts with a click!",
   },
   {
     question: 'What is your studio capacity?',
