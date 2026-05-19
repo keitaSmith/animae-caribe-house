@@ -7,6 +7,7 @@ import StatsSection from '../components/StatsSection';
 import TeamTeaser from '../components/TeamTeaser';
 import ShopTeaser from '../components/ShopTeaser';
 import NewsTeaser from '../components/NewsTeaser';
+import FaqSection from '../components/FaqSection';
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <TeamTeaser />
       <ShopTeaser />
       <NewsTeaser />
+      <FaqSection />
     </>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import ButtonLink from './ButtonLink';
-import { ArrowRightIcon, PlayIcon } from './Icons';
+import { MailIcon, PlayIcon } from './Icons';
 import MuxHeroShowreel from './MuxHeroShowreel';
 import { useShowreel } from './ShowreelProvider';
 
@@ -17,14 +17,13 @@ export default function Hero() {
 
       <div className="container hero-content">
         <div className="hero-card reveal-up">
-          <span className="eyebrow">Caribbean animation / digital culture / creative community</span>
           <img className="hero-logo" src="/assets/animae-house-logo-white.png" alt="Animae Caribe House" />
           <p className="hero-copy">
             A cinematic digital home for animated stories, creative production, community building and Caribbean imagination.
           </p>
           <div className="hero-actions">
-            <ButtonLink href="#featured-work" variant="soft">
-              <ArrowRightIcon /> Check our work
+            <ButtonLink href="mailto:info@animaecaribehouse.com" variant="soft">
+              <MailIcon /> Get in touch
             </ButtonLink>
             <ButtonLink variant="primary" onClick={openShowreel} type="button">
               <PlayIcon /> Watch showreel

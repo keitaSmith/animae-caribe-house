@@ -70,12 +70,15 @@ export default function Header() {
     .join(' ');
   const showHeaderShowreel = !isHomePage || !heroInView;
   const showreelClassName = ['nav-showreel', showHeaderShowreel ? 'is-visible' : 'is-hidden'].join(' ');
+  const brandLogoSrc =
+    isScrolled || menuOpen
+      ? '/assets/animae-house-logo-black-plain.PNG'
+      : '/assets/animae-house-logo-white-plain.PNG';
 
   return (
     <header className={headerClassName}>
       <Link className="brand-mark" href="/" aria-label="Animae Caribe House home">
-        <img src="/assets/animae-logo-mark.png" alt="" />
-        <span>Animae Caribe House</span>
+        <img src={brandLogoSrc} alt="Animae Caribe House" />
       </Link>
 
       <button
