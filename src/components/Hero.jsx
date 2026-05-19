@@ -4,10 +4,12 @@ import { ArrowRightIcon, PlayIcon } from './Icons';
 import MuxHeroShowreel from './MuxHeroShowreel';
 
 export default function Hero() {
+  const hasMuxShowreel = Boolean(process.env.NEXT_PUBLIC_MUX_SHOWREEL_PLAYBACK_ID);
+
   return (
     <section className="hero-section" id="home" aria-label="Animae Caribe House introduction">
       <MuxHeroShowreel />
-      <div className="hero-poster" style={{ backgroundImage: 'url(/assets/hero-poster.webp)' }} />
+      {!hasMuxShowreel ? <div className="hero-poster" style={{ backgroundImage: 'url(/assets/hero-poster.webp)' }} /> : null}
       <div className="hero-scrim" />
 
       <div className="container hero-content">

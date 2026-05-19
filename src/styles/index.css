@@ -554,6 +554,7 @@ p {
 }
 
 .sunrise-divider {
+  --sunrise-skyline-end-scale: 0.92;
   position: relative;
   min-height: 500px;
   display: grid;
@@ -628,7 +629,9 @@ p {
   min-width: 100%;
   object-fit: cover;
   object-position: center bottom;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scaleX(calc(1 - ((1 - var(--sunrise-skyline-end-scale)) * var(--sunrise-skyline-progress, 0))));
+  transform-origin: center bottom;
+  will-change: transform;
 }
 
 .work-grid,
@@ -1208,6 +1211,7 @@ p {
   }
 
   .sunrise-divider {
+    --sunrise-skyline-end-scale: 0.97;
     min-height: 390px;
   }
 
@@ -1289,6 +1293,10 @@ p {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .sunrise-divider {
+    --sunrise-skyline-end-scale: 1;
+  }
+
   html {
     scroll-behavior: auto;
   }

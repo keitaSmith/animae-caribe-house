@@ -49,7 +49,10 @@ export default function SunriseDivider() {
       ref={sectionRef}
       className="sunrise-divider"
       aria-label="We animate in the sunshine"
-      style={{ '--sunrise-progress': visualProgress }}
+      style={{
+        '--sunrise-progress': visualProgress,
+        '--sunrise-skyline-progress': progress,
+      }}
     >
       <div className="container sunrise-divider-copy">
         <span className="section-kicker">We animate in the sunshine</span>
