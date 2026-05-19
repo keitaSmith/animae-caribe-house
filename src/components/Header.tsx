@@ -29,7 +29,7 @@ export default function Header() {
   useEffect(() => {
     if (!isHomePage) return undefined;
 
-    let observer;
+    let observer: IntersectionObserver | null = null;
     let frameId = 0;
 
     const attachObserver = () => {
