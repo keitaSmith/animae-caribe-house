@@ -24,7 +24,7 @@ export default function FeaturedWork() {
       <div className="container work-grid">
         {featuredProjects.map((project) => (
           <article className="work-card glass-card" key={project.title}>
-            <img src={project.image} alt="" />
+            <img src={project.image} alt={project.alt} />
             <div className="work-card-body">
               <span>{project.category}</span>
               <h3>{project.title}</h3>
