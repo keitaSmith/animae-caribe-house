@@ -14,8 +14,7 @@ export default function Footer() {
         </div>
         <div className="footer-copy">
           <span className="section-kicker">Contact</span>
-          <h2>Ready to build, animate or collaborate?</h2>
-          <p>Animate in Sunshine With Us</p>
+          <h2>Animate in Sunshine With Us</h2>
           <p>
             Reach out to Animae Caribe House for project conversations, creative partnerships, article updates and community opportunities.
           </p>
