@@ -82,17 +82,23 @@ export default function Header() {
       </Link>
 
       <button
-        className="menu-toggle"
+        className={menuOpen ? 'menu-toggle is-open' : 'menu-toggle'}
         type="button"
-        aria-label="Toggle navigation menu"
+        aria-controls="primary-navigation"
+        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={menuOpen}
         onClick={() => setMenuOpen((open) => !open)}
       >
         <span />
         <span />
+        <span />
       </button>
 
-      <nav className={menuOpen ? 'nav-links is-open' : 'nav-links'} aria-label="Primary navigation">
+      <nav
+        id="primary-navigation"
+        className={menuOpen ? 'nav-links is-open' : 'nav-links'}
+        aria-label="Primary navigation"
+      >
         {navItems.map((item) => (
           <Link
             key={item.href}
