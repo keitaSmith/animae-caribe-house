@@ -9,8 +9,8 @@ export default function Footer() {
   return (
     <footer className="site-footer" id="contact">
       <div className="container footer-grid">
-        <div className="footer-image">
-          <img src="/assets/creator-seaside.webp" alt="Creative animation studio placeholder" />
+        <div className="footer-image footer-logo">
+          <img src="/assets/animae-house-logo-white.png" alt="Animae Caribe House" />
         </div>
         <div className="footer-copy">
           <span className="section-kicker">Contact</span>

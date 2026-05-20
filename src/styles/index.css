@@ -330,28 +330,34 @@ p {
   overflow: hidden;
   white-space: nowrap;
   max-width: 220px;
+  max-height: 56px;
   border: 1px solid transparent;
   background: linear-gradient(135deg, var(--cyan), var(--purple) 52%, var(--magenta));
   box-shadow: 0 14px 30px rgba(0, 169, 224, 0.26);
   margin-left: 6px;
   transition:
-    opacity 220ms ease,
-    transform 220ms ease,
-    max-width 220ms ease,
-    margin 220ms ease,
-    padding 220ms ease,
-    border-color 220ms ease,
-    background 220ms ease;
+    opacity 320ms ease,
+    transform 320ms ease,
+    max-width 320ms ease,
+    max-height 320ms ease,
+    margin 320ms ease,
+    padding 320ms ease,
+    border-color 320ms ease,
+    background 320ms ease,
+    box-shadow 320ms ease;
 }
 
 .nav-links .nav-showreel.is-hidden {
   opacity: 0;
   max-width: 0;
+  max-height: 0;
   margin-left: 0;
   padding-left: 0;
   padding-right: 0;
+  padding-top: 0;
+  padding-bottom: 0;
   border-width: 0;
-  transform: translateY(-6px);
+  transform: translateY(-8px) scale(0.96);
   pointer-events: none;
   box-shadow: none;
 }
@@ -1348,7 +1354,28 @@ p {
 }
 
 .faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  padding: 0 22px;
+  opacity: 0;
+  transition: grid-template-rows 320ms ease, padding 320ms ease, opacity 240ms ease;
+}
+
+.faq-panel.is-open {
+  grid-template-rows: 1fr;
   padding: 0 22px 22px;
+  opacity: 1;
+}
+
+.faq-panel-inner {
+  overflow: hidden;
+  min-height: 0;
+  transform: translateY(-6px);
+  transition: transform 320ms ease;
+}
+
+.faq-panel.is-open .faq-panel-inner {
+  transform: translateY(0);
 }
 
 .faq-panel p {
@@ -1386,6 +1413,15 @@ p {
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
 }
 
+.footer-logo {
+  overflow: visible;
+  display: grid;
+  place-items: center start;
+  padding: clamp(28px, 5vw, 48px);
+  background: transparent;
+  box-shadow: none;
+}
+
 @keyframes statFloat {
   0%,
   100% {
@@ -1410,6 +1446,13 @@ p {
   width: 100%;
   height: 390px;
   object-fit: cover;
+}
+
+.footer-logo img {
+  width: min(100%, 520px);
+  height: auto;
+  max-height: none;
+  object-fit: contain;
 }
 
 .footer-copy p {
@@ -1619,7 +1662,11 @@ p {
   }
 
   .nav-links .nav-showreel.is-hidden {
-    display: none;
+    max-height: 0;
+    margin-top: -8px;
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+    visibility: hidden;
   }
 
   .hero-content,
@@ -1778,6 +1825,10 @@ p {
 
   .partners-section {
     padding: 34px 0 40px;
+  }
+
+  .partners-section .section-kicker {
+    text-align: center;
   }
 
   .partner-marquee {

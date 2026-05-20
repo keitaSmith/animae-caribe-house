@@ -68,8 +68,16 @@ export default function FaqSection() {
                     </span>
                   </button>
                 </h3>
-                <div id={panelId} className="faq-panel" role="region" aria-labelledby={buttonId} hidden={!isOpen}>
-                  <p>{item.answer}</p>
+                <div
+                  id={panelId}
+                  className={isOpen ? 'faq-panel is-open' : 'faq-panel'}
+                  role="region"
+                  aria-labelledby={buttonId}
+                  aria-hidden={!isOpen}
+                >
+                  <div className="faq-panel-inner">
+                    <p>{item.answer}</p>
+                  </div>
                 </div>
               </article>
             );
