@@ -5,7 +5,18 @@ import MuxPlayer from '@mux/mux-player-react';
 import { useShowreel } from './ShowreelProvider';
 
 export default function ShowreelModal() {
-  const { playbackId, isShowreelOpen, closeShowreel, posterSrc, variant, videoTitle } = useShowreel();
+  const {
+    playbackId,
+    isShowreelOpen,
+    closeShowreel,
+    posterSrc,
+    variant,
+    videoTitle,
+    startTimeSeconds,
+    endTimeSeconds,
+    posterTimeSeconds,
+    ariaLabel,
+  } = useShowreel();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -50,7 +61,7 @@ export default function ShowreelModal() {
       className="showreel-modal-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label={`Play the ${videoTitle}`}
+      aria-label={ariaLabel || `Play the ${videoTitle}`}
       onClick={closeShowreel}
     >
       <div className="showreel-modal-shell" onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>
@@ -70,9 +81,11 @@ export default function ShowreelModal() {
               className="showreel-modal-player"
               playbackId={playbackId}
               autoPlay
+              assetStartTime={startTimeSeconds}
+              assetEndTime={endTimeSeconds}
               playsInline
               streamType="on-demand"
-              thumbnailTime={28}
+              thumbnailTime={typeof posterTimeSeconds === 'number' ? posterTimeSeconds : 28}
               metadata={{
                 video_title: videoTitle,
               }}

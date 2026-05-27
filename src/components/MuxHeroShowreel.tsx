@@ -13,18 +13,21 @@ const HeroMuxPlayer = MuxPlayer as ComponentType<HeroMuxPlayerProps>;
 const HERO_SHOWREEL_CLIP = {
   assetStartTime: 5,
   assetEndTime: 55,
-  // extraSourceParams: {
-  //   asset_start_time: 5,
-  //   asset_end_time: 55,
-  // },
+  thumbnailTime: 28,
 };
 
 export default function MuxHeroShowreel() {
-  const { playbackId, isBackgroundPaused, videoTitle } = useShowreel();
+  const { playbackId, isBackgroundPaused, videoTitle, startTimeSeconds, endTimeSeconds, posterTimeSeconds } =
+    useShowreel();
 
   if (!playbackId) {
     return null;
   }
+
+  const assetStartTime = typeof startTimeSeconds === 'number' ? startTimeSeconds : HERO_SHOWREEL_CLIP.assetStartTime;
+  const assetEndTime = typeof endTimeSeconds === 'number' ? endTimeSeconds : HERO_SHOWREEL_CLIP.assetEndTime;
+  const thumbnailTime =
+    typeof posterTimeSeconds === 'number' ? posterTimeSeconds : assetStartTime || HERO_SHOWREEL_CLIP.thumbnailTime;
 
   return (
     <div className="hero-video hero-video-layer" aria-hidden="true">
@@ -32,16 +35,14 @@ export default function MuxHeroShowreel() {
         className="hero-video-player"
         playbackId={playbackId}
         autoPlay="muted"
-        // startTime={HERO_SHOWREEL_CLIP.startTime}
-        assetStartTime={HERO_SHOWREEL_CLIP.assetStartTime}
-        assetEndTime={HERO_SHOWREEL_CLIP.assetEndTime}
-        // extraSourceParams={HERO_SHOWREEL_CLIP.extraSourceParams}
+        assetStartTime={assetStartTime}
+        assetEndTime={assetEndTime}
         muted
         loop
         paused={isBackgroundPaused}
         playsInline
         streamType="on-demand"
-        thumbnailTime={28}
+        thumbnailTime={thumbnailTime}
         nohotkeys
         aria-hidden="true"
         tabIndex={-1}

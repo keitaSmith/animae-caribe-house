@@ -4,6 +4,7 @@ import ButtonLink from './ButtonLink';
 import { MailIcon, PlayIcon } from './Icons';
 import MuxHeroShowreel from './MuxHeroShowreel';
 import { useShowreel } from './ShowreelProvider';
+import { useEffect } from 'react';
 
 type HeroProps = {
   ariaLabel?: string;
@@ -14,6 +15,13 @@ type HeroProps = {
   contactHref?: string;
   contactLabel?: string;
   showreelLabel?: string;
+  showreelPlaybackId?: string;
+  showreelPosterSrc?: string;
+  showreelTitle?: string;
+  showreelStartTimeSeconds?: number;
+  showreelEndTimeSeconds?: number;
+  showreelPosterTimeSeconds?: number;
+  showreelAriaLabel?: string;
 };
 
 export default function Hero({
@@ -25,9 +33,51 @@ export default function Hero({
   contactHref = 'mailto:info@animaecaribehouse.com',
   contactLabel = 'Get in touch',
   showreelLabel = 'Watch showreel',
+  showreelPlaybackId,
+  showreelPosterSrc,
+  showreelTitle,
+  showreelStartTimeSeconds,
+  showreelEndTimeSeconds,
+  showreelPosterTimeSeconds,
+  showreelAriaLabel,
 }: HeroProps) {
-  const { openShowreel, playbackId, posterSrc } = useShowreel();
+  const { openShowreel, playbackId, posterSrc, setPageShowreel } = useShowreel();
   const hasMuxShowreel = Boolean(playbackId);
+
+  useEffect(() => {
+    if (
+      !showreelPlaybackId &&
+      !showreelPosterSrc &&
+      !showreelTitle &&
+      typeof showreelStartTimeSeconds !== 'number' &&
+      typeof showreelEndTimeSeconds !== 'number' &&
+      typeof showreelPosterTimeSeconds !== 'number' &&
+      !showreelAriaLabel
+    ) {
+      return undefined;
+    }
+
+    setPageShowreel({
+      playbackId: showreelPlaybackId,
+      posterSrc: showreelPosterSrc,
+      videoTitle: showreelTitle,
+      startTimeSeconds: showreelStartTimeSeconds,
+      endTimeSeconds: showreelEndTimeSeconds,
+      posterTimeSeconds: showreelPosterTimeSeconds,
+      ariaLabel: showreelAriaLabel,
+    });
+
+    return () => setPageShowreel(null);
+  }, [
+    setPageShowreel,
+    showreelAriaLabel,
+    showreelEndTimeSeconds,
+    showreelPlaybackId,
+    showreelPosterSrc,
+    showreelPosterTimeSeconds,
+    showreelStartTimeSeconds,
+    showreelTitle,
+  ]);
 
   return (
     <section className="hero-section" id="home" aria-label={ariaLabel}>

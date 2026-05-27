@@ -15,7 +15,7 @@ export default function PartnersStrip({
   return (
     <section className="partners-section" aria-label={ariaLabel}>
       <div className="container">
-        <p className="section-kicker">{kicker}</p>
+        {kicker ? <p className="section-kicker">{kicker}</p> : null}
         <div className="partner-marquee">
           {items.map((partner) => (
             <div className="partner-logo" key={partner.src}>
