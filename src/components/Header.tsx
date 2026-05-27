@@ -11,9 +11,10 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
-  const { openShowreel } = useShowreel();
+  const { openShowreel, canOpenShowreel } = useShowreel();
   const pathname = usePathname() || '/';
-  const isHomePage = pathname === '/';
+  const hasLandingHero = pathname === '/' || pathname === '/house' || pathname === '/festival';
+  const hasShowreelHero = pathname === '/house' || pathname === '/festival';
 
   useEffect(() => {
     const syncScrollState = () => {
@@ -27,7 +28,7 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    if (!isHomePage) return undefined;
+    if (!hasLandingHero) return undefined;
 
     let observer: IntersectionObserver | null = null;
     let frameId = 0;
@@ -59,7 +60,7 @@ export default function Header() {
         observer.disconnect();
       }
     };
-  }, [isHomePage]);
+  }, [hasLandingHero]);
 
   const headerClassName = [
     'site-header',
@@ -68,17 +69,17 @@ export default function Header() {
   ]
     .filter(Boolean)
     .join(' ');
-  const showHeaderShowreel = !isHomePage || !heroInView;
+  const showHeaderShowreel = canOpenShowreel && (hasShowreelHero ? !heroInView : false);
   const showreelClassName = ['nav-showreel', showHeaderShowreel ? 'is-visible' : 'is-hidden'].join(' ');
   const brandLogoSrc =
     isScrolled || menuOpen
-      ? '/assets/animae-house-logo-black-plain.PNG'
-      : '/assets/animae-house-logo-white-plain.PNG';
+      ? '/assets/anime-caribe-logo-black.png'
+      : '/assets/anime-caribe-logo-white.png';
 
   return (
     <header className={headerClassName}>
-      <Link className="brand-mark" href="/" aria-label="Animae Caribe House home">
-        <img src={brandLogoSrc} alt="Animae Caribe House" />
+      <Link className="brand-mark" href="/" aria-label="Animae Caribe home">
+        <img src={brandLogoSrc} alt="Animae Caribe" />
       </Link>
 
       <button

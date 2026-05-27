@@ -5,7 +5,7 @@ import MuxPlayer from '@mux/mux-player-react';
 import { useShowreel } from './ShowreelProvider';
 
 export default function ShowreelModal() {
-  const { playbackId, isShowreelOpen, closeShowreel } = useShowreel();
+  const { playbackId, isShowreelOpen, closeShowreel, posterSrc, variant, videoTitle } = useShowreel();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function ShowreelModal() {
     };
   }, [closeShowreel, isShowreelOpen]);
 
-  if (!isShowreelOpen || !playbackId) {
+  if (!isShowreelOpen) {
     return null;
   }
 
@@ -50,7 +50,7 @@ export default function ShowreelModal() {
       className="showreel-modal-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Play the Animae Caribe House showreel"
+      aria-label={`Play the ${videoTitle}`}
       onClick={closeShowreel}
     >
       <div className="showreel-modal-shell" onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>
@@ -65,22 +65,34 @@ export default function ShowreelModal() {
         </button>
 
         <div className="showreel-modal-player-frame">
-          <MuxPlayer
-            className="showreel-modal-player"
-            playbackId={playbackId}
-            autoPlay
-            playsInline
-            streamType="on-demand"
-            thumbnailTime={28}
-            metadata={{
-              video_title: 'Animae Caribe House Showreel',
-            }}
-            style={{
-              width: '100%',
-              height: '100%',
-              '--media-object-fit': 'cover',
-            }}
-          />
+          {playbackId ? (
+            <MuxPlayer
+              className="showreel-modal-player"
+              playbackId={playbackId}
+              autoPlay
+              playsInline
+              streamType="on-demand"
+              thumbnailTime={28}
+              metadata={{
+                video_title: videoTitle,
+              }}
+              style={{
+                width: '100%',
+                height: '100%',
+                '--media-object-fit': 'cover',
+              }}
+            />
+          ) : (
+            <div className="showreel-placeholder" style={{ backgroundImage: `url(${posterSrc})` }}>
+              <div>
+                <span className="section-kicker">{variant === 'festival' ? 'Festival reel' : 'Showreel'}</span>
+                <h2>{variant === 'festival' ? 'Festival showreel coming soon.' : 'Showreel coming soon.'}</h2>
+                <p>
+                  Add a dedicated {variant === 'festival' ? 'Festival' : 'House'} Mux playback ID to enable this reel.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

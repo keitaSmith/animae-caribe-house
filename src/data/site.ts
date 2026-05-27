@@ -16,8 +16,8 @@ export type NavItem = {
 };
 
 export const site: Site = {
-  name: 'Animae Caribe House',
-  tagline: 'Where Digital Creatives Find Community',
+  name: 'Animae Caribe',
+  tagline: 'Caribbean Animation, Festival and Creative Community',
   showreelUrl: 'https://www.youtube.com/',
   twixalotUrl: 'https://twixalot.com',
   contact: {
@@ -28,9 +28,9 @@ export const site: Site = {
 };
 
 export const navItems: NavItem[] = [
+  { label: 'Festival 2026', href: '/festival' },
+  { label: 'House', href: '/house' },
   { label: 'About', href: '/about' },
-  { label: 'Portfolio', href: '/portfolio' },
-  { label: 'News', href: '/news' },
-  { label: 'Team', href: '/team' },
+  { label: 'Partners', href: '/partners' },
   { label: 'Contact', href: '/contact' },
 ];

@@ -20,7 +20,7 @@ const HERO_SHOWREEL_CLIP = {
 };
 
 export default function MuxHeroShowreel() {
-  const { playbackId, isBackgroundPaused } = useShowreel();
+  const { playbackId, isBackgroundPaused, videoTitle } = useShowreel();
 
   if (!playbackId) {
     return null;
@@ -46,7 +46,7 @@ export default function MuxHeroShowreel() {
         aria-hidden="true"
         tabIndex={-1}
         metadata={{
-          video_title: "Animae Caribe House Showreel",
+          video_title: videoTitle,
         }}
         style={{
           width: "100%",

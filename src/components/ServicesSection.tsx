@@ -1,4 +1,10 @@
-const services = [
+type ServiceCard = {
+  number: string;
+  title: string;
+  description: string;
+};
+
+const services: ServiceCard[] = [
   {
     number: '01',
     title: 'Animation Production',
@@ -37,23 +43,34 @@ const services = [
   },
 ];
 
-export default function ServicesSection() {
+type ServicesSectionProps = {
+  id?: string;
+  kicker?: string;
+  title?: string;
+  intro?: string;
+  items?: ServiceCard[];
+};
+
+export default function ServicesSection({
+  id = 'services',
+  kicker = 'What We Create',
+  title = 'Services',
+  intro = 'From first idea to final delivery, Animae Caribe House helps bring bold Caribbean and global stories to life through animation, digital content, emerging technology, and collaborative production support.',
+  items = services,
+}: ServicesSectionProps) {
   return (
-    <section className="section services-section" id="services">
+    <section className="section services-section" id={id}>
       <div className="container">
         <div className="services-header">
           <div>
-            <span className="section-kicker">What We Create</span>
-            <h2>Services</h2>
+            <span className="section-kicker">{kicker}</span>
+            <h2>{title}</h2>
           </div>
-          <p>
-            From first idea to final delivery, Animae Caribe House helps bring bold Caribbean and global stories to
-            life through animation, digital content, emerging technology, and collaborative production support.
-          </p>
+          <p>{intro}</p>
         </div>
 
         <div className="services-grid">
-          {services.map((service) => (
+          {items.map((service) => (
             <article className="services-card glass-card" key={service.title}>
               <span className="services-number">{service.number}</span>
               <h3>{service.title}</h3>

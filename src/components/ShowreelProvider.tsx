@@ -2,9 +2,16 @@
 
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
+
+export type ShowreelVariant = 'house' | 'festival' | 'none';
 
 type ShowreelContextValue = {
+  variant: ShowreelVariant;
   playbackId?: string;
+  posterSrc: string;
+  videoTitle: string;
+  canOpenShowreel: boolean;
   isShowreelOpen: boolean;
   isBackgroundPaused: boolean;
   openShowreel: () => void;
@@ -19,15 +26,32 @@ type ShowreelProviderProps = {
 
 export function ShowreelProvider({ children }: ShowreelProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const playbackId = process.env.NEXT_PUBLIC_MUX_SHOWREEL_PLAYBACK_ID;
+  const pathname = usePathname() || '/';
+  const housePlaybackId =
+    process.env.NEXT_PUBLIC_MUX_HOUSE_SHOWREEL_PLAYBACK_ID || process.env.NEXT_PUBLIC_MUX_SHOWREEL_PLAYBACK_ID;
+  const festivalPlaybackId = process.env.NEXT_PUBLIC_MUX_FESTIVAL_SHOWREEL_PLAYBACK_ID;
+  const variant: ShowreelVariant = pathname === '/house' ? 'house' : pathname === '/festival' ? 'festival' : 'none';
+  const playbackId = variant === 'festival' ? festivalPlaybackId : variant === 'house' ? housePlaybackId : undefined;
+  const posterSrc = variant === 'festival' ? '/assets/animae-caribe-festival-feature.webp' : '/assets/hero-poster.webp';
+  const videoTitle =
+    variant === 'festival'
+      ? 'Animae Caribe Festival Showreel'
+      : variant === 'house'
+        ? 'Animae Caribe House Showreel'
+        : 'Animae Caribe Showreel';
+  const canOpenShowreel = variant === 'house' || variant === 'festival';
 
   const value = useMemo(
     () => ({
+      variant,
       playbackId,
+      posterSrc,
+      videoTitle,
+      canOpenShowreel,
       isShowreelOpen: isOpen,
       isBackgroundPaused: isOpen,
       openShowreel: () => {
-        if (!playbackId) {
+        if (!canOpenShowreel) {
           return;
         }
 
@@ -35,7 +59,7 @@ export function ShowreelProvider({ children }: ShowreelProviderProps) {
       },
       closeShowreel: () => setIsOpen(false),
     }),
-    [isOpen, playbackId]
+    [canOpenShowreel, isOpen, playbackId, posterSrc, variant, videoTitle]
   );
 
   return <ShowreelContext.Provider value={value}>{children}</ShowreelContext.Provider>;
