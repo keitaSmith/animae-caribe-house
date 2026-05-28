@@ -1,5 +1,6 @@
 import type {
   SanityEvent,
+  SanityFestivalEdition,
   SanityFestivalPage,
   SanityPartner,
   SanityUmbrellaHomePage,
@@ -17,7 +18,11 @@ const partnerProjection = `
 `;
 
 const eventProjection = `
+  _id,
   title,
+  "slug": slug.current,
+  startDateTime,
+  endDateTime,
   date,
   startTime,
   endTime,
@@ -25,9 +30,34 @@ const eventProjection = `
   eventType,
   shortDescription,
   attendanceType,
+  priceLabel,
   buttonLabel,
   ticketUrl,
-  registrationUrl
+  registrationUrl,
+  "imageUrl": image.asset->url,
+  festivalEdition->{
+    _id,
+    title,
+    theme,
+    year,
+    startDate,
+    endDate,
+    location,
+    description,
+    isActive
+  }
+`;
+
+const festivalEditionProjection = `
+  _id,
+  title,
+  year,
+  theme,
+  startDate,
+  endDate,
+  location,
+  description,
+  isActive
 `;
 
 export async function getSiteSettings() {
@@ -113,10 +143,11 @@ export async function getUmbrellaHomePage() {
       isVisible,
       showEyebrow,
       showHeading,
-      showBody,
+      showDescription,
       showCta,
       eyebrow,
       heading,
+      description,
       plainText,
       cta
     },
@@ -134,19 +165,14 @@ export async function getUmbrellaHomePage() {
         isVisible,
         number,
         title,
-        description,
-        cta
+        description
       },
       cta
     },
     partnersSection{
       isVisible,
-      showHeading,
-      showIntro,
-      showCta,
+      eyebrow,
       heading,
-      intro,
-      cta,
       partners[]->{
         ${partnerProjection}
       }
@@ -158,15 +184,31 @@ export async function getFestivalPage() {
   return sanityFetch<SanityFestivalPage>(`*[_type == "festivalPage"][0]{
     hero{
       isVisible,
-      showHeading,
-      showCopy,
-      showCtas,
       heading,
       copy,
+      primaryCta,
+      backgroundVideo{
+        title,
+        muxPlaybackId,
+        startTimeSeconds,
+        endTimeSeconds,
+        posterMode,
+        posterTimeSeconds,
+        "customPosterImage": {
+          "url": customPosterImage.asset->url,
+          "alt": customPosterImage.alt
+        },
+        "fallbackImage": {
+          "url": fallbackImage.asset->url,
+          "alt": fallbackImage.alt
+        },
+        ariaLabel
+      },
       ctas,
-      "backgroundImageUrl": backgroundImage.asset->url,
       showreel{
         muxPlaybackId,
+        modalTitle,
+        modalDescription,
         startTimeSeconds,
         endTimeSeconds,
         posterMode,
@@ -176,23 +218,78 @@ export async function getFestivalPage() {
         "fallbackImageUrl": fallbackImage.asset->url
       }
     },
-    aboutSection{isVisible, showEyebrow, showHeading, showBody, showCta, eyebrow, heading, plainText, cta},
+    aboutSection{isVisible, showEyebrow, showHeading, showDescription, showCta, eyebrow, heading, description, plainText, cta},
     partnersSection{
       isVisible,
-      showHeading,
-      showIntro,
-      showCta,
+      eyebrow,
       heading,
-      intro,
-      cta,
       partners[]->{
         ${partnerProjection}
       }
     },
-    programmingSection{isVisible, showEyebrow, showHeading, showIntro, eyebrow, heading, intro, cards[]{isVisible, number, title, description}},
-    eventsPreview{isVisible, showHeading, showIntro, showCta, heading, intro, cta},
-    archiveTeaser{isVisible, showEyebrow, showHeading, showCopy, showCta, eyebrow, heading, copy, cta},
-    finalCta{isVisible, showEyebrow, showHeading, showCopy, showCta, eyebrow, heading, copy, cta}
+    programmingSection{isVisible, showEyebrow, showHeading, showDescription, eyebrow, heading, description, intro, cards[]{isVisible, number, title, description}},
+    calendarSection{
+      isVisible,
+      eyebrow,
+      heading,
+      description,
+      modalTitle,
+      downloadLabel,
+      downloadButtonStyle,
+      "calendarImage": {
+        "url": calendarImage.asset->url,
+        "alt": calendarImage.alt
+      },
+      "downloadFileUrl": downloadFile.asset->url,
+      downloadUrl
+    },
+    eventsPreview{
+      isVisible,
+      showEyebrow,
+      showHeading,
+      showDescription,
+      showCta,
+      eyebrow,
+      heading,
+      description,
+      festivalEdition->{
+        _id,
+        title,
+        year,
+        isActive
+      },
+      maxEvents,
+      cta,
+      events[]->{
+        ${eventProjection}
+      }
+    },
+    venueSection{
+      isVisible,
+      eyebrow,
+      heading,
+      description,
+      venueName,
+      address,
+      googleMapsEmbedUrl,
+      googleMapsUrl,
+      mapCtaLabel,
+      mapButtonStyle
+    },
+    archiveTeaser{isVisible, showEyebrow, showHeading, showDescription, showCta, eyebrow, heading, description, plainText, cta},
+    finalCta{
+      isVisible,
+      showEyebrow,
+      showHeading,
+      showDescription,
+      eyebrow,
+      heading,
+      description,
+      plainText,
+      primaryCta,
+      secondaryCta,
+      cta
+    }
   }`);
 }
 
@@ -207,26 +304,90 @@ export async function getHousePage() {
 }
 
 export async function getActiveFestivalEdition() {
-  return sanityFetch(`*[_type == "festivalEdition" && isActive == true][0]{
-    title,
-    year,
-    theme,
-    startDate,
-    endDate,
-    location,
-    description,
-    "heroImageUrl": heroImage.asset->url
+  return sanityFetch<SanityFestivalEdition>(`*[_type == "festivalEdition" && isActive == true][0]{
+    ${festivalEditionProjection}
   }`);
 }
 
 export async function getFeaturedFestivalEvents() {
-  return sanityFetch<SanityEvent[]>(`*[_type == "event" && isFeatured == true] | order(date asc, startTime asc)[0...6]{
+  return sanityFetch<SanityEvent[]>(`*[_type == "event" && isFeatured == true] | order(startDateTime asc, date asc, startTime asc)[0...6]{
     ${eventProjection}
   }`);
 }
 
+export async function getUpcomingFestivalEventsByEdition(editionId: string, maxEvents = 3) {
+  const now = new Date().toISOString();
+  const today = now.slice(0, 10);
+  const limit = Math.min(Math.max(maxEvents, 1), 12);
+
+  return sanityFetch<SanityEvent[]>(
+    `*[
+      _type == "event" &&
+      references($editionId) &&
+      (
+        (defined(startDateTime) && startDateTime >= $now) ||
+        (!defined(startDateTime) && defined(date) && date >= $today)
+      )
+    ] | order(startDateTime asc, date asc, startTime asc)[0...${limit}]{
+      ${eventProjection}
+    }`,
+    {editionId, now, today}
+  );
+}
+
+export async function getFestivalEditionByYear(year: number | string) {
+  return sanityFetch<SanityFestivalEdition>(
+    `*[_type == "festivalEdition" && year == $year][0]{
+      ${festivalEditionProjection}
+    }`,
+    {year: Number(year)}
+  );
+}
+
+export async function getAllFestivalEditions() {
+  return sanityFetch<SanityFestivalEdition[]>(`*[_type == "festivalEdition" && defined(year)] | order(year desc){
+    ${festivalEditionProjection}
+  }`);
+}
+
+export async function getPastFestivalEditions() {
+  const [allEditions, activeEdition] = await Promise.all([getAllFestivalEditions(), getActiveFestivalEdition()]);
+
+  if (!allEditions?.length) {
+    return null;
+  }
+
+  const activeYear = activeEdition?.year;
+
+  return allEditions
+    .filter((edition) => {
+      if (typeof edition.year !== 'number') {
+        return false;
+      }
+
+      if (typeof activeYear === 'number') {
+        return edition.year < activeYear;
+      }
+
+      return edition.isActive !== true;
+    })
+    .sort((left, right) => (right.year || 0) - (left.year || 0));
+}
+
+export async function getFestivalEventsByEdition(editionId: string) {
+  return sanityFetch<SanityEvent[]>(
+    `*[
+      _type == "event" &&
+      references($editionId)
+    ] | order(startDateTime asc, date asc, startTime asc){
+      ${eventProjection}
+    }`,
+    {editionId}
+  );
+}
+
 export async function getAllFestivalEvents() {
-  return sanityFetch<SanityEvent[]>(`*[_type == "event"] | order(date asc, startTime asc){
+  return sanityFetch<SanityEvent[]>(`*[_type == "event"] | order(startDateTime asc, date asc, startTime asc){
     ${eventProjection}
   }`);
 }

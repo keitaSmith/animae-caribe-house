@@ -1,3 +1,5 @@
+import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute, getPastEditionsRoute} from '../lib/festivalRoutes';
+
 export type Site = {
   name: string;
   tagline: string;
@@ -13,6 +15,10 @@ export type Site = {
 export type NavItem = {
   label: string;
   href: string;
+  children?: Array<{
+    label: string;
+    href: string;
+  }>;
 };
 
 export const site: Site = {
@@ -28,7 +34,15 @@ export const site: Site = {
 };
 
 export const navItems: NavItem[] = [
-  { label: 'Festival 2026', href: '/festival' },
+  {
+    label: `Festival ${DEFAULT_FESTIVAL_YEAR}`,
+    href: '/festival',
+    children: [
+      {label: 'Festival Home', href: '/festival'},
+      {label: `${DEFAULT_FESTIVAL_YEAR} Programme`, href: getFestivalEventsRoute(DEFAULT_FESTIVAL_YEAR)},
+      {label: 'Past Editions', href: getPastEditionsRoute()},
+    ],
+  },
   { label: 'House', href: '/house' },
   { label: 'About', href: '/about' },
   { label: 'Partners', href: '/partners' },

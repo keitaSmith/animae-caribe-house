@@ -51,3 +51,34 @@ export function ExternalIcon() {
     </svg>
   );
 }
+
+export function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="M12 3v12" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M5 21h14" />
+    </svg>
+  );
+}
+
+export function ShareIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="M15 8a3 3 0 1 0-2.8-4H12a3 3 0 0 0 0 6 3 3 0 0 0 3-2Z" />
+      <path d="M6 15a3 3 0 1 0 0 6 3 3 0 0 0 2.8-2h.2A3 3 0 0 0 6 15Z" />
+      <path d="M18 14a3 3 0 1 0 0 6 3 3 0 0 0 2.8-2h.2a3 3 0 0 0-3-4Z" />
+      <path d="m8.7 16.3 6.6-3.6" />
+      <path d="m8.7 7.7 6.6 3.6" />
+    </svg>
+  );
+}
+
+export function MapPinIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11Z" />
+      <path d="M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+    </svg>
+  );
+}

@@ -8,11 +8,14 @@ import { PlayIcon } from './Icons';
 import { useShowreel } from './ShowreelProvider';
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuState, setMenuState] = useState({isOpen: false, path: '/'});
+  const [submenuState, setSubmenuState] = useState<{key: string | null; path: string}>({key: null, path: '/'});
   const [isScrolled, setIsScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
-  const { openShowreel, canOpenShowreel } = useShowreel();
+  const { openShowreel, canOpenShowreel, showreelButtonLabel } = useShowreel();
   const pathname = usePathname() || '/';
+  const menuOpen = menuState.isOpen && menuState.path === pathname;
+  const openSubmenu = submenuState.path === pathname ? submenuState.key : null;
   const hasLandingHero = pathname === '/' || pathname === '/house' || pathname === '/festival';
   const hasShowreelHero = pathname === '/house' || pathname === '/festival';
 
@@ -62,6 +65,13 @@ export default function Header() {
     };
   }, [hasLandingHero]);
 
+  const isLinkActive = (href: string) => pathname === href;
+  const isFestivalBranch = pathname === '/festival' || pathname.startsWith('/festival/');
+  const closeMenus = () => {
+    setMenuState({isOpen: false, path: pathname});
+    setSubmenuState({key: null, path: pathname});
+  };
+
   const headerClassName = [
     'site-header',
     isScrolled ? 'is-scrolled' : 'is-top',
@@ -88,7 +98,9 @@ export default function Header() {
         aria-controls="primary-navigation"
         aria-label={menuOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={menuOpen}
-        onClick={() => setMenuOpen((open) => !open)}
+        onClick={() =>
+          setMenuState((current) => (current.isOpen && current.path === pathname ? {isOpen: false, path: pathname} : {isOpen: true, path: pathname}))
+        }
       >
         <span />
         <span />
@@ -100,16 +112,67 @@ export default function Header() {
         className={menuOpen ? 'nav-links is-open' : 'nav-links'}
         aria-label="Primary navigation"
       >
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={pathname === item.href ? 'active' : ''}
-            onClick={() => setMenuOpen(false)}
-          >
-            {item.label}
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          if (!item.children?.length) {
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={isLinkActive(item.href) ? 'active' : ''}
+                onClick={closeMenus}
+              >
+                {item.label}
+              </Link>
+            );
+          }
+
+          const submenuId = `${item.label.toLowerCase().replace(/\s+/g, '-')}-submenu`;
+          const isOpen = openSubmenu === item.label;
+          const isActive = item.href === '/festival' ? isFestivalBranch : isLinkActive(item.href);
+
+          return (
+            <div
+              key={item.href}
+              className={['nav-item-with-submenu', isOpen ? 'is-open' : '', isActive ? 'is-active' : '']
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <div className="nav-link-row">
+                <Link href={item.href} className={isActive ? 'active' : ''} onClick={closeMenus}>
+                  {item.label}
+                </Link>
+                <button
+                  className={isOpen ? 'nav-submenu-toggle active' : 'nav-submenu-toggle'}
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={submenuId}
+                  aria-label={isOpen ? `Collapse ${item.label} menu` : `Expand ${item.label} menu`}
+                  onClick={() =>
+                    setSubmenuState((current) =>
+                      current.path === pathname && current.key === item.label
+                        ? {key: null, path: pathname}
+                        : {key: item.label, path: pathname}
+                    )
+                  }
+                >
+                  <span className="nav-submenu-caret" aria-hidden="true" />
+                </button>
+              </div>
+              <div id={submenuId} className={isOpen ? 'nav-submenu is-open' : 'nav-submenu'}>
+                {item.children.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className={pathname === child.href ? 'active' : ''}
+                    onClick={closeMenus}
+                  >
+                    {child.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          );
+        })}
         <button
           className={showreelClassName}
           type="button"
@@ -117,10 +180,10 @@ export default function Header() {
           tabIndex={showHeaderShowreel ? 0 : -1}
           onClick={() => {
             openShowreel();
-            setMenuOpen(false);
+            closeMenus();
           }}
         >
-          <PlayIcon /> Watch showreel
+          <PlayIcon /> {showreelButtonLabel}
         </button>
       </nav>
     </header>

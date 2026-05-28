@@ -34,6 +34,12 @@ const attendanceTypeOptions = [
   {title: 'Invite only', value: 'inviteOnly'},
 ]
 
+const buttonStyleOptions = [
+  {title: 'Primary', value: 'primary'},
+  {title: 'Soft', value: 'soft'},
+  {title: 'Outline', value: 'outline'},
+]
+
 function fixedPreview(title: string, subtitle?: string) {
   return {
     prepare: () => ({
@@ -41,6 +47,73 @@ function fixedPreview(title: string, subtitle?: string) {
       subtitle,
     }),
   }
+}
+
+function formatPreviewDate(dateTime?: string) {
+  if (!dateTime) {
+    return undefined
+  }
+
+  const parsed = new Date(dateTime)
+
+  if (Number.isNaN(parsed.getTime())) {
+    return undefined
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(parsed)
+}
+
+function formatPreviewDateRange(startDate?: string, endDate?: string) {
+  if (!startDate || !endDate) {
+    return undefined
+  }
+
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return undefined
+  }
+
+  const sameYear = start.getFullYear() === end.getFullYear()
+  const sameMonth = sameYear && start.getMonth() === end.getMonth()
+
+  if (sameMonth) {
+    const month = new Intl.DateTimeFormat('en', {month: 'short'}).format(start)
+    return `${month} ${start.getDate()}–${end.getDate()}, ${start.getFullYear()}`
+  }
+
+  if (sameYear) {
+    const startLabel = new Intl.DateTimeFormat('en', {month: 'short', day: 'numeric'}).format(start)
+    const endLabel = new Intl.DateTimeFormat('en', {month: 'short', day: 'numeric'}).format(end)
+    return `${startLabel}–${endLabel}, ${start.getFullYear()}`
+  }
+
+  return `${formatPreviewDate(startDate)}–${formatPreviewDate(endDate)}`
+}
+
+function formatPreviewDateTime(dateTime?: string) {
+  if (!dateTime) {
+    return undefined
+  }
+
+  const parsed = new Date(dateTime)
+
+  if (Number.isNaN(parsed.getTime())) {
+    return undefined
+  }
+
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(parsed)
 }
 
 function elementVisibilityFields() {
@@ -298,6 +371,183 @@ const socialLink = defineType({
   },
 })
 
+const teaserSection = defineType({
+  name: 'teaserSection',
+  title: 'Teaser section',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'showEyebrow', title: 'Show eyebrow/label', type: 'boolean', initialValue: true}),
+    defineField({name: 'showHeading', title: 'Show title', type: 'boolean', initialValue: true}),
+    defineField({name: 'showDescription', title: 'Show description', type: 'boolean', initialValue: true}),
+    defineField({name: 'showCta', title: 'Show CTA', type: 'boolean', initialValue: true}),
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'heading', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+    defineField({name: 'cta', title: 'CTA', type: 'cta'}),
+    defineField({name: 'plainText', title: 'Legacy plain text fallback', type: 'text', rows: 4, hidden: true}),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      subtitle: 'eyebrow',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, subtitle, isVisible}) => ({
+      title: title || 'Teaser section',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` · ${subtitle}` : ''}`,
+    }),
+  },
+})
+
+const joinFestivalSection = defineType({
+  name: 'joinFestivalSection',
+  title: 'Join the Festival section',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'showEyebrow', title: 'Show eyebrow/label', type: 'boolean', initialValue: true}),
+    defineField({name: 'showHeading', title: 'Show title', type: 'boolean', initialValue: true}),
+    defineField({name: 'showDescription', title: 'Show description', type: 'boolean', initialValue: true}),
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'heading', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+    defineField({name: 'primaryCta', title: 'Primary CTA', type: 'cta'}),
+    defineField({name: 'secondaryCta', title: 'Secondary CTA', type: 'cta'}),
+    defineField({name: 'plainText', title: 'Legacy plain text fallback', type: 'text', rows: 4, hidden: true}),
+    defineField({name: 'cta', title: 'Legacy single CTA fallback', type: 'cta', hidden: true}),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      subtitle: 'eyebrow',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, subtitle, isVisible}) => ({
+      title: title || 'Join the Festival section',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` · ${subtitle}` : ''}`,
+    }),
+  },
+})
+
+const festivalCalendarSection = defineType({
+  name: 'festivalCalendarSection',
+  title: 'Festival Calendar Image',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'heading', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+    defineField({
+      name: 'calendarImage',
+      title: 'Calendar / programme image',
+      type: 'imageWithAlt',
+      description: 'Upload the visible festival programme image. This image is also used inside the modal.',
+    }),
+    defineField({
+      name: 'modalTitle',
+      title: 'Modal title',
+      type: 'string',
+      description: 'Optional heading shown inside the enlarged image modal.',
+    }),
+    defineField({
+      name: 'downloadLabel',
+      title: 'Download button label',
+      type: 'string',
+      description: 'Text shown on the download action button.',
+    }),
+    defineField({
+      name: 'downloadButtonStyle',
+      title: 'Download button style',
+      type: 'string',
+      options: {list: buttonStyleOptions},
+      description: 'Choose which existing site button style the Download button should use.',
+    }),
+    defineField({
+      name: 'downloadFile',
+      title: 'Download file',
+      type: 'file',
+      description: 'Optional separate downloadable asset, such as a high-resolution PDF or image.',
+      options: {accept: '.pdf,image/*'},
+    }),
+    defineField({
+      name: 'downloadUrl',
+      title: 'Download URL',
+      type: 'url',
+      description: 'Optional external download URL used if no file asset is provided.',
+    }),
+    defineField({
+      name: 'shareLabel',
+      title: 'Legacy share label',
+      type: 'string',
+      hidden: true,
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      media: 'calendarImage',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, media, isVisible}) => ({
+      title: title || 'Festival Calendar Image',
+      subtitle: isVisible === false ? 'Hidden' : 'Visible',
+      media,
+    }),
+  },
+})
+
+const venueMapSection = defineType({
+  name: 'venueMapSection',
+  title: 'Venue / Location Map',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'heading', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+    defineField({name: 'venueName', title: 'Venue name', type: 'string'}),
+    defineField({name: 'address', title: 'Address', type: 'text', rows: 3}),
+    defineField({
+      name: 'googleMapsEmbedUrl',
+      title: 'Google Maps embed URL',
+      type: 'url',
+      description: 'Paste a standard Google Maps embed URL copied from the Google Maps share/embed dialog. No API key is required.',
+    }),
+    defineField({
+      name: 'googleMapsUrl',
+      title: 'Google Maps link',
+      type: 'url',
+      description: 'Optional Google Maps link used for the “Open in Google Maps” style button.',
+    }),
+    defineField({
+      name: 'mapCtaLabel',
+      title: 'Map CTA label',
+      type: 'string',
+      description: 'Controls the text for the Google Maps link button.',
+    }),
+    defineField({
+      name: 'mapButtonStyle',
+      title: 'Google Maps button style',
+      type: 'string',
+      options: {list: buttonStyleOptions},
+      description: 'Choose which existing site button style the Google Maps button should use.',
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      subtitle: 'venueName',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, subtitle, isVisible}) => ({
+      title: title || 'Venue / Location Map',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` · ${subtitle}` : ''}`,
+    }),
+  },
+})
+
 const richTextSection = defineType({
   name: 'richTextSection',
   title: 'Rich text section',
@@ -330,6 +580,29 @@ const richTextSection = defineType({
     prepare: ({title, subtitle, isVisible}) => ({
       title: title || 'Rich text section',
       subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` • ${subtitle}` : ''}`,
+    }),
+  },
+})
+
+const simpleCardItem = defineType({
+  name: 'simpleCardItem',
+  title: 'Card item',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this card', type: 'boolean', initialValue: true}),
+    defineField({name: 'number', title: 'Number/label', type: 'string'}),
+    defineField({name: 'title', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'number',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, subtitle, isVisible}) => ({
+      title: title || 'Card item',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` · ${subtitle}` : ''}`,
     }),
   },
 })
@@ -389,6 +662,36 @@ const cardGridSection = defineType({
   },
 })
 
+const simpleCardGridSection = defineType({
+  name: 'simpleCardGridSection',
+  title: 'Card grid section',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'showEyebrow', title: 'Show eyebrow/label', type: 'boolean', initialValue: true}),
+    defineField({name: 'showHeading', title: 'Show title', type: 'boolean', initialValue: true}),
+    defineField({name: 'showDescription', title: 'Show description', type: 'boolean', initialValue: true}),
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'heading', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+    defineField({name: 'cards', title: 'Cards', type: 'array', of: [defineArrayMember({type: 'simpleCardItem'})]}),
+    defineField({name: 'intro', title: 'Legacy intro fallback', type: 'text', rows: 3, hidden: true}),
+    defineField({name: 'cta', title: 'Legacy CTA fallback', type: 'cta', hidden: true}),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      subtitle: 'eyebrow',
+      count: 'cards.length',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, subtitle, count, isVisible}) => ({
+      title: title || 'Card grid section',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` · ${subtitle}` : ''}${typeof count === 'number' ? ` · ${count} cards` : ''}`,
+    }),
+  },
+})
+
 const ecosystemSection = defineType({
   name: 'ecosystemSection',
   title: 'Ecosystem section',
@@ -404,7 +707,7 @@ const ecosystemSection = defineType({
     defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
     defineField({name: 'heading', title: 'Heading', type: 'string'}),
     defineField({name: 'intro', title: 'Intro/copy', type: 'text', rows: 3}),
-    defineField({name: 'cards', title: 'Cards/items', type: 'array', of: [defineArrayMember({type: 'cardItem'})]}),
+    defineField({name: 'cards', title: 'Cards/items', type: 'array', of: [defineArrayMember({type: 'simpleCardItem'})]}),
     defineField({
       name: 'cta',
       title: 'Ecosystem CTA',
@@ -421,6 +724,42 @@ const ecosystemSection = defineType({
     prepare: ({title, subtitle, isVisible}) => ({
       title: title || 'Ecosystem section',
       subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` • ${subtitle}` : ''}`,
+    }),
+  },
+})
+
+const festivalHeroSection = defineType({
+  name: 'festivalHeroSection',
+  title: 'Festival hero section',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'heading', title: 'Title', type: 'string'}),
+    defineField({name: 'copy', title: 'Description', type: 'text', rows: 3}),
+    defineField({name: 'primaryCta', title: 'Primary CTA', type: 'cta'}),
+    defineField({
+      name: 'backgroundVideo',
+      title: 'Hero background video',
+      type: 'muxVideo',
+      description: 'Controls the cinematic looping background video inside the Festival hero.',
+    }),
+    defineField({
+      name: 'showreel',
+      title: 'Watch Showreel modal video',
+      type: 'videoShowreel',
+      description: 'Controls the Festival hero Watch Showreel button, the Festival menu Watch Showreel button, and the modal video.',
+    }),
+    defineField({name: 'ctas', title: 'Legacy CTA buttons', type: 'array', of: [defineArrayMember({type: 'cta'})], hidden: true}),
+    defineField({name: 'backgroundImage', title: 'Legacy background image', type: 'imageWithAlt', hidden: true}),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, isVisible}) => ({
+      title: title || 'Festival hero section',
+      subtitle: isVisible === false ? 'Hidden' : 'Visible',
     }),
   },
 })
@@ -513,6 +852,38 @@ const splitHeroSection = defineType({
   preview: fixedPreview('Split Hero', 'Two-panel umbrella homepage hero'),
 })
 
+const partnersMarqueeSection = defineType({
+  name: 'partnersMarqueeSection',
+  title: 'Partners & collaborators section',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({
+      name: 'partners',
+      title: 'Selected partners',
+      type: 'array',
+      description:
+        'If you choose partners here, the frontend will respect this manual order. If left empty, it falls back to experience-based partner queries.',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'partner'}]})],
+    }),
+    defineField({name: 'heading', title: 'Legacy title fallback', type: 'string', hidden: true}),
+    defineField({name: 'intro', title: 'Legacy intro fallback', type: 'text', rows: 3, hidden: true}),
+    defineField({name: 'cta', title: 'Legacy CTA fallback', type: 'cta', hidden: true}),
+  ],
+  preview: {
+    select: {
+      eyebrow: 'eyebrow',
+      count: 'partners.length',
+      isVisible: 'isVisible',
+    },
+    prepare: ({eyebrow, count, isVisible}) => ({
+      title: eyebrow || 'Partners & collaborators section',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${typeof count === 'number' ? ` · ${count} selected` : ''}`,
+    }),
+  },
+})
+
 const partnerSectionSettings = defineType({
   name: 'partnerSectionSettings',
   title: 'Partner section settings',
@@ -543,6 +914,70 @@ const partnerSectionSettings = defineType({
     prepare: ({title, count, isVisible}) => ({
       title: title || 'Partner section',
       subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${typeof count === 'number' ? ` • ${count} selected` : ''}`,
+    }),
+  },
+})
+
+const festivalEventsSection = defineType({
+  name: 'festivalEventsSection',
+  title: 'Upcoming events section',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'showEyebrow', title: 'Show eyebrow/label', type: 'boolean', initialValue: true}),
+    defineField({name: 'showHeading', title: 'Show title', type: 'boolean', initialValue: true}),
+    defineField({name: 'showDescription', title: 'Show description', type: 'boolean', initialValue: true}),
+    defineField({name: 'showCta', title: 'Show CTA', type: 'boolean', initialValue: true}),
+    defineField({
+      name: 'eyebrow',
+      title: 'Eyebrow',
+      type: 'string',
+      description: 'Small label shown above the section title.',
+    }),
+    defineField({name: 'heading', title: 'Title', type: 'string'}),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      description: 'Intro text shown below the heading.',
+    }),
+    defineField({
+      name: 'festivalEdition',
+      title: 'Festival Year / Edition',
+      type: 'reference',
+      to: [{type: 'festivalEdition'}],
+      description:
+        'Select the festival edition whose events should be shown, for example “Animae Caribe Festival 2026”.',
+    }),
+    defineField({
+      name: 'maxEvents',
+      title: 'Maximum number of events',
+      type: 'number',
+      description: 'Choose how many upcoming events to show in this section.',
+      initialValue: 3,
+      validation: (Rule) => Rule.required().min(1).max(12),
+    }),
+    defineField({name: 'cta', title: 'CTA', type: 'cta'}),
+    defineField({
+      name: 'events',
+      title: 'Legacy manual event selection',
+      type: 'array',
+      description: 'Deprecated manual fallback. Upcoming events are now selected automatically by Festival Year / Edition.',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'event'}]})],
+      hidden: true,
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      subtitle: 'festivalEdition.title',
+      maxEvents: 'maxEvents',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, subtitle, maxEvents, isVisible}) => ({
+      title: title || 'Upcoming events section',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` · ${subtitle}` : ''}${maxEvents ? ` · max ${maxEvents}` : ''}`,
     }),
   },
 })
@@ -637,15 +1072,14 @@ const umbrellaHomePage = defineType({
   fields: [
     defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
     defineField({name: 'splitHero', title: 'Split hero', type: 'splitHeroSection'}),
-    defineField({name: 'aboutSection', title: 'About section', type: 'richTextSection'}),
-    defineField({name: 'partnersSection', title: 'Partners/collaborators section', type: 'partnerSectionSettings'}),
+    defineField({name: 'aboutSection', title: 'About section', type: 'teaserSection'}),
+    defineField({name: 'partnersSection', title: 'Partners/collaborators section', type: 'partnersMarqueeSection'}),
     defineField({
       name: 'ecosystemSection',
       title: 'Ecosystem section',
       type: 'ecosystemSection',
       description: 'Controls the ecosystem heading, copy, cards, and its CTA on the homepage.',
     }),
-    defineField({name: 'footerNote', title: 'Footer note', type: 'text', rows: 3}),
   ],
   preview: fixedPreview('Umbrella Homepage', 'animaecaribe.com root page'),
 })
@@ -656,13 +1090,15 @@ const festivalPage = defineType({
   type: 'document',
   fields: [
     defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
-    defineField({name: 'hero', title: 'Hero', type: 'heroSection'}),
-    defineField({name: 'aboutSection', title: 'About section', type: 'richTextSection'}),
-    defineField({name: 'partnersSection', title: 'Partners section', type: 'partnerSectionSettings'}),
-    defineField({name: 'programmingSection', title: 'Programming/highlights', type: 'cardGridSection'}),
-    defineField({name: 'eventsPreview', title: 'Events/programme preview', type: 'eventsPreviewSection'}),
-    defineField({name: 'archiveTeaser', title: 'Past editions/archive teaser', type: 'archiveTeaserSection'}),
-    defineField({name: 'finalCta', title: 'Final CTA', type: 'archiveTeaserSection'}),
+    defineField({name: 'hero', title: 'Hero', type: 'festivalHeroSection'}),
+    defineField({name: 'aboutSection', title: 'About section', type: 'teaserSection'}),
+    defineField({name: 'partnersSection', title: 'Partners section', type: 'partnersMarqueeSection'}),
+    defineField({name: 'programmingSection', title: 'Programming/highlights', type: 'simpleCardGridSection'}),
+    defineField({name: 'calendarSection', title: 'Festival Calendar Image', type: 'festivalCalendarSection'}),
+    defineField({name: 'eventsPreview', title: 'Events/programme preview', type: 'festivalEventsSection'}),
+    defineField({name: 'venueSection', title: 'Venue / Location Map', type: 'venueMapSection'}),
+    defineField({name: 'archiveTeaser', title: 'Past Editions', type: 'teaserSection'}),
+    defineField({name: 'finalCta', title: 'Join the Festival', type: 'joinFestivalSection'}),
   ],
   preview: fixedPreview('Festival Page', 'animaecaribe.com/festival'),
 })
@@ -693,26 +1129,65 @@ const festivalEdition = defineType({
   title: 'Festival edition',
   type: 'document',
   fields: [
-    defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+      description: 'The public name of the festival edition, e.g. “Animae Caribe Festival 2026”.',
+      validation: (Rule) => Rule.required(),
+    }),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
-    defineField({name: 'year', title: 'Year', type: 'number'}),
-    defineField({name: 'theme', title: 'Theme', type: 'string'}),
+    defineField({
+      name: 'year',
+      title: 'Year',
+      type: 'number',
+      description: 'The year this edition belongs to.',
+    }),
     defineField({name: 'startDate', title: 'Start date', type: 'date'}),
     defineField({name: 'endDate', title: 'End date', type: 'date'}),
     defineField({name: 'location', title: 'Location', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
-    defineField({name: 'heroImage', title: 'Hero/key image', type: 'imageWithAlt'}),
-    defineField({name: 'isActive', title: 'Active edition', type: 'boolean', initialValue: false}),
+    defineField({
+      name: 'isActive',
+      title: 'Active edition',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Mark this as the current/active festival edition used for current festival content.',
+    }),
   ],
   preview: {
     select: {
       title: 'title',
-      subtitle: 'year',
+      year: 'year',
+      isActive: 'isActive',
+      startDate: 'startDate',
+      endDate: 'endDate',
+      location: 'location',
     },
-    prepare: ({title, subtitle}) => ({
-      title: title || 'Festival edition',
-      subtitle: subtitle ? String(subtitle) : undefined,
-    }),
+    prepare: ({title, year, isActive, startDate, endDate, location}) => {
+      const previewTitle = title || (year ? `Animae Caribe Festival ${year}` : 'Festival Edition')
+      const parts: string[] = []
+
+      const dateRange = formatPreviewDateRange(startDate, endDate)
+
+      if (dateRange) {
+        parts.push(dateRange)
+      } else if (year) {
+        parts.push(String(year))
+      }
+
+      if (isActive) {
+        parts.push('Active')
+      }
+
+      if (location) {
+        parts.push(location)
+      }
+
+      return {
+        title: previewTitle,
+        subtitle: parts.join(' · ') || 'Festival Edition',
+      }
+    },
   },
 })
 
@@ -806,10 +1281,57 @@ const event = defineType({
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
-    defineField({name: 'festivalEdition', title: 'Festival edition', type: 'reference', to: [{type: 'festivalEdition'}]}),
-    defineField({name: 'date', title: 'Date', type: 'date'}),
-    defineField({name: 'startTime', title: 'Start time', type: 'string'}),
-    defineField({name: 'endTime', title: 'End time', type: 'string'}),
+    defineField({
+      name: 'festivalEdition',
+      title: 'Festival Year / Edition',
+      type: 'reference',
+      to: [{type: 'festivalEdition'}],
+      description:
+        'Select the festival year this event belongs to, for example “Animae Caribe Festival 2026”. This helps group events by festival edition and supports future archive pages.',
+    }),
+    defineField({
+      name: 'startDateTime',
+      title: 'Start date & time',
+      type: 'datetime',
+      description: 'The full start date and time for this event.',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'endDateTime',
+      title: 'End date & time',
+      type: 'datetime',
+      description: 'The full end date and time for this event.',
+      validation: (Rule) =>
+        Rule.custom((value, context) => {
+          const startValue = context.document?.startDateTime
+
+          if (typeof value !== 'string' || typeof startValue !== 'string') {
+            return true
+          }
+
+          return new Date(value).getTime() >= new Date(startValue).getTime()
+            ? true
+            : 'End date & time cannot be before the start date & time.'
+        }),
+    }),
+    defineField({
+      name: 'date',
+      title: 'Legacy date fallback',
+      type: 'date',
+      description: 'Legacy fallback for older event documents. Use Start date & time instead for new content.',
+    }),
+    defineField({
+      name: 'startTime',
+      title: 'Legacy start time fallback',
+      type: 'string',
+      description: 'Legacy fallback for older event documents. Use Start date & time instead for new content.',
+    }),
+    defineField({
+      name: 'endTime',
+      title: 'Legacy end time fallback',
+      type: 'string',
+      description: 'Legacy fallback for older event documents. Use End date & time instead for new content.',
+    }),
     defineField({name: 'venue', title: 'Venue/location', type: 'string'}),
     defineField({
       name: 'eventType',
@@ -818,37 +1340,62 @@ const event = defineType({
       options: {list: eventTypeOptions},
     }),
     defineField({name: 'shortDescription', title: 'Short description', type: 'text', rows: 3}),
-    defineField({name: 'body', title: 'Body', type: 'array', of: [defineArrayMember({type: 'block'})]}),
-    defineField({name: 'image', title: 'Image', type: 'imageWithAlt'}),
+    defineField({name: 'body', title: 'Legacy body content', type: 'array', of: [defineArrayMember({type: 'block'})], hidden: true}),
+    defineField({name: 'image', title: 'Legacy image', type: 'imageWithAlt', hidden: true}),
     defineField({
       name: 'speakers',
-      title: 'Speakers/guests',
+      title: 'Legacy speakers/guests',
       type: 'array',
       of: [defineArrayMember({type: 'reference', to: [{type: 'person'}]})],
+      hidden: true,
     }),
-    defineField({name: 'isFeatured', title: 'Featured', type: 'boolean', initialValue: false}),
+    defineField({name: 'isFeatured', title: 'Legacy featured flag', type: 'boolean', initialValue: false, hidden: true}),
     defineField({
       name: 'attendanceType',
       title: 'Attendance type',
       type: 'string',
       options: {list: attendanceTypeOptions},
     }),
-    defineField({name: 'priceLabel', title: 'Price label', type: 'string'}),
-    defineField({name: 'priceAmount', title: 'Price amount', type: 'number'}),
-    defineField({name: 'currency', title: 'Currency', type: 'string'}),
-    defineField({name: 'ticketUrl', title: 'Ticket URL', type: 'url'}),
-    defineField({name: 'registrationUrl', title: 'Registration URL', type: 'url'}),
-    defineField({name: 'buttonLabel', title: 'Button label', type: 'string'}),
+    defineField({name: 'priceLabel', title: 'Legacy price label', type: 'string', hidden: true}),
+    defineField({name: 'priceAmount', title: 'Legacy price amount', type: 'number', hidden: true}),
+    defineField({name: 'currency', title: 'Legacy currency', type: 'string', hidden: true}),
+    defineField({name: 'ticketUrl', title: 'Legacy ticket URL', type: 'url', hidden: true}),
+    defineField({name: 'registrationUrl', title: 'Legacy registration URL', type: 'url', hidden: true}),
+    defineField({name: 'buttonLabel', title: 'Legacy button label', type: 'string', hidden: true}),
   ],
   preview: {
     select: {
       title: 'title',
-      subtitle: 'date',
+      startDateTime: 'startDateTime',
+      legacyDate: 'date',
+      legacyStartTime: 'startTime',
+      editionTitle: 'festivalEdition.title',
+      editionYear: 'festivalEdition.year',
     },
-    prepare: ({title, subtitle}) => ({
-      title: title || 'Event',
-      subtitle,
-    }),
+    prepare: ({title, startDateTime, legacyDate, legacyStartTime, editionTitle, editionYear}) => {
+      const previewTitle = title || 'Event'
+      const timeLabel = formatPreviewDateTime(startDateTime)
+      const editionLabel = editionTitle || (editionYear ? `Animae Caribe Festival ${editionYear}` : undefined)
+
+      if (timeLabel) {
+        return {
+          title: previewTitle,
+          subtitle: [timeLabel, editionLabel].filter(Boolean).join(' · '),
+        }
+      }
+
+      if (legacyDate || legacyStartTime) {
+        return {
+          title: previewTitle,
+          subtitle: [legacyDate, legacyStartTime, editionLabel].filter(Boolean).join(' · '),
+        }
+      }
+
+      return {
+        title: previewTitle,
+        subtitle: 'Start date/time missing',
+      }
+    },
   },
 })
 
@@ -950,16 +1497,25 @@ export const schemaTypes = [
   imageWithAlt,
   seoFields,
   muxVideo,
-  videoShowreel,
-  socialLink,
-  richTextSection,
+    videoShowreel,
+    socialLink,
+    teaserSection,
+    joinFestivalSection,
+    festivalCalendarSection,
+    venueMapSection,
+    richTextSection,
+  simpleCardItem,
   cardItem,
   cardGridSection,
+  simpleCardGridSection,
   ecosystemSection,
+  festivalHeroSection,
   heroSection,
   splitHeroPanel,
   splitHeroSection,
+  partnersMarqueeSection,
   partnerSectionSettings,
+  festivalEventsSection,
   eventsPreviewSection,
   archiveTeaserSection,
   siteSettings,

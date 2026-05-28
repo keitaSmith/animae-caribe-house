@@ -15,6 +15,12 @@ type HeroProps = {
   contactHref?: string;
   contactLabel?: string;
   showreelLabel?: string;
+  backgroundPlaybackId?: string;
+  backgroundPosterSrc?: string;
+  backgroundVideoTitle?: string;
+  backgroundStartTimeSeconds?: number;
+  backgroundEndTimeSeconds?: number;
+  backgroundPosterTimeSeconds?: number;
   showreelPlaybackId?: string;
   showreelPosterSrc?: string;
   showreelTitle?: string;
@@ -33,6 +39,12 @@ export default function Hero({
   contactHref = 'mailto:info@animaecaribehouse.com',
   contactLabel = 'Get in touch',
   showreelLabel = 'Watch showreel',
+  backgroundPlaybackId,
+  backgroundPosterSrc,
+  backgroundVideoTitle,
+  backgroundStartTimeSeconds,
+  backgroundEndTimeSeconds,
+  backgroundPosterTimeSeconds,
   showreelPlaybackId,
   showreelPosterSrc,
   showreelTitle,
@@ -41,11 +53,50 @@ export default function Hero({
   showreelPosterTimeSeconds,
   showreelAriaLabel,
 }: HeroProps) {
-  const { openShowreel, playbackId, posterSrc, setPageShowreel } = useShowreel();
-  const hasMuxShowreel = Boolean(playbackId);
+  const {
+    openShowreel,
+    backgroundPlaybackId: activeBackgroundPlaybackId,
+    backgroundPosterSrc: activeBackgroundPosterSrc,
+    setPageShowreel,
+    setPageBackgroundVideo,
+  } = useShowreel();
+  const hasMuxBackground = Boolean(activeBackgroundPlaybackId);
 
   useEffect(() => {
     if (
+      !backgroundPlaybackId &&
+      !backgroundPosterSrc &&
+      !backgroundVideoTitle &&
+      typeof backgroundStartTimeSeconds !== 'number' &&
+      typeof backgroundEndTimeSeconds !== 'number' &&
+      typeof backgroundPosterTimeSeconds !== 'number'
+    ) {
+      return undefined;
+    }
+
+    setPageBackgroundVideo({
+      playbackId: backgroundPlaybackId,
+      posterSrc: backgroundPosterSrc,
+      videoTitle: backgroundVideoTitle,
+      startTimeSeconds: backgroundStartTimeSeconds,
+      endTimeSeconds: backgroundEndTimeSeconds,
+      posterTimeSeconds: backgroundPosterTimeSeconds,
+    });
+
+    return () => setPageBackgroundVideo(null);
+  }, [
+    backgroundEndTimeSeconds,
+    backgroundPlaybackId,
+    backgroundPosterSrc,
+    backgroundPosterTimeSeconds,
+    backgroundStartTimeSeconds,
+    backgroundVideoTitle,
+    setPageBackgroundVideo,
+  ]);
+
+  useEffect(() => {
+    if (
+      !showreelLabel &&
       !showreelPlaybackId &&
       !showreelPosterSrc &&
       !showreelTitle &&
@@ -65,6 +116,7 @@ export default function Hero({
       endTimeSeconds: showreelEndTimeSeconds,
       posterTimeSeconds: showreelPosterTimeSeconds,
       ariaLabel: showreelAriaLabel,
+      buttonLabel: showreelLabel,
     });
 
     return () => setPageShowreel(null);
@@ -72,6 +124,7 @@ export default function Hero({
     setPageShowreel,
     showreelAriaLabel,
     showreelEndTimeSeconds,
+    showreelLabel,
     showreelPlaybackId,
     showreelPosterSrc,
     showreelPosterTimeSeconds,
@@ -82,7 +135,9 @@ export default function Hero({
   return (
     <section className="hero-section" id="home" aria-label={ariaLabel}>
       <MuxHeroShowreel />
-      {!hasMuxShowreel ? <div className="hero-poster" style={{ backgroundImage: `url(${posterSrc})` }} /> : null}
+      {!hasMuxBackground ? (
+        <div className="hero-poster" style={{ backgroundImage: `url(${activeBackgroundPosterSrc})` }} />
+      ) : null}
       <div className="hero-scrim" />
 
       <div className="container hero-content">

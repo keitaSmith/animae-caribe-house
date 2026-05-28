@@ -56,7 +56,45 @@ export type SanityCardItem = SanityVisibilityFields & {
   cta?: SanityCta;
 };
 
+export type SanityTeaserSection = SanityVisibilityFields & {
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  plainText?: string;
+  cta?: SanityCta;
+};
+
+export type SanityCalendarSection = {
+  isVisible?: boolean;
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  modalTitle?: string;
+  downloadLabel?: string;
+  downloadButtonStyle?: 'primary' | 'soft' | 'outline';
+  calendarImage?: SanityImage;
+  downloadFileUrl?: string;
+  downloadUrl?: string;
+};
+
+export type SanityVenueSection = {
+  isVisible?: boolean;
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  venueName?: string;
+  address?: string;
+  googleMapsEmbedUrl?: string;
+  googleMapsUrl?: string;
+  mapCtaLabel?: string;
+  mapButtonStyle?: 'primary' | 'soft' | 'outline';
+};
+
 export type SanityEvent = {
+  _id?: string;
+  slug?: string;
+  startDateTime?: string;
+  endDateTime?: string;
   date?: string;
   startTime?: string;
   endTime?: string;
@@ -65,20 +103,36 @@ export type SanityEvent = {
   venue?: string;
   eventType?: string;
   attendanceType?: string;
+  priceLabel?: string;
   buttonLabel?: string;
   ticketUrl?: string;
   registrationUrl?: string;
+  imageUrl?: string;
+  festivalEdition?: {
+    _id?: string;
+    title?: string;
+    year?: number;
+    isActive?: boolean;
+  };
+};
+
+export type SanityFestivalEdition = {
+  _id?: string;
+  title?: string;
+  year?: number;
+  theme?: string;
+  startDate?: string;
+  endDate?: string;
+  location?: string;
+  description?: string;
+  isActive?: boolean;
 };
 
 export type SanityPartnerSection = {
   isVisible?: boolean;
-  showHeading?: boolean;
-  showIntro?: boolean;
-  showCta?: boolean;
+  eyebrow?: string;
   heading?: string;
-  intro?: string;
   partners?: SanityPartner[];
-  cta?: SanityCta;
 };
 
 export type SanityUmbrellaHomePage = {
@@ -103,12 +157,7 @@ export type SanityUmbrellaHomePage = {
       video?: SanityMuxVideo;
     };
   };
-  aboutSection?: SanityVisibilityFields & {
-    eyebrow?: string;
-    heading?: string;
-    plainText?: string;
-    cta?: SanityCta;
-  };
+  aboutSection?: SanityTeaserSection;
   ecosystemSection?: SanityVisibilityFields & {
     eyebrow?: string;
     heading?: string;
@@ -123,11 +172,14 @@ export type SanityFestivalPage = {
   hero?: SanityVisibilityFields & {
     heading?: string;
     copy?: string;
+    primaryCta?: SanityCta;
+    backgroundVideo?: SanityMuxVideo;
     ctas?: SanityCta[];
-    backgroundImageUrl?: string;
     showreel?: {
       muxPlaybackId?: string;
       buttonLabel?: string;
+      modalTitle?: string;
+      modalDescription?: string;
       startTimeSeconds?: number;
       endTimeSeconds?: number;
       posterMode?: 'muxFrame' | 'customImage' | 'fallbackImage';
@@ -137,34 +189,29 @@ export type SanityFestivalPage = {
       ariaLabel?: string;
     };
   };
-  aboutSection?: SanityVisibilityFields & {
-    eyebrow?: string;
-    heading?: string;
-    plainText?: string;
-    cta?: SanityCta;
-  };
+  aboutSection?: SanityTeaserSection;
   partnersSection?: SanityPartnerSection;
   programmingSection?: SanityVisibilityFields & {
     eyebrow?: string;
     heading?: string;
+    description?: string;
     intro?: string;
     cards?: SanityCardItem[];
   };
   eventsPreview?: SanityVisibilityFields & {
-    heading?: string;
-    intro?: string;
-    cta?: SanityCta;
-  };
-  archiveTeaser?: SanityVisibilityFields & {
     eyebrow?: string;
     heading?: string;
-    copy?: string;
+    description?: string;
     cta?: SanityCta;
+    festivalEdition?: SanityFestivalEdition;
+    maxEvents?: number;
+    events?: SanityEvent[];
   };
-  finalCta?: SanityVisibilityFields & {
-    eyebrow?: string;
-    heading?: string;
-    copy?: string;
-    cta?: SanityCta;
+  archiveTeaser?: SanityTeaserSection;
+  finalCta?: SanityTeaserSection & {
+    primaryCta?: SanityCta;
+    secondaryCta?: SanityCta;
   };
+  calendarSection?: SanityCalendarSection;
+  venueSection?: SanityVenueSection;
 };

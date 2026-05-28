@@ -6,16 +6,16 @@ import { useShowreel } from './ShowreelProvider';
 
 export default function ShowreelModal() {
   const {
-    playbackId,
+    modalPlaybackId,
     isShowreelOpen,
     closeShowreel,
-    posterSrc,
+    modalPosterSrc,
     variant,
-    videoTitle,
-    startTimeSeconds,
-    endTimeSeconds,
-    posterTimeSeconds,
-    ariaLabel,
+    modalVideoTitle,
+    modalStartTimeSeconds,
+    modalEndTimeSeconds,
+    modalPosterTimeSeconds,
+    modalAriaLabel,
   } = useShowreel();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -61,7 +61,7 @@ export default function ShowreelModal() {
       className="showreel-modal-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label={ariaLabel || `Play the ${videoTitle}`}
+      aria-label={modalAriaLabel || `Play the ${modalVideoTitle}`}
       onClick={closeShowreel}
     >
       <div className="showreel-modal-shell" onClick={(event: React.MouseEvent<HTMLDivElement>) => event.stopPropagation()}>
@@ -76,18 +76,18 @@ export default function ShowreelModal() {
         </button>
 
         <div className="showreel-modal-player-frame">
-          {playbackId ? (
+          {modalPlaybackId ? (
             <MuxPlayer
               className="showreel-modal-player"
-              playbackId={playbackId}
+              playbackId={modalPlaybackId}
               autoPlay
-              assetStartTime={startTimeSeconds}
-              assetEndTime={endTimeSeconds}
+              assetStartTime={modalStartTimeSeconds}
+              assetEndTime={modalEndTimeSeconds}
               playsInline
               streamType="on-demand"
-              thumbnailTime={typeof posterTimeSeconds === 'number' ? posterTimeSeconds : 28}
+              thumbnailTime={typeof modalPosterTimeSeconds === 'number' ? modalPosterTimeSeconds : 28}
               metadata={{
-                video_title: videoTitle,
+                video_title: modalVideoTitle,
               }}
               style={{
                 width: '100%',
@@ -96,7 +96,7 @@ export default function ShowreelModal() {
               }}
             />
           ) : (
-            <div className="showreel-placeholder" style={{ backgroundImage: `url(${posterSrc})` }}>
+            <div className="showreel-placeholder" style={{ backgroundImage: `url(${modalPosterSrc})` }}>
               <div>
                 <span className="section-kicker">{variant === 'festival' ? 'Festival reel' : 'Showreel'}</span>
                 <h2>{variant === 'festival' ? 'Festival showreel coming soon.' : 'Showreel coming soon.'}</h2>

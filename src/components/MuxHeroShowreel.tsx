@@ -17,23 +17,33 @@ const HERO_SHOWREEL_CLIP = {
 };
 
 export default function MuxHeroShowreel() {
-  const { playbackId, isBackgroundPaused, videoTitle, startTimeSeconds, endTimeSeconds, posterTimeSeconds } =
-    useShowreel();
+  const {
+    backgroundPlaybackId,
+    isBackgroundPaused,
+    backgroundVideoTitle,
+    backgroundStartTimeSeconds,
+    backgroundEndTimeSeconds,
+    backgroundPosterTimeSeconds,
+  } = useShowreel();
 
-  if (!playbackId) {
+  if (!backgroundPlaybackId) {
     return null;
   }
 
-  const assetStartTime = typeof startTimeSeconds === 'number' ? startTimeSeconds : HERO_SHOWREEL_CLIP.assetStartTime;
-  const assetEndTime = typeof endTimeSeconds === 'number' ? endTimeSeconds : HERO_SHOWREEL_CLIP.assetEndTime;
+  const assetStartTime =
+    typeof backgroundStartTimeSeconds === 'number' ? backgroundStartTimeSeconds : HERO_SHOWREEL_CLIP.assetStartTime;
+  const assetEndTime =
+    typeof backgroundEndTimeSeconds === 'number' ? backgroundEndTimeSeconds : HERO_SHOWREEL_CLIP.assetEndTime;
   const thumbnailTime =
-    typeof posterTimeSeconds === 'number' ? posterTimeSeconds : assetStartTime || HERO_SHOWREEL_CLIP.thumbnailTime;
+    typeof backgroundPosterTimeSeconds === 'number'
+      ? backgroundPosterTimeSeconds
+      : assetStartTime || HERO_SHOWREEL_CLIP.thumbnailTime;
 
   return (
     <div className="hero-video hero-video-layer" aria-hidden="true">
       <HeroMuxPlayer
         className="hero-video-player"
-        playbackId={playbackId}
+        playbackId={backgroundPlaybackId}
         autoPlay="muted"
         assetStartTime={assetStartTime}
         assetEndTime={assetEndTime}
@@ -47,7 +57,7 @@ export default function MuxHeroShowreel() {
         aria-hidden="true"
         tabIndex={-1}
         metadata={{
-          video_title: videoTitle,
+          video_title: backgroundVideoTitle,
         }}
         style={{
           width: "100%",

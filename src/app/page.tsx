@@ -49,9 +49,10 @@ export default async function UmbrellaHome() {
               ) : null}
             </div>
             <div className="stacked-copy">
-              {aboutSection?.showBody !== false ? (
+              {aboutSection?.showDescription !== false ? (
                 <p>
-                  {aboutSection?.plainText ||
+                  {aboutSection?.description ||
+                    aboutSection?.plainText ||
                     'This umbrella home will grow into the central point for Animae Caribe news, festival access, creative services, community stories and partner opportunities. For now, it gives visitors a clear map of the ecosystem while the Festival and House experiences remain distinct.'}
                 </p>
               ) : null}
@@ -68,7 +69,7 @@ export default async function UmbrellaHome() {
       {partnersSection?.isVisible !== false ? (
         <PartnersStrip
           items={partners}
-          kicker={partnersSection?.showHeading !== false ? partnersSection?.heading || 'Animae Caribe partners and collaborators' : ''}
+          kicker={partnersSection?.eyebrow || partnersSection?.heading || 'Animae Caribe partners and collaborators'}
           ariaLabel="Animae Caribe partners"
         />
       ) : null}
