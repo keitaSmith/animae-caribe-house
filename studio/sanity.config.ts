@@ -6,6 +6,7 @@ import {schemaTypes} from './schemaTypes'
 export default defineConfig({
   name: 'default',
   title: 'animae-caribe',
+  basePath: '/studio',
 
   projectId: 'kpfseop2',
   dataset: 'production',

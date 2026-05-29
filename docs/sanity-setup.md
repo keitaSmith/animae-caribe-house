@@ -7,6 +7,10 @@ Sanity Studio now lives in `studio/` and the Next.js app has a small Sanity fron
 - Studio: `cd studio` then `npm run dev`
 - Website: from the project root, run `npm run dev`
 
+When the Studio uses `basePath: '/studio'`, the local Studio opens at:
+
+- `http://127.0.0.1:3333/studio`
+
 ## Environment variables
 
 Add these to the Next.js app environment:
@@ -15,9 +19,12 @@ Add these to the Next.js app environment:
 NEXT_PUBLIC_SANITY_PROJECT_ID=
 NEXT_PUBLIC_SANITY_DATASET=production
 SANITY_API_READ_TOKEN=
+SANITY_STUDIO_ORIGIN=
 ```
 
 `NEXT_PUBLIC_SANITY_PROJECT_ID` and `NEXT_PUBLIC_SANITY_DATASET` are safe for browser exposure. `SANITY_API_READ_TOKEN` must stay server-side. If the dataset is public, the frontend can read published content without a token; keep the token available later for preview or private reads.
+
+`SANITY_STUDIO_ORIGIN` should point to the separately deployed Studio app, for example `https://your-studio-deployment.vercel.app`. The root Next.js website uses this to proxy `/studio` so editors can sign in from the main domain path.
 
 ## Schema location
 
@@ -155,6 +162,9 @@ The Festival Page also includes:
 
 - Add Vercel environment variables for the Next.js app.
 - Deploy the Studio when the schema is reviewed.
+  - The Studio config uses `basePath: '/studio'`
+  - After deploying the Studio, set `SANITY_STUDIO_ORIGIN` on the root website Vercel project
+  - Redeploy the root website project so `/studio` proxies to the Studio deployment
 - Add Sanity structure customization for singleton editing if desired.
 - Manually add old WordPress posts later, or build an importer later.
 - Import historical media later after the content model has been reviewed.
