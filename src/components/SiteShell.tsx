@@ -8,13 +8,14 @@ import { ShowreelProvider } from './ShowreelProvider';
 
 type SiteShellProps = {
   children: ReactNode;
+  currentFestivalYear?: number;
 };
 
-export default function SiteShell({ children }: SiteShellProps) {
+export default function SiteShell({ children, currentFestivalYear }: SiteShellProps) {
   return (
     <ShowreelProvider>
       <div className="site-shell">
-        <Header />
+        <Header currentFestivalYear={currentFestivalYear} />
         <main>{children}</main>
         <Footer />
       </div>

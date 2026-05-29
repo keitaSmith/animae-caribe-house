@@ -117,9 +117,9 @@ The Festival Page also includes:
 - `Festival Calendar Image`
   Edit this directly on the Festival Page document.
   - Upload or replace `Calendar / programme image`
-  - `Download file` is preferred for downloads
-  - `Download URL` is used if no file is provided
-  - If neither is provided, the image asset itself is used for download when possible
+  - This section is currently controlled by the `Festival Page` document, not by `Festival Edition`
+  - Editors do not need to add a separate download file or download URL
+  - The `Download Calendar` button automatically downloads the uploaded `Calendar / programme image`
   - `Download button style` lets editors choose the existing site button variant used on the page and inside the lightbox
   - Turn off `Show this section` to hide it entirely
   - Clicking the image opens a dark lightbox that shows the poster without a white card container
@@ -133,6 +133,7 @@ The Festival Page also includes:
 
 - `Venue / Location Map`
   Edit this directly on the Festival Page document.
+  - This section is currently controlled by the `Festival Page` document, not by `Festival Edition`
   - Add `Venue name` and `Address` for the visible venue details
   - Paste a standard Google Maps embed URL into `Google Maps embed URL`
   - Paste a normal Google Maps share link into `Google Maps link`

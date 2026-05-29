@@ -3,11 +3,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { navItems } from '../data/site';
+import { buildNavItems } from '../data/site';
 import { PlayIcon } from './Icons';
 import { useShowreel } from './ShowreelProvider';
 
-export default function Header() {
+type HeaderProps = {
+  currentFestivalYear?: number;
+};
+
+export default function Header({currentFestivalYear}: HeaderProps) {
   const [menuState, setMenuState] = useState({isOpen: false, path: '/'});
   const [submenuState, setSubmenuState] = useState<{key: string | null; path: string}>({key: null, path: '/'});
   const [isScrolled, setIsScrolled] = useState(false);
@@ -16,6 +20,7 @@ export default function Header() {
   const pathname = usePathname() || '/';
   const menuOpen = menuState.isOpen && menuState.path === pathname;
   const openSubmenu = submenuState.path === pathname ? submenuState.key : null;
+  const navItems = buildNavItems(currentFestivalYear);
   const hasLandingHero = pathname === '/' || pathname === '/house' || pathname === '/festival';
   const hasShowreelHero = pathname === '/house' || pathname === '/festival';
 
@@ -138,7 +143,11 @@ export default function Header() {
                 .join(' ')}
             >
               <div className="nav-link-row">
-                <Link href={item.href} className={isActive ? 'active' : ''} onClick={closeMenus}>
+                <Link
+                  href={item.href}
+                  className={isActive ? 'nav-submenu-link active' : 'nav-submenu-link'}
+                  onClick={closeMenus}
+                >
                   {item.label}
                 </Link>
                 <button

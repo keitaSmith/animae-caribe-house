@@ -3,14 +3,53 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SanityCalendarSection } from '../sanity/lib/types';
 import { DownloadIcon } from './Icons';
-import ButtonLink from './ButtonLink';
 
 type FestivalCalendarSectionProps = {
   content?: SanityCalendarSection | null;
 };
 
-function getDownloadHref(content?: SanityCalendarSection | null) {
-  return content?.downloadFileUrl || content?.downloadUrl || content?.calendarImage?.url || '';
+function getDownloadDetails(content?: SanityCalendarSection | null) {
+  const rawImageUrl = content?.calendarImage?.url;
+
+  if (!rawImageUrl) {
+    return null;
+  }
+
+  try {
+    const parsedUrl = new URL(rawImageUrl);
+    const extensionMatch = parsedUrl.pathname.match(/\.([a-zA-Z0-9]+)$/);
+    const extension = extensionMatch?.[1]?.toLowerCase() || 'jpg';
+    const safeExtension = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'].includes(extension) ? extension : 'jpg';
+    const filename = `animae-caribe-festival-calendar.${safeExtension}`;
+    parsedUrl.searchParams.set('dl', filename);
+
+    return {
+      href: parsedUrl.toString(),
+      filename,
+    };
+  } catch {
+    return {
+      href: rawImageUrl,
+      filename: 'animae-caribe-festival-calendar.jpg',
+    };
+  }
+}
+
+function renderDownloadButton(
+  details: { href: string; filename: string } | null,
+  label: string,
+  variant: string,
+  className?: string
+) {
+  if (!details) {
+    return null;
+  }
+
+  return (
+    <a className={`button button-${variant}${className ? ` ${className}` : ''}`} href={details.href} download={details.filename}>
+      <DownloadIcon /> {label}
+    </a>
+  );
 }
 
 export default function FestivalCalendarSection({ content }: FestivalCalendarSectionProps) {
@@ -19,9 +58,10 @@ export default function FestivalCalendarSection({ content }: FestivalCalendarSec
 
   const imageUrl = content?.calendarImage?.url;
   const imageAlt = content?.calendarImage?.alt || content?.heading || 'Festival programme image';
-  const downloadHref = getDownloadHref(content);
-  const canDownload = Boolean(downloadHref);
+  const downloadDetails = getDownloadDetails(content);
+  const canDownload = Boolean(downloadDetails?.href);
   const downloadVariant = content?.downloadButtonStyle || 'outline';
+  const downloadLabel = content?.downloadLabel || 'Download programme';
 
   useEffect(() => {
     if (!isOpen) {
@@ -59,11 +99,7 @@ export default function FestivalCalendarSection({ content }: FestivalCalendarSec
               {content?.eyebrow ? <span className="section-kicker">{content.eyebrow}</span> : null}
               {content?.heading ? <h2>{content.heading}</h2> : null}
               {content?.description ? <p>{content.description}</p> : null}
-              {canDownload ? (
-                <ButtonLink href={downloadHref} variant={downloadVariant} external>
-                  <DownloadIcon /> {content?.downloadLabel || 'Download programme'}
-                </ButtonLink>
-              ) : null}
+              {renderDownloadButton(downloadDetails, downloadLabel, downloadVariant)}
             </div>
 
             <button
@@ -104,9 +140,7 @@ export default function FestivalCalendarSection({ content }: FestivalCalendarSec
               </div>
               {canDownload ? (
                 <div className="festival-image-modal-actions">
-                  <ButtonLink href={downloadHref} variant={downloadVariant} external>
-                    <DownloadIcon /> {content?.downloadLabel || 'Download programme'}
-                  </ButtonLink>
+                  {renderDownloadButton(downloadDetails, downloadLabel, downloadVariant)}
                 </div>
               ) : null}
             </div>

@@ -443,7 +443,7 @@ const festivalCalendarSection = defineType({
       name: 'calendarImage',
       title: 'Calendar / programme image',
       type: 'imageWithAlt',
-      description: 'Upload the visible festival programme image. This image is also used inside the modal.',
+      description: 'Upload the visible festival programme image. This image is also used inside the modal and is the source for the Download Calendar button.',
     }),
     defineField({
       name: 'modalTitle',
@@ -466,16 +466,18 @@ const festivalCalendarSection = defineType({
     }),
     defineField({
       name: 'downloadFile',
-      title: 'Download file',
+      title: 'Legacy download file',
       type: 'file',
-      description: 'Optional separate downloadable asset, such as a high-resolution PDF or image.',
+      description: 'Legacy field no longer used on the Festival landing page. The Download button now uses the uploaded calendar image automatically.',
       options: {accept: '.pdf,image/*'},
+      hidden: true,
     }),
     defineField({
       name: 'downloadUrl',
-      title: 'Download URL',
+      title: 'Legacy download URL',
       type: 'url',
-      description: 'Optional external download URL used if no file asset is provided.',
+      description: 'Legacy field no longer used on the Festival landing page. The Download button now uses the uploaded calendar image automatically.',
+      hidden: true,
     }),
     defineField({
       name: 'shareLabel',
@@ -1137,22 +1139,110 @@ const festivalEdition = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
-    defineField({
-      name: 'year',
-      title: 'Year',
-      type: 'number',
-      description: 'The year this edition belongs to.',
-    }),
-    defineField({name: 'startDate', title: 'Start date', type: 'date'}),
-    defineField({name: 'endDate', title: 'End date', type: 'date'}),
-    defineField({name: 'location', title: 'Location', type: 'string'}),
-    defineField({
-      name: 'isActive',
-      title: 'Active edition',
-      type: 'boolean',
-      initialValue: false,
-      description: 'Mark this as the current/active festival edition used for current festival content.',
-    }),
+      defineField({
+        name: 'year',
+        title: 'Year',
+        type: 'number',
+        description: 'The year this edition belongs to.',
+      }),
+      defineField({
+        name: 'theme',
+        title: 'Theme',
+        type: 'string',
+        description: 'Optional public festival theme for this edition.',
+      }),
+      defineField({name: 'startDate', title: 'Start date', type: 'date'}),
+      defineField({name: 'endDate', title: 'End date', type: 'date'}),
+      defineField({name: 'location', title: 'Location', type: 'string'}),
+      defineField({
+        name: 'description',
+        title: 'Description',
+        type: 'text',
+        rows: 4,
+        description: 'Optional year-specific overview copy used by programme pages and the current Festival landing page.',
+      }),
+      defineField({
+        name: 'calendarImage',
+        title: 'Legacy festival calendar / programme image',
+        type: 'imageWithAlt',
+        description: 'Legacy field not currently used on the Festival landing page. The current calendar image is managed from the Festival Page document.',
+        hidden: true,
+      }),
+      defineField({
+        name: 'calendarDownloadFile',
+        title: 'Legacy festival calendar download file',
+        type: 'file',
+        description: 'Legacy field not currently used on the Festival landing page.',
+        options: {accept: '.pdf,image/*'},
+        hidden: true,
+      }),
+      defineField({
+        name: 'calendarDownloadUrl',
+        title: 'Legacy festival calendar download URL',
+        type: 'url',
+        description: 'Legacy field not currently used on the Festival landing page.',
+        hidden: true,
+      }),
+      defineField({
+        name: 'venueName',
+        title: 'Legacy venue name',
+        type: 'string',
+        description: 'Legacy field not currently used on the Festival landing page. Venue / map content is managed from the Festival Page document.',
+        hidden: true,
+      }),
+      defineField({
+        name: 'venueAddress',
+        title: 'Legacy venue address',
+        type: 'text',
+        rows: 3,
+        description: 'Legacy field not currently used on the Festival landing page. Venue / map content is managed from the Festival Page document.',
+        hidden: true,
+      }),
+      defineField({
+        name: 'googleMapsEmbedUrl',
+        title: 'Legacy Google Maps embed URL',
+        type: 'url',
+        description: 'Legacy field not currently used on the Festival landing page.',
+        hidden: true,
+      }),
+      defineField({
+        name: 'googleMapsUrl',
+        title: 'Legacy Google Maps link',
+        type: 'url',
+        description: 'Legacy field not currently used on the Festival landing page.',
+        hidden: true,
+      }),
+      defineField({
+        name: 'isActive',
+        title: 'Active edition',
+        type: 'boolean',
+        initialValue: false,
+        description:
+          'Only one Festival Edition should be active at a time. The active edition controls the current Festival page, current programme links, and year-specific festival content.',
+        validation: (Rule) =>
+          Rule.custom(async (value, context) => {
+            if (!value) {
+              return true
+            }
+
+            const currentId = context.document?._id?.replace(/^drafts\./, '')
+            const draftId = currentId ? `drafts.${currentId}` : context.document?._id
+            const client = context.getClient({apiVersion: '2026-05-27'})
+            const activeCount = await client.fetch<number>(
+              `count(*[_type == "festivalEdition" && isActive == true && !(_id in [$draftId, $publishedId])])`,
+              {
+                draftId,
+                publishedId: currentId || context.document?._id,
+              }
+            )
+
+            if (activeCount > 0) {
+              return 'Only one Festival Edition can be active at a time. Unset the current active edition first.'
+            }
+
+            return true
+          }),
+      }),
   ],
   preview: {
     select: {

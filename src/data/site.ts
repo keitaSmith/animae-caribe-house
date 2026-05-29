@@ -33,18 +33,21 @@ export const site: Site = {
   },
 };
 
-export const navItems: NavItem[] = [
-  {
-    label: `Festival ${DEFAULT_FESTIVAL_YEAR}`,
-    href: '/festival',
-    children: [
-      {label: 'Festival Home', href: '/festival'},
-      {label: `${DEFAULT_FESTIVAL_YEAR} Programme`, href: getFestivalEventsRoute(DEFAULT_FESTIVAL_YEAR)},
-      {label: 'Past Editions', href: getPastEditionsRoute()},
-    ],
-  },
-  { label: 'House', href: '/house' },
-  { label: 'About', href: '/about' },
-  { label: 'Partners', href: '/partners' },
-  { label: 'Contact', href: '/contact' },
-];
+export function buildNavItems(currentFestivalYear = DEFAULT_FESTIVAL_YEAR): NavItem[] {
+  return [
+    {
+      label: `Festival ${currentFestivalYear}`,
+      href: '/festival',
+      children: [
+        {label: `${currentFestivalYear} Programme`, href: getFestivalEventsRoute(currentFestivalYear)},
+        {label: 'Past Editions', href: getPastEditionsRoute()},
+      ],
+    },
+    {label: 'House', href: '/house'},
+    {label: 'About', href: '/about'},
+    {label: 'Partners', href: '/partners'},
+    {label: 'Contact', href: '/contact'},
+  ];
+}
+
+export const navItems: NavItem[] = buildNavItems();

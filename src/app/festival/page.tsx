@@ -1,12 +1,45 @@
 import FestivalExperience from '../../components/FestivalExperience';
 import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute} from '../../lib/festivalRoutes';
 import {getActiveFestivalEdition, getFestivalPage, getFestivalPartners, getUpcomingFestivalEventsByEdition} from '../../sanity/lib/queries';
+import type {SanityFestivalPage} from '../../sanity/lib/types';
 
-export const metadata = {
-  title: 'Animae Caribe Festival | Screenings, Workshops and Caribbean Animation',
-  description:
-    'The Animae Caribe Festival experience for screenings, workshops, panels, animation showcases, industry development and community programming.',
-};
+export async function generateMetadata() {
+  const activeEdition = await getActiveFestivalEdition();
+
+  return {
+    title: activeEdition?.title
+      ? `${activeEdition.title} | Screenings, Workshops and Caribbean Animation`
+      : 'Animae Caribe Festival | Screenings, Workshops and Caribbean Animation',
+    description:
+      activeEdition?.description ||
+      'The Animae Caribe Festival experience for screenings, workshops, panels, animation showcases, industry development and community programming.',
+  };
+}
+
+function mergeFestivalPageWithActiveEdition(
+  festivalPage: SanityFestivalPage | null,
+  activeEdition: Awaited<ReturnType<typeof getActiveFestivalEdition>>
+): SanityFestivalPage | null {
+  if (!festivalPage) {
+    return festivalPage;
+  }
+
+  if (!activeEdition) {
+    return festivalPage;
+  }
+
+  return {
+    ...festivalPage,
+    hero: {
+      ...festivalPage.hero,
+      heading: activeEdition.title || festivalPage.hero?.heading,
+    },
+    eventsPreview: {
+      ...festivalPage.eventsPreview,
+      festivalEdition: activeEdition,
+    },
+  };
+}
 
 export default async function FestivalPage() {
   const [festivalPage, sanityPartners, activeEdition] = await Promise.all([
@@ -14,22 +47,23 @@ export default async function FestivalPage() {
     getFestivalPartners(),
     getActiveFestivalEdition(),
   ]);
+  const mergedFestivalPage = mergeFestivalPageWithActiveEdition(festivalPage, activeEdition);
   const partners =
     sanityPartners
       ?.filter((partner) => partner.name && partner.logoUrl)
       .map((partner) => ({name: partner.name as string, src: partner.logoUrl as string})) || null;
-  const festivalEditionId = festivalPage?.eventsPreview?.festivalEdition?._id;
-  const festivalEditionYear = festivalPage?.eventsPreview?.festivalEdition?.year || activeEdition?.year || DEFAULT_FESTIVAL_YEAR;
-  const maxEvents = festivalPage?.eventsPreview?.maxEvents || 3;
+  const festivalEditionId = mergedFestivalPage?.eventsPreview?.festivalEdition?._id;
+  const festivalEditionYear = mergedFestivalPage?.eventsPreview?.festivalEdition?.year || activeEdition?.year || DEFAULT_FESTIVAL_YEAR;
+  const maxEvents = mergedFestivalPage?.eventsPreview?.maxEvents || 3;
   const upcomingEvents = festivalEditionId ? await getUpcomingFestivalEventsByEdition(festivalEditionId, maxEvents) : null;
-  const legacySelectedEvents = festivalPage?.eventsPreview?.events?.filter(
+  const legacySelectedEvents = mergedFestivalPage?.eventsPreview?.events?.filter(
     (event) => event.title && (event.startDateTime || event.date)
   );
   const events = upcomingEvents?.length ? upcomingEvents : legacySelectedEvents?.length ? legacySelectedEvents : null;
 
   return (
     <FestivalExperience
-      content={festivalPage}
+      content={mergedFestivalPage}
       partners={partners}
       events={events}
       currentProgrammeHref={getFestivalEventsRoute(festivalEditionYear)}

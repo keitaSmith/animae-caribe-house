@@ -2,6 +2,7 @@ import {notFound} from 'next/navigation';
 import FestivalProgrammePage from '../../../../components/FestivalProgrammePage';
 import {festivalEvents} from '../../../../data/festival';
 import {DEFAULT_FESTIVAL_YEAR, isValidFestivalYear} from '../../../../lib/festivalRoutes';
+import {isSanityConfigured} from '../../../../sanity/lib/client';
 import {getFestivalEditionByYear, getFestivalEventsByEdition} from '../../../../sanity/lib/queries';
 import type {SanityEvent} from '../../../../sanity/lib/types';
 
@@ -29,10 +30,12 @@ function getFallbackEvents(year: string): SanityEvent[] | null {
 
 export async function generateMetadata({params}: FestivalEventsPageProps) {
   const {year} = await params;
+  const edition = await getFestivalEditionByYear(year);
 
   return {
-    title: `Animae Caribe Festival ${year} Programme`,
-    description: `The day-by-day programme for Animae Caribe Festival ${year}.`,
+    title: edition?.title ? `${edition.title} Programme` : `Animae Caribe Festival ${year} Programme`,
+    description:
+      edition?.description || `The day-by-day programme for Animae Caribe Festival ${year}.`,
   };
 }
 
@@ -44,8 +47,13 @@ export default async function FestivalEventsPage({params}: FestivalEventsPagePro
   }
 
   const edition = await getFestivalEditionByYear(year);
+
+  if (isSanityConfigured && !edition?._id) {
+    notFound();
+  }
+
   const sanityEvents = edition?._id ? await getFestivalEventsByEdition(edition._id) : null;
-  const events = sanityEvents?.length ? sanityEvents : getFallbackEvents(year);
+  const events = sanityEvents?.length ? sanityEvents : isSanityConfigured ? null : getFallbackEvents(year);
 
   return (
     <FestivalProgrammePage
@@ -53,7 +61,7 @@ export default async function FestivalEventsPage({params}: FestivalEventsPagePro
       edition={edition}
       events={events}
       eyebrow={`Festival ${year}`}
-      title={edition?.title || `Festival ${year} Programme`}
+      title={edition?.title || `Animae Caribe Festival ${year}`}
       intro={`Follow the full day-by-day programme for Animae Caribe Festival ${year}, from screenings and panels to workshops and community events.`}
       emptyMessage="The full programme will be announced soon."
       backHref="/festival"

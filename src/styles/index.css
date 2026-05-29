@@ -77,6 +77,11 @@ button {
   min-height: 72vh;
 }
 
+.page-section-cinematic {
+  padding: 0 0 100px;
+  min-height: auto;
+}
+
 .section-kicker,
 .eyebrow {
   display: inline-block;
@@ -304,30 +309,53 @@ p {
   align-items: center;
 }
 
+.nav-item-with-submenu::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 14px;
+}
+
 .nav-link-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0;
+  padding: 4px;
+  border-radius: 999px;
+  transition: background 180ms ease, color 180ms ease;
 }
 
 .nav-submenu-toggle {
-  min-width: 42px;
+  min-width: 34px;
   justify-content: center;
-  padding-left: 10px;
+  padding-left: 8px;
   padding-right: 10px;
 }
 
 .nav-submenu-caret {
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg) translateY(-1px);
+  width: 7px;
+  height: 7px;
+  border-right: 1.75px solid currentColor;
+  border-bottom: 1.75px solid currentColor;
+  transform: rotate(45deg) translateY(-0.5px);
   transition: transform 180ms ease;
 }
 
 .nav-item-with-submenu.is-open .nav-submenu-caret {
   transform: rotate(-135deg) translateX(-1px);
+}
+
+.nav-submenu-link,
+.nav-link-row .nav-submenu-toggle {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+.nav-link-row .nav-submenu-link {
+  padding-right: 8px;
 }
 
 .nav-submenu {
@@ -351,7 +379,9 @@ p {
   transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
 }
 
-.nav-submenu.is-open {
+.nav-item-with-submenu.is-open .nav-submenu,
+.nav-item-with-submenu:hover .nav-submenu,
+.nav-item-with-submenu:focus-within .nav-submenu {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -364,10 +394,21 @@ p {
   background: rgba(255, 255, 255, 0.78);
 }
 
+.site-header.is-top .nav-submenu {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
 .site-header.is-top .nav-submenu a,
 .site-header.is-scrolled .nav-submenu a,
 .site-header.menu-open .nav-submenu a {
   color: rgba(7, 21, 34, 0.72);
+}
+
+.site-header.is-top .nav-submenu a {
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .site-header.is-top .nav-submenu a:hover,
@@ -380,12 +421,34 @@ p {
   background: rgba(7, 21, 34, 0.06);
 }
 
+.site-header.is-top .nav-submenu a:hover,
+.site-header.is-top .nav-submenu a.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .site-header.is-top .nav-links a:hover,
 .site-header.is-top .nav-links a.active,
 .site-header.is-top .nav-links button:hover,
 .site-header.is-top .nav-links button.active {
   color: white;
   background: rgba(255, 255, 255, 0.12);
+}
+
+.site-header.is-top .nav-item-with-submenu:hover .nav-link-row,
+.site-header.is-top .nav-item-with-submenu:focus-within .nav-link-row,
+.site-header.is-top .nav-item-with-submenu.is-open .nav-link-row {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.site-header.is-top .nav-item-with-submenu:hover .nav-submenu-link,
+.site-header.is-top .nav-item-with-submenu:focus-within .nav-submenu-link,
+.site-header.is-top .nav-item-with-submenu.is-open .nav-submenu-link,
+.site-header.is-top .nav-item-with-submenu:hover .nav-submenu-toggle,
+.site-header.is-top .nav-item-with-submenu:focus-within .nav-submenu-toggle,
+.site-header.is-top .nav-item-with-submenu.is-open .nav-submenu-toggle {
+  color: white;
+  background: transparent;
 }
 
 .site-header.is-scrolled .nav-links a,
@@ -405,6 +468,31 @@ p {
 .site-header.menu-open .nav-links button.active {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.84);
+}
+
+.site-header.is-scrolled .nav-item-with-submenu:hover .nav-link-row,
+.site-header.is-scrolled .nav-item-with-submenu:focus-within .nav-link-row,
+.site-header.is-scrolled .nav-item-with-submenu.is-open .nav-link-row,
+.site-header.menu-open .nav-item-with-submenu:hover .nav-link-row,
+.site-header.menu-open .nav-item-with-submenu:focus-within .nav-link-row,
+.site-header.menu-open .nav-item-with-submenu.is-open .nav-link-row {
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.site-header.is-scrolled .nav-item-with-submenu:hover .nav-submenu-link,
+.site-header.is-scrolled .nav-item-with-submenu:focus-within .nav-submenu-link,
+.site-header.is-scrolled .nav-item-with-submenu.is-open .nav-submenu-link,
+.site-header.is-scrolled .nav-item-with-submenu:hover .nav-submenu-toggle,
+.site-header.is-scrolled .nav-item-with-submenu:focus-within .nav-submenu-toggle,
+.site-header.is-scrolled .nav-item-with-submenu.is-open .nav-submenu-toggle,
+.site-header.menu-open .nav-item-with-submenu:hover .nav-submenu-link,
+.site-header.menu-open .nav-item-with-submenu:focus-within .nav-submenu-link,
+.site-header.menu-open .nav-item-with-submenu.is-open .nav-submenu-link,
+.site-header.menu-open .nav-item-with-submenu:hover .nav-submenu-toggle,
+.site-header.menu-open .nav-item-with-submenu:focus-within .nav-submenu-toggle,
+.site-header.menu-open .nav-item-with-submenu.is-open .nav-submenu-toggle {
+  color: var(--ink);
+  background: transparent;
 }
 
 .nav-links .nav-showreel {
@@ -1459,12 +1547,12 @@ p {
 }
 
 .ecosystem-diagonal-slit-core {
-  stroke: rgba(255, 255, 255, 0.9);
+  stroke: rgba(53, 53, 53, 0.9);
   stroke-width: 2.25px;
 }
 
 .ecosystem-diagonal-slit-glow {
-  stroke: rgba(255, 255, 255, 0.28);
+  stroke: rgba(53, 53, 53, 0.28);
   stroke-width: 7px;
   filter: drop-shadow(0 0 18px rgba(0, 169, 224, 0.34)) drop-shadow(0 0 28px rgba(236, 0, 140, 0.22));
 }
@@ -1595,22 +1683,24 @@ p {
 }
 
 .festival-calendar-preview {
-    justify-self: center;
-    width: auto;
-    max-width: min(100%, 520px);
-    padding: 0;
-    border: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    appearance: none;
-    -webkit-appearance: none;
-    box-shadow: none;
-    overflow: visible;
-    transition: transform 180ms ease;
-    cursor: zoom-in;
-  }
+  justify-self: center;
+  align-self: center;
+  width: auto;
+  max-width: min(100%, 480px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow: none;
+  overflow: visible;
+  transition: transform 180ms ease;
+  cursor: zoom-in;
+}
 
 .festival-calendar-preview:hover {
   transform: translateY(-2px);
@@ -1620,31 +1710,31 @@ p {
   display: grid;
   gap: 24px;
   align-content: center;
+  max-width: 540px;
 }
 
-.festival-calendar-preview img,
-.festival-image-modal-frame img {
-    display: block;
-    width: auto;
-    max-width: min(100%, 520px);
-    max-height: min(68vh, 680px);
-    height: auto;
-    object-fit: contain;
-  }
+.festival-calendar-preview img {
+  display: block;
+  width: auto;
+  max-width: min(100%, 480px);
+  max-height: min(64vh, 620px);
+  height: auto;
+  object-fit: contain;
+}
 
 .festival-image-modal-shell {
-    width: min(94vw, 1080px);
-    max-height: calc(100vh - 48px);
-  }
+  width: min(94vw, 1080px);
+  max-height: calc(100vh - 48px);
+}
 
 .festival-image-modal-frame {
-    display: grid;
-    gap: 14px;
-    justify-items: center;
-    width: 100%;
-    max-height: calc(100vh - 48px);
-    overflow: visible;
-  }
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow: visible;
+}
 
 .festival-image-modal-title {
   margin-bottom: 0;
@@ -1653,26 +1743,27 @@ p {
 }
 
 .festival-image-modal-poster {
-    width: 100%;
-    max-height: min(74vh, 720px);
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-  }
+  width: 100%;
+  max-height: min(70vh, 680px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
 
 .festival-image-modal-poster img {
-    width: auto;
-    max-width: min(94vw, 980px);
-    max-height: min(74vh, 720px);
-    object-fit: contain;
-  }
+  display: block;
+  width: auto;
+  max-width: min(94vw, 980px);
+  max-height: min(70vh, 680px);
+  object-fit: contain;
+}
 
 .festival-image-modal-actions {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    padding-bottom: 4px;
-  }
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 4px;
+}
 
 .festival-events-grid {
   display: grid;
@@ -1740,9 +1831,16 @@ p {
 
 .festival-programme-page-hero-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: clamp(28px, 6vw, 76px);
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 1fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: center;
+}
+
+.festival-programme-page-copy {
+  max-width: 720px;
+  display: grid;
+  gap: 20px;
+  align-content: end;
 }
 
 .festival-programme-page-hero .section-kicker,
@@ -1751,21 +1849,70 @@ p {
   color: white;
 }
 
+.festival-programme-page-hero h1 {
+  font-size: clamp(2.4rem, 4.8vw, 4.2rem);
+  line-height: 0.98;
+  margin-bottom: 20px;
+}
+
 .festival-programme-page-hero p {
   max-width: 760px;
   color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 0;
+}
+
+.festival-programme-page-date-range {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.festival-programme-page-side {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 360px;
 }
 
 .festival-programme-page-meta {
-  display: grid;
-  gap: 18px;
-  justify-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.festival-programme-page-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.88rem;
+}
+
+.festival-programme-page-meta strong {
+  color: white;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
 }
 
 .festival-programme-page-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
 }
 
 .festival-programme-page-actions .button-soft,
@@ -1779,6 +1926,90 @@ p {
 .festival-programme-page-actions .button-soft:hover,
 .festival-programme-page-actions .button-outline:hover {
   background: rgba(255, 255, 255, 0.18);
+}
+
+.festival-programme-ghost-calendar {
+  position: relative;
+    width: min(100%, 420px);
+  height: 320px;
+  pointer-events: none;
+}
+
+.festival-programme-ghost-calendar-frame {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 300px;
+  height: 250px;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 34px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transform: rotate(8deg);
+}
+
+.festival-programme-ghost-calendar-bar {
+  width: 96px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 212, 0, 0.7), rgba(255, 0, 111, 0.35));
+  margin-bottom: 18px;
+}
+
+.festival-programme-ghost-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.festival-programme-ghost-calendar-grid span {
+  height: 42px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.festival-programme-ghost-orb {
+  position: absolute;
+  right: 42px;
+  bottom: 8px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 34%, rgba(255, 255, 255, 0.28), transparent 30%),
+    radial-gradient(circle at 65% 65%, rgba(0, 169, 224, 0.28), transparent 46%),
+    rgba(255, 255, 255, 0.03);
+  filter: blur(6px);
+}
+
+.festival-programme-ghost-chip {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(0.4px);
+}
+
+.festival-programme-ghost-chip-cyan {
+  left: 24px;
+  top: 132px;
+  width: 112px;
+  height: 42px;
+  border: 1px solid rgba(0, 169, 224, 0.3);
+  background: rgba(0, 169, 224, 0.08);
+  transform: rotate(-14deg);
+}
+
+.festival-programme-ghost-chip-gold {
+  right: 112px;
+  bottom: 18px;
+  width: 96px;
+  height: 32px;
+  border: 1px solid rgba(255, 212, 0, 0.28);
+  background: rgba(255, 212, 0, 0.08);
+  transform: rotate(12deg);
 }
 
 .festival-programme-page-section,
@@ -1812,11 +2043,58 @@ p {
   gap: 18px;
 }
 
+.festival-programme-card {
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: clamp(22px, 3vw, 30px);
+}
+
+.festival-programme-card .festival-event-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.festival-programme-card .festival-event-meta span,
+.festival-programme-card .festival-event-meta small {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(7, 21, 34, 0.06);
+  color: rgba(7, 21, 34, 0.7);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.festival-programme-card-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.festival-programme-card-copy h3 {
+  margin-bottom: 0;
+}
+
+.festival-programme-card-copy p {
+  margin-bottom: 0;
+}
+
+.festival-programme-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  align-items: center;
+}
+
 .festival-programme-event-flags {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 14px;
 }
 
 .festival-programme-event-flags span {
@@ -1831,7 +2109,7 @@ p {
 }
 
 .festival-programme-event-action {
-  margin-top: 18px;
+  margin-top: 6px;
 }
 
 .festival-programme-empty {
@@ -2261,8 +2539,242 @@ p {
   font-size: 1.14rem;
 }
 
+.page-cinematic-hero {
+  padding: 184px 0 88px;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(0, 169, 224, 0.14), transparent 24%),
+    radial-gradient(circle at 84% 22%, rgba(255, 212, 0, 0.1), transparent 22%),
+    linear-gradient(180deg, #06111f 0%, #0d1c2e 56%, #13263c 100%);
+}
+
+.page-cinematic-hero .section-kicker,
+.page-cinematic-hero h1,
+.page-cinematic-hero p {
+  color: white;
+}
+
+.page-cinematic-hero h1 {
+  font-size: clamp(2.4rem, 4.8vw, 4.2rem);
+  line-height: 0.98;
+  margin-bottom: 20px;
+}
+
+.page-cinematic-hero p {
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 0;
+}
+
+.page-cinematic-panel {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.page-cinematic-panel p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.page-cinematic-panel .contact-list.large a {
+  color: white;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
 .page-feature {
   margin-top: 30px;
+}
+
+.page-section-cinematic .page-feature {
+  margin-top: 72px;
+}
+
+.page-section-cinematic .partners-section:first-of-type {
+  padding-top: 72px;
+}
+
+.page-cinematic-ghost {
+  position: relative;
+  width: min(100%, 420px);
+  height: 320px;
+  pointer-events: none;
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-ring {
+  position: absolute;
+  right: 34px;
+  top: 30px;
+  width: 232px;
+  height: 232px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    radial-gradient(circle at 48% 48%, rgba(255, 255, 255, 0.09), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-slab {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-slab-wide {
+  left: 34px;
+  bottom: 54px;
+  width: 188px;
+  height: 58px;
+  transform: rotate(-16deg);
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-slab-tall {
+  right: 80px;
+  bottom: 18px;
+  width: 72px;
+  height: 172px;
+  transform: rotate(14deg);
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-orb {
+  position: absolute;
+  left: 70px;
+  top: 48px;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 212, 0, 0.28), rgba(255, 212, 0, 0.04) 70%, transparent 72%);
+  filter: blur(1px);
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-line {
+  position: absolute;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 169, 224, 0.55), transparent);
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-line-left {
+  left: 10px;
+  top: 166px;
+  width: 180px;
+}
+
+.page-cinematic-ghost-about .page-cinematic-ghost-line-right {
+  right: 18px;
+  top: 110px;
+  width: 142px;
+}
+
+.page-cinematic-ghost-partners .page-cinematic-ghost-node {
+  position: absolute;
+  width: 82px;
+  height: 82px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.page-cinematic-ghost-node-top {
+  right: 132px;
+  top: 20px;
+}
+
+.page-cinematic-ghost-node-left {
+  left: 60px;
+  top: 126px;
+}
+
+.page-cinematic-ghost-node-right {
+  right: 34px;
+  top: 138px;
+}
+
+.page-cinematic-ghost-node-bottom {
+  right: 132px;
+  bottom: 12px;
+}
+
+.page-cinematic-ghost-connection {
+  position: absolute;
+  height: 1px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, rgba(0, 169, 224, 0.08), rgba(255, 255, 255, 0.52), rgba(255, 212, 0, 0.16));
+}
+
+.page-cinematic-ghost-connection-a {
+  left: 140px;
+  top: 117px;
+  width: 132px;
+  transform: rotate(-34deg);
+}
+
+.page-cinematic-ghost-connection-b {
+  left: 138px;
+  top: 170px;
+  width: 154px;
+  transform: rotate(2deg);
+}
+
+.page-cinematic-ghost-connection-c {
+  left: 152px;
+  top: 196px;
+  width: 110px;
+  transform: rotate(34deg);
+}
+
+.page-cinematic-ghost-contact .page-cinematic-ghost-signal {
+  position: absolute;
+  right: 88px;
+  top: 34px;
+  width: 164px;
+  height: 224px;
+  border-radius: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at 50% 18%, rgba(255, 212, 0, 0.16), transparent 24%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.page-cinematic-ghost-contact .page-cinematic-ghost-pulse {
+  position: absolute;
+  border: 1px solid rgba(0, 169, 224, 0.22);
+  border-radius: 50%;
+}
+
+.page-cinematic-ghost-pulse-a {
+  right: 34px;
+  top: 18px;
+  width: 272px;
+  height: 272px;
+}
+
+.page-cinematic-ghost-pulse-b {
+  right: 74px;
+  top: 58px;
+  width: 192px;
+  height: 192px;
+}
+
+.page-cinematic-ghost-pulse-c {
+  right: 112px;
+  top: 96px;
+  width: 116px;
+  height: 116px;
+}
+
+.page-cinematic-ghost-contact .page-cinematic-ghost-dot {
+  position: absolute;
+  right: 166px;
+  top: 148px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffd400;
+  box-shadow: 0 0 24px rgba(255, 212, 0, 0.6);
 }
 
 .process-list {
@@ -2393,6 +2905,10 @@ p {
     width: min(100%, 420px);
     display: grid;
     gap: 8px;
+  }
+
+  .nav-item-with-submenu::after {
+    display: none;
   }
 
   .nav-link-row {
@@ -2653,6 +3169,32 @@ p {
     justify-items: stretch;
   }
 
+  .festival-programme-page-side {
+    min-height: 0;
+    justify-content: flex-start;
+  }
+
+  .festival-programme-ghost-calendar {
+    position: relative;
+    inset: auto;
+    width: min(100%, 360px);
+    height: 240px;
+    margin-top: 8px;
+  }
+
+  .festival-programme-ghost-calendar-frame {
+    width: 240px;
+    height: 204px;
+    right: 0;
+    top: 0;
+  }
+
+  .festival-programme-ghost-orb {
+    width: 140px;
+    height: 140px;
+    right: 20px;
+  }
+
   .festival-calendar-actions {
     flex-direction: column;
     align-items: stretch;
@@ -2662,6 +3204,24 @@ p {
   .festival-calendar-preview img {
     max-width: min(100%, 420px);
     max-height: min(62vh, 560px);
+  }
+
+  .festival-programme-page-hero h1 {
+    font-size: clamp(2.2rem, 10vw, 3.35rem);
+  }
+
+  .festival-programme-page-meta {
+    gap: 8px;
+  }
+
+  .festival-programme-page-meta span {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .festival-programme-ghost-calendar,
+  .page-cinematic-ghost {
+    display: none;
   }
 
   .festival-past-editions-grid {
@@ -2817,6 +3377,14 @@ p {
 
   .page-section {
     padding-top: 128px;
+  }
+
+  .page-section-cinematic {
+    padding-top: 0;
+  }
+
+  .page-cinematic-hero {
+    padding: 156px 0 72px;
   }
 
   .image-frame,

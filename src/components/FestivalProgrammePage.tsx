@@ -6,6 +6,7 @@ import {getPastEditionsRoute} from '../lib/festivalRoutes';
 type ProgrammeItem = {
   dateKey: string;
   dateLabel: string;
+  dateShortLabel: string;
   timeLabel: string;
   title: string;
   description: string;
@@ -15,6 +16,11 @@ type ProgrammeItem = {
   priceLabel?: string;
   actionHref?: string;
   actionLabel?: string;
+};
+
+type EditionMetaItem = {
+  label: string;
+  value: string;
 };
 
 type FestivalProgrammePageProps = {
@@ -41,6 +47,10 @@ function formatDateLabel(dateTime?: string, legacyDate?: string) {
           month: 'long',
           day: 'numeric',
         }).format(parsed),
+        shortLabel: new Intl.DateTimeFormat('en', {
+          month: 'short',
+          day: 'numeric',
+        }).format(parsed),
       };
     }
   }
@@ -56,13 +66,17 @@ function formatDateLabel(dateTime?: string, legacyDate?: string) {
           month: 'long',
           day: 'numeric',
         }).format(parsed),
+        shortLabel: new Intl.DateTimeFormat('en', {
+          month: 'short',
+          day: 'numeric',
+        }).format(parsed),
       };
     }
 
-    return {key: legacyDate, label: legacyDate};
+    return {key: legacyDate, label: legacyDate, shortLabel: legacyDate};
   }
 
-  return {key: 'date-tba', label: 'Date to be announced'};
+  return {key: 'date-tba', label: 'Date to be announced', shortLabel: 'Date TBA'};
 }
 
 function formatTimeLabel(event: SanityEvent) {
@@ -108,6 +122,7 @@ function normalizeProgrammeItems(events?: SanityEvent[] | null): ProgrammeItem[]
       return {
         dateKey: date.key,
         dateLabel: date.label,
+        dateShortLabel: date.shortLabel,
         timeLabel: formatTimeLabel(event),
         title: event.title || '',
         description: event.shortDescription || '',
@@ -144,24 +159,33 @@ function groupProgrammeItems(items: ProgrammeItem[]) {
 
 function formatEditionRange(edition: SanityFestivalEdition | null | undefined, year: string) {
   if (!edition?.startDate || !edition?.endDate) {
-    return edition?.location || `Festival programme for ${yearLabel(edition?.year || Number(year))}`;
+    return `Festival ${edition?.year || year}`;
   }
 
   const start = new Date(`${edition.startDate}T00:00:00`);
   const end = new Date(`${edition.endDate}T00:00:00`);
 
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-    return edition.location || `Festival programme for ${yearLabel(edition?.year || Number(year))}`;
+    return `Festival ${edition?.year || year}`;
   }
 
   const startLabel = new Intl.DateTimeFormat('en', {month: 'short', day: 'numeric'}).format(start);
   const endLabel = new Intl.DateTimeFormat('en', {month: 'short', day: 'numeric', year: 'numeric'}).format(end);
 
-  return edition.location ? `${startLabel} - ${endLabel} · ${edition.location}` : `${startLabel} - ${endLabel}`;
+  return `${startLabel} - ${endLabel}`;
 }
 
-function yearLabel(year?: number) {
-  return year ? String(year) : 'this edition';
+function buildEditionMeta(edition: SanityFestivalEdition | null | undefined): EditionMetaItem[] {
+  const items: EditionMetaItem[] = [];
+  if (edition?.location) {
+    items.push({label: 'Location', value: edition.location});
+  }
+
+  if (edition?.theme) {
+    items.push({label: 'Theme', value: edition.theme});
+  }
+
+  return items;
 }
 
 export default function FestivalProgrammePage({
@@ -176,22 +200,31 @@ export default function FestivalProgrammePage({
   backLabel,
 }: FestivalProgrammePageProps) {
   const groupedEvents = groupProgrammeItems(normalizeProgrammeItems(events));
+  const editionRange = formatEditionRange(edition, year);
+  const editionMeta = buildEditionMeta(edition);
 
   return (
     <>
       <section className="festival-programme-page-hero">
         <div className="container festival-programme-page-hero-shell">
-          <div>
+          <div className="festival-programme-page-copy">
             <span className="section-kicker">{eyebrow}</span>
             <h1>{title}</h1>
+            <div className="festival-programme-page-date-range">{editionRange}</div>
             <p>
               {edition?.description ||
                 intro ||
                 `Browse the day-by-day programme for Animae Caribe Festival ${year}.`}
             </p>
-          </div>
-          <div className="festival-programme-page-meta">
-            <p>{formatEditionRange(edition, year)}</p>
+            {editionMeta.length ? (
+              <div className="festival-programme-page-meta">
+                {editionMeta.map((item) => (
+                  <span key={`${item.label}-${item.value}`}>
+                    <strong>{item.label}:</strong> {item.value}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             <div className="festival-programme-page-actions">
               <ButtonLink href={backHref} variant="outline">
                 {backLabel} <ArrowRightIcon />
@@ -199,6 +232,28 @@ export default function FestivalProgrammePage({
               <ButtonLink href={getPastEditionsRoute()} variant="soft">
                 Past Editions <ArrowRightIcon />
               </ButtonLink>
+            </div>
+          </div>
+
+          <div className="festival-programme-page-side">
+            <div className="festival-programme-ghost-calendar" aria-hidden="true">
+              <div className="festival-programme-ghost-calendar-frame">
+                <div className="festival-programme-ghost-calendar-bar" />
+                <div className="festival-programme-ghost-calendar-grid">
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+              <div className="festival-programme-ghost-chip festival-programme-ghost-chip-cyan" />
+              <div className="festival-programme-ghost-chip festival-programme-ghost-chip-gold" />
+              <div className="festival-programme-ghost-orb" />
             </div>
           </div>
         </div>
@@ -215,22 +270,27 @@ export default function FestivalProgrammePage({
                 </div>
                 <div className="festival-programme-day-events">
                   {group.items.map((event) => (
-                    <article className="festival-event-card glass-card" key={`${group.dateKey}-${event.title}-${event.timeLabel}`}>
+                    <article
+                      className="festival-event-card festival-programme-card glass-card"
+                      key={`${group.dateKey}-${event.title}-${event.timeLabel}`}
+                    >
                       <div className="festival-event-meta">
-                        <span>{group.dateLabel}</span>
+                        <span>{event.dateShortLabel}</span>
                         <small>{event.timeLabel}</small>
                       </div>
-                      <div>
+                      <div className="festival-programme-card-copy">
                         <p className="festival-event-category">{event.category}</p>
                         <h3>{event.title}</h3>
                         <p>{event.description}</p>
-                        <strong>{event.venue}</strong>
-                        {event.attendanceLabel || event.priceLabel ? (
-                          <div className="festival-programme-event-flags">
-                            {event.attendanceLabel ? <span>{event.attendanceLabel}</span> : null}
-                            {event.priceLabel ? <span>{event.priceLabel}</span> : null}
-                          </div>
-                        ) : null}
+                        <div className="festival-programme-card-footer">
+                          <strong>{event.venue}</strong>
+                          {event.attendanceLabel || event.priceLabel ? (
+                            <div className="festival-programme-event-flags">
+                              {event.attendanceLabel ? <span>{event.attendanceLabel}</span> : null}
+                              {event.priceLabel ? <span>{event.priceLabel}</span> : null}
+                            </div>
+                          ) : null}
+                        </div>
                         {event.actionHref && event.actionLabel ? (
                           <div className="festival-programme-event-action">
                             <ButtonLink href={event.actionHref} variant="outline" external>

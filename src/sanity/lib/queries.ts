@@ -239,9 +239,7 @@ export async function getFestivalPage() {
       "calendarImage": {
         "url": calendarImage.asset->url,
         "alt": calendarImage.alt
-      },
-      "downloadFileUrl": downloadFile.asset->url,
-      downloadUrl
+      }
     },
     eventsPreview{
       isVisible,

@@ -16,16 +16,28 @@ export const metadata = {
 
 export default function About() {
   return (
-    <section className="page-section">
-      <div className="container page-hero split-grid">
-        <div>
-          <span className="section-kicker">About Animae Caribe</span>
-          <h1>A Caribbean animation ecosystem with a festival and a creative house.</h1>
+    <section className="page-section page-section-cinematic">
+      <div className="page-cinematic-hero page-cinematic-hero-about">
+        <div className="container festival-programme-page-hero-shell">
+          <div className="festival-programme-page-copy">
+            <span className="section-kicker">About Animae Caribe</span>
+            <h1>A Caribbean animation ecosystem with a festival and a creative house.</h1>
+            <p>
+            Animae Caribe connects artists, audiences, partners and emerging talent through Festival programming,
+            House production work, community storytelling and industry development.
+            </p>
+          </div>
+          <div className="festival-programme-page-side">
+            <div className="page-cinematic-ghost page-cinematic-ghost-about" aria-hidden="true">
+              <div className="page-cinematic-ghost-ring" />
+              <div className="page-cinematic-ghost-slab page-cinematic-ghost-slab-wide" />
+              <div className="page-cinematic-ghost-slab page-cinematic-ghost-slab-tall" />
+              <div className="page-cinematic-ghost-orb" />
+              <div className="page-cinematic-ghost-line page-cinematic-ghost-line-left" />
+              <div className="page-cinematic-ghost-line page-cinematic-ghost-line-right" />
+            </div>
+          </div>
         </div>
-        <p>
-          Animae Caribe connects artists, audiences, partners and emerging talent through Festival programming, House
-          production work, community storytelling and industry development.
-        </p>
       </div>
 
       <div className="container image-copy-grid page-feature">

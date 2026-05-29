@@ -73,8 +73,6 @@ export type SanityCalendarSection = {
   downloadLabel?: string;
   downloadButtonStyle?: 'primary' | 'soft' | 'outline';
   calendarImage?: SanityImage;
-  downloadFileUrl?: string;
-  downloadUrl?: string;
 };
 
 export type SanityVenueSection = {
