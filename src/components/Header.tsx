@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { buildNavItems } from '../data/site';
@@ -13,13 +13,15 @@ type HeaderProps = {
 
 export default function Header({currentFestivalYear}: HeaderProps) {
   const [menuState, setMenuState] = useState({isOpen: false, path: '/'});
-  const [submenuState, setSubmenuState] = useState<{key: string | null; path: string}>({key: null, path: '/'});
+  const [mobileSubmenuState, setMobileSubmenuState] = useState<{key: string | null; path: string}>({key: null, path: '/'});
+  const [desktopSubmenuKey, setDesktopSubmenuKey] = useState<string | null>(null);
+  const [isDesktopNav, setIsDesktopNav] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [heroInView, setHeroInView] = useState(true);
   const { openShowreel, canOpenShowreel, showreelButtonLabel } = useShowreel();
   const pathname = usePathname() || '/';
   const menuOpen = menuState.isOpen && menuState.path === pathname;
-  const openSubmenu = submenuState.path === pathname ? submenuState.key : null;
+  const mobileOpenSubmenu = mobileSubmenuState.path === pathname ? mobileSubmenuState.key : null;
   const navItems = buildNavItems(currentFestivalYear);
   const hasLandingHero = pathname === '/' || pathname === '/house' || pathname === '/festival';
   const hasShowreelHero = pathname === '/house' || pathname === '/festival';
@@ -70,11 +72,62 @@ export default function Header({currentFestivalYear}: HeaderProps) {
     };
   }, [hasLandingHero]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 981px)');
+
+    const syncDesktopNav = (event?: MediaQueryListEvent) => {
+      const matches = event?.matches ?? mediaQuery.matches;
+      setIsDesktopNav(matches);
+
+      if (matches) {
+        setMobileSubmenuState({key: null, path: pathname});
+      } else {
+        setDesktopSubmenuKey(null);
+      }
+    };
+
+    syncDesktopNav();
+    mediaQuery.addEventListener('change', syncDesktopNav);
+
+    return () => mediaQuery.removeEventListener('change', syncDesktopNav);
+  }, [pathname]);
+
   const isLinkActive = (href: string) => pathname === href;
   const isFestivalBranch = pathname === '/festival' || pathname.startsWith('/festival/');
   const closeMenus = () => {
     setMenuState({isOpen: false, path: pathname});
-    setSubmenuState({key: null, path: pathname});
+    setMobileSubmenuState({key: null, path: pathname});
+    setDesktopSubmenuKey(null);
+  };
+  const blurActiveElement = () => {
+    if (typeof document === 'undefined') return;
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
+  };
+  const handleNavLinkClick = () => {
+    closeMenus();
+
+    if (isDesktopNav) {
+      blurActiveElement();
+    }
+  };
+
+  const openDesktopSubmenu = (key: string) => {
+    if (!isDesktopNav) return;
+    setDesktopSubmenuKey(key);
+  };
+
+  const closeDesktopSubmenu = (key?: string) => {
+    if (!isDesktopNav) return;
+    setDesktopSubmenuKey((current) => (key && current !== key ? current : null));
+  };
+
+  const handleSubmenuEscape = (event: KeyboardEvent<HTMLDivElement>, key: string) => {
+    if (event.key !== 'Escape') return;
+    event.stopPropagation();
+    closeDesktopSubmenu(key);
   };
 
   const headerClassName = [
@@ -132,7 +185,7 @@ export default function Header({currentFestivalYear}: HeaderProps) {
           }
 
           const submenuId = `${item.label.toLowerCase().replace(/\s+/g, '-')}-submenu`;
-          const isOpen = openSubmenu === item.label;
+          const isOpen = isDesktopNav ? desktopSubmenuKey === item.label : mobileOpenSubmenu === item.label;
           const isActive = item.href === '/festival' ? isFestivalBranch : isLinkActive(item.href);
 
           return (
@@ -141,12 +194,15 @@ export default function Header({currentFestivalYear}: HeaderProps) {
               className={['nav-item-with-submenu', isOpen ? 'is-open' : '', isActive ? 'is-active' : '']
                 .filter(Boolean)
                 .join(' ')}
+              onMouseEnter={() => openDesktopSubmenu(item.label)}
+              onMouseLeave={() => closeDesktopSubmenu(item.label)}
+              onKeyDown={(event) => handleSubmenuEscape(event, item.label)}
             >
               <div className="nav-link-row">
                 <Link
                   href={item.href}
                   className={isActive ? 'nav-submenu-link active' : 'nav-submenu-link'}
-                  onClick={closeMenus}
+                  onClick={handleNavLinkClick}
                 >
                   {item.label}
                 </Link>
@@ -156,13 +212,19 @@ export default function Header({currentFestivalYear}: HeaderProps) {
                   aria-expanded={isOpen}
                   aria-controls={submenuId}
                   aria-label={isOpen ? `Collapse ${item.label} menu` : `Expand ${item.label} menu`}
-                  onClick={() =>
-                    setSubmenuState((current) =>
+                  onClick={(event) => {
+                    if (isDesktopNav) {
+                      closeDesktopSubmenu(item.label);
+                      event.currentTarget.blur();
+                      return;
+                    }
+
+                    setMobileSubmenuState((current) =>
                       current.path === pathname && current.key === item.label
                         ? {key: null, path: pathname}
                         : {key: item.label, path: pathname}
-                    )
-                  }
+                    );
+                  }}
                 >
                   <span className="nav-submenu-caret" aria-hidden="true" />
                 </button>
@@ -173,7 +235,7 @@ export default function Header({currentFestivalYear}: HeaderProps) {
                     key={child.href}
                     href={child.href}
                     className={pathname === child.href ? 'active' : ''}
-                    onClick={closeMenus}
+                    onClick={handleNavLinkClick}
                   >
                     {child.label}
                   </Link>

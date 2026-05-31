@@ -1,7 +1,9 @@
+import Image from 'next/image';
 import PartnersStrip from '../../components/PartnersStrip';
 import { ecosystemPartners } from '../../data/ecosystem';
 import { festivalPartners } from '../../data/festival';
 import { partners as housePartners } from '../../data/partners';
+import partnersHeroCharacter from '../../../public/assets/characters/CarnivalCharacater02-copy-scaled.webp';
 
 export const metadata = {
   title: 'Partners | Animae Caribe',
@@ -22,14 +24,14 @@ export default function PartnersPage() {
             </p>
           </div>
           <div className="festival-programme-page-side">
-            <div className="page-cinematic-ghost page-cinematic-ghost-partners" aria-hidden="true">
-              <div className="page-cinematic-ghost-node page-cinematic-ghost-node-top" />
-              <div className="page-cinematic-ghost-node page-cinematic-ghost-node-left" />
-              <div className="page-cinematic-ghost-node page-cinematic-ghost-node-right" />
-              <div className="page-cinematic-ghost-node page-cinematic-ghost-node-bottom" />
-              <div className="page-cinematic-ghost-connection page-cinematic-ghost-connection-a" />
-              <div className="page-cinematic-ghost-connection page-cinematic-ghost-connection-b" />
-              <div className="page-cinematic-ghost-connection page-cinematic-ghost-connection-c" />
+            <div className="page-cinematic-character page-cinematic-character-partners">
+              <Image
+                src={partnersHeroCharacter}
+                alt="Illustrated carnival character representing Animae Caribe partners"
+                className="page-cinematic-character-image"
+                priority
+                sizes="(max-width: 680px) 72vw, (max-width: 980px) 52vw, 360px"
+              />
             </div>
           </div>
         </div>

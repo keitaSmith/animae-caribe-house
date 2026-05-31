@@ -380,8 +380,7 @@ p {
 }
 
 .nav-item-with-submenu.is-open .nav-submenu,
-.nav-item-with-submenu:hover .nav-submenu,
-.nav-item-with-submenu:focus-within .nav-submenu {
+.nav-item-with-submenu:hover .nav-submenu {
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
@@ -436,16 +435,13 @@ p {
 }
 
 .site-header.is-top .nav-item-with-submenu:hover .nav-link-row,
-.site-header.is-top .nav-item-with-submenu:focus-within .nav-link-row,
 .site-header.is-top .nav-item-with-submenu.is-open .nav-link-row {
   background: rgba(255, 255, 255, 0.12);
 }
 
 .site-header.is-top .nav-item-with-submenu:hover .nav-submenu-link,
-.site-header.is-top .nav-item-with-submenu:focus-within .nav-submenu-link,
 .site-header.is-top .nav-item-with-submenu.is-open .nav-submenu-link,
 .site-header.is-top .nav-item-with-submenu:hover .nav-submenu-toggle,
-.site-header.is-top .nav-item-with-submenu:focus-within .nav-submenu-toggle,
 .site-header.is-top .nav-item-with-submenu.is-open .nav-submenu-toggle {
   color: white;
   background: transparent;
@@ -471,25 +467,19 @@ p {
 }
 
 .site-header.is-scrolled .nav-item-with-submenu:hover .nav-link-row,
-.site-header.is-scrolled .nav-item-with-submenu:focus-within .nav-link-row,
 .site-header.is-scrolled .nav-item-with-submenu.is-open .nav-link-row,
 .site-header.menu-open .nav-item-with-submenu:hover .nav-link-row,
-.site-header.menu-open .nav-item-with-submenu:focus-within .nav-link-row,
 .site-header.menu-open .nav-item-with-submenu.is-open .nav-link-row {
   background: rgba(255, 255, 255, 0.84);
 }
 
 .site-header.is-scrolled .nav-item-with-submenu:hover .nav-submenu-link,
-.site-header.is-scrolled .nav-item-with-submenu:focus-within .nav-submenu-link,
 .site-header.is-scrolled .nav-item-with-submenu.is-open .nav-submenu-link,
 .site-header.is-scrolled .nav-item-with-submenu:hover .nav-submenu-toggle,
-.site-header.is-scrolled .nav-item-with-submenu:focus-within .nav-submenu-toggle,
 .site-header.is-scrolled .nav-item-with-submenu.is-open .nav-submenu-toggle,
 .site-header.menu-open .nav-item-with-submenu:hover .nav-submenu-link,
-.site-header.menu-open .nav-item-with-submenu:focus-within .nav-submenu-link,
 .site-header.menu-open .nav-item-with-submenu.is-open .nav-submenu-link,
 .site-header.menu-open .nav-item-with-submenu:hover .nav-submenu-toggle,
-.site-header.menu-open .nav-item-with-submenu:focus-within .nav-submenu-toggle,
 .site-header.menu-open .nav-item-with-submenu.is-open .nav-submenu-toggle {
   color: var(--ink);
   background: transparent;
@@ -2600,6 +2590,73 @@ p {
   pointer-events: none;
 }
 
+.page-cinematic-character {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: min(100%, 420px);
+  min-height: 360px;
+  pointer-events: none;
+}
+
+.page-cinematic-character::before {
+  content: '';
+  position: absolute;
+  inset: 14px 28px 32px 48px;
+  border-radius: 38px;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 212, 0, 0.24), transparent 26%),
+    radial-gradient(circle at 72% 34%, rgba(0, 169, 224, 0.22), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 22px 44px rgba(6, 17, 31, 0.24);
+  z-index: -2;
+}
+
+.page-cinematic-character::after {
+  content: '';
+  position: absolute;
+  left: 54px;
+  right: 18px;
+  bottom: 12px;
+  height: 54px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(6, 17, 31, 0.5) 0%, rgba(6, 17, 31, 0.12) 64%, transparent 80%);
+  filter: blur(6px);
+  z-index: -1;
+}
+
+.page-cinematic-character-image {
+  width: auto;
+  height: auto;
+  max-width: min(100%, 350px);
+  max-height: 360px;
+  object-fit: contain;
+  filter: drop-shadow(0 24px 40px rgba(6, 17, 31, 0.3));
+}
+
+.page-cinematic-character-about .page-cinematic-character-image {
+  transform: translate(6px, 4px);
+}
+
+.page-cinematic-character-contact .page-cinematic-character-image {
+  max-width: min(100%, 365px);
+  transform: translate(12px, 8px);
+}
+
+.page-cinematic-character-partners .page-cinematic-character-image {
+  max-width: min(100%, 340px);
+  transform: translate(6px, 6px);
+}
+
+.page-cinematic-character-contact::before {
+  inset: 20px 18px 30px 60px;
+}
+
 .page-cinematic-ghost-about .page-cinematic-ghost-ring {
   position: absolute;
   right: 34px;
@@ -3035,6 +3092,46 @@ p {
     order: initial;
   }
 
+  .festival-programme-page-side {
+    justify-content: center;
+    min-height: auto;
+  }
+
+  .page-cinematic-character {
+    justify-content: center;
+    width: min(100%, 360px);
+    min-height: 300px;
+    margin-inline: auto;
+  }
+
+  .page-cinematic-character::before {
+    inset: 18px 26px 30px;
+  }
+
+  .page-cinematic-character::after {
+    left: 34px;
+    right: 34px;
+  }
+
+  .page-cinematic-character-image {
+    max-width: min(100%, 300px);
+    max-height: 300px;
+  }
+
+  .page-cinematic-character-contact .page-cinematic-character-image {
+    max-width: min(100%, 312px);
+    transform: translate(0, 4px);
+  }
+
+  .page-cinematic-character-about .page-cinematic-character-image {
+    transform: translate(0, 2px);
+  }
+
+  .page-cinematic-character-partners .page-cinematic-character-image {
+    max-width: min(100%, 292px);
+    transform: translate(0, 2px);
+  }
+
   .sunrise-divider {
     min-height: 450px;
   }
@@ -3222,6 +3319,33 @@ p {
   .festival-programme-ghost-calendar,
   .page-cinematic-ghost {
     display: none;
+  }
+
+  .page-cinematic-character {
+    width: min(100%, 280px);
+    min-height: 240px;
+  }
+
+  .page-cinematic-character::before {
+    inset: 16px 18px 22px;
+    border-radius: 30px;
+  }
+
+  .page-cinematic-character::after {
+    left: 24px;
+    right: 24px;
+    bottom: 8px;
+  }
+
+  .page-cinematic-character-image {
+    max-width: min(100%, 238px);
+    max-height: 236px;
+  }
+
+  .page-cinematic-character-contact .page-cinematic-character-image,
+  .page-cinematic-character-about .page-cinematic-character-image,
+  .page-cinematic-character-partners .page-cinematic-character-image {
+    transform: none;
   }
 
   .festival-past-editions-grid {

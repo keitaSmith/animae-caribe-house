@@ -1,5 +1,7 @@
+import Image from 'next/image';
 import { site } from '../../data/site';
 import { MailIcon, PhoneIcon } from '../../components/Icons';
+import contactHeroCharacter from '../../../public/assets/characters/CarnivalCharacater.webp';
 
 export const metadata = {
   title: 'Contact | Animae Caribe House',
@@ -19,12 +21,14 @@ export default function Contact() {
             </p>
           </div>
           <div className="festival-programme-page-side">
-            <div className="page-cinematic-ghost page-cinematic-ghost-contact" aria-hidden="true">
-              <div className="page-cinematic-ghost-signal" />
-              <div className="page-cinematic-ghost-pulse page-cinematic-ghost-pulse-a" />
-              <div className="page-cinematic-ghost-pulse page-cinematic-ghost-pulse-b" />
-              <div className="page-cinematic-ghost-pulse page-cinematic-ghost-pulse-c" />
-              <div className="page-cinematic-ghost-dot" />
+            <div className="page-cinematic-character page-cinematic-character-contact">
+              <Image
+                src={contactHeroCharacter}
+                alt="Illustrated carnival character for Animae Caribe contact page"
+                className="page-cinematic-character-image"
+                priority
+                sizes="(max-width: 680px) 72vw, (max-width: 980px) 52vw, 360px"
+              />
             </div>
           </div>
         </div>

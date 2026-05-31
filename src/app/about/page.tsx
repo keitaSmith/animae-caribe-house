@@ -1,5 +1,7 @@
+import Image from 'next/image';
 import ButtonLink from '../../components/ButtonLink';
 import { ArrowRightIcon } from '../../components/Icons';
+import aboutHeroCharacter from '../../../public/assets/characters/NewJacketFIN.webp';
 
 const processItems = [
   'Animae Caribe umbrella',
@@ -28,13 +30,14 @@ export default function About() {
             </p>
           </div>
           <div className="festival-programme-page-side">
-            <div className="page-cinematic-ghost page-cinematic-ghost-about" aria-hidden="true">
-              <div className="page-cinematic-ghost-ring" />
-              <div className="page-cinematic-ghost-slab page-cinematic-ghost-slab-wide" />
-              <div className="page-cinematic-ghost-slab page-cinematic-ghost-slab-tall" />
-              <div className="page-cinematic-ghost-orb" />
-              <div className="page-cinematic-ghost-line page-cinematic-ghost-line-left" />
-              <div className="page-cinematic-ghost-line page-cinematic-ghost-line-right" />
+            <div className="page-cinematic-character page-cinematic-character-about">
+              <Image
+                src={aboutHeroCharacter}
+                alt="Illustrated Animae Caribe character wearing a jacket"
+                className="page-cinematic-character-image"
+                priority
+                sizes="(max-width: 680px) 72vw, (max-width: 980px) 52vw, 360px"
+              />
             </div>
           </div>
         </div>
