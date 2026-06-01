@@ -22,6 +22,8 @@ export default async function About() {
   const hero = aboutPage?.hero;
   const heroImageSrc = hero?.image?.url || aboutHeroCharacter;
   const heroImageAlt = hero?.image?.alt || 'Illustrated Animae Caribe character wearing a jacket';
+  const heroImageWidth = hero?.image?.width || aboutHeroCharacter.width;
+  const heroImageHeight = hero?.image?.height || aboutHeroCharacter.height;
 
   return (
     <section className="page-section page-section-cinematic">
@@ -40,6 +42,8 @@ export default async function About() {
               <Image
                 src={heroImageSrc}
                 alt={heroImageAlt}
+                width={heroImageWidth}
+                height={heroImageHeight}
                 className="page-cinematic-character-image"
                 priority
                 sizes="(max-width: 680px) 72vw, (max-width: 980px) 52vw, 360px"

@@ -16,6 +16,8 @@ export default async function PartnersPage() {
   const hero = partnersPage?.hero;
   const heroImageSrc = hero?.image?.url || partnersHeroCharacter;
   const heroImageAlt = hero?.image?.alt || 'Illustrated carnival character representing Animae Caribe partners';
+  const heroImageWidth = hero?.image?.width || partnersHeroCharacter.width;
+  const heroImageHeight = hero?.image?.height || partnersHeroCharacter.height;
 
   return (
     <section className="page-section page-section-cinematic partners-page">
@@ -34,6 +36,8 @@ export default async function PartnersPage() {
               <Image
                 src={heroImageSrc}
                 alt={heroImageAlt}
+                width={heroImageWidth}
+                height={heroImageHeight}
                 className="page-cinematic-character-image"
                 priority
                 sizes="(max-width: 680px) 72vw, (max-width: 980px) 52vw, 360px"

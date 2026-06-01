@@ -205,7 +205,7 @@ export default function FestivalProgrammePage({
 
   return (
     <>
-      <section className="festival-programme-page-hero">
+      <section className="festival-programme-page-hero festival-programme-page-hero-art">
         <div className="container festival-programme-page-hero-shell">
           <div className="festival-programme-page-copy">
             <span className="section-kicker">{eyebrow}</span>

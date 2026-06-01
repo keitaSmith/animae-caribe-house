@@ -17,7 +17,9 @@ const pageHeroProjection = `
   description,
   "image": {
     "url": image.asset->url,
-    "alt": image.alt
+    "alt": image.alt,
+    "width": image.asset->metadata.dimensions.width,
+    "height": image.asset->metadata.dimensions.height
   }
 `;
 

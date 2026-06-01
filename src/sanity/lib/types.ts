@@ -7,6 +7,8 @@ export type SanityCta = {
 export type SanityImage = {
   url?: string;
   alt?: string;
+  width?: number;
+  height?: number;
 };
 
 export type SanityMuxVideo = {

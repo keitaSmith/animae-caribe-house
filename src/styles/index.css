@@ -2435,7 +2435,7 @@ p {
   display: grid;
   grid-template-columns: 0.86fr 1.14fr;
   gap: 54px;
-  align-items: center;
+  align-items: start;
   padding-bottom: 72px;
 }
 
@@ -2448,8 +2448,9 @@ p {
 .footer-logo {
   overflow: visible;
   display: grid;
-  place-items: center start;
-  padding: clamp(28px, 5vw, 48px);
+  justify-items: start;
+  align-items: start;
+  padding: 0;
   background: transparent;
   box-shadow: none;
 }
@@ -2485,6 +2486,7 @@ p {
   height: auto;
   max-height: none;
   object-fit: contain;
+  margin-left: 0;
 }
 
 .footer-copy p {
@@ -3067,7 +3069,7 @@ p {
   .ecosystem-panel-content,
   .ecosystem-panel-house .ecosystem-panel-content,
   .ecosystem-panel-festival .ecosystem-panel-content {
-    width: min(100% - 40px, 620px);
+    width: min(var(--container), calc(100% - 40px));
     margin: 0 auto;
     text-align: left;
     justify-self: center;
@@ -3261,7 +3263,6 @@ p {
   .umbrella-hero-grid,
   .split-grid,
   .services-header,
-  .festival-programme-page-hero-shell,
   .image-copy-grid,
   .section-heading-row,
   .footer-grid,
@@ -3312,15 +3313,25 @@ p {
   }
 
   .festival-programme-page-side {
-    justify-content: center;
+    justify-content: flex-end;
     min-height: auto;
   }
 
+  .festival-programme-page-hero-shell {
+    grid-template-columns: minmax(0, 1.08fr) minmax(220px, 0.92fr);
+    gap: clamp(20px, 3vw, 36px);
+    align-items: center;
+  }
+
+  .festival-programme-page-copy {
+    max-width: none;
+  }
+
   .page-cinematic-character {
-    justify-content: center;
+    justify-content: flex-end;
     width: min(100%, 360px);
     min-height: 300px;
-    margin-inline: auto;
+    margin-inline: 0;
   }
 
   .page-cinematic-character::before {
@@ -3432,7 +3443,7 @@ p {
   .ecosystem-panel-content,
   .ecosystem-panel-house .ecosystem-panel-content,
   .ecosystem-panel-festival .ecosystem-panel-content {
-    width: min(100% - 32px, 560px);
+    width: min(var(--container), calc(100% - 24px));
     margin: 0 auto;
     text-align: left;
     justify-self: center;
@@ -3477,9 +3488,51 @@ p {
     justify-items: stretch;
   }
 
+  .festival-programme-page-hero-shell {
+    grid-template-columns: 1fr;
+  }
+
   .festival-programme-page-side {
     min-height: 0;
-    justify-content: flex-start;
+    justify-content: flex-end;
+  }
+
+  .page-cinematic-hero .festival-programme-page-hero-shell,
+  .festival-programme-page-hero-art .festival-programme-page-hero-shell {
+    position: relative;
+    grid-template-columns: 1fr;
+    gap: 0;
+    align-items: start;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .page-cinematic-hero .festival-programme-page-copy,
+  .festival-programme-page-hero-art .festival-programme-page-copy {
+    position: relative;
+    z-index: 2;
+    max-width: none;
+    width: 100%;
+  }
+
+  .page-cinematic-hero .festival-programme-page-side,
+  .festival-programme-page-hero-art .festival-programme-page-side {
+    position: absolute;
+    top: 8px;
+    right: -10px;
+    bottom: 0;
+    width: min(52vw, 240px);
+    min-height: 0;
+    justify-content: flex-end;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .page-cinematic-hero .festival-programme-page-side {
+    top: 20px;
+    right: -54px;
+    width: min(48vw, 220px);
   }
 
   .festival-programme-ghost-calendar {
@@ -3527,7 +3580,6 @@ p {
     justify-content: flex-start;
   }
 
-  .festival-programme-ghost-calendar,
   .page-cinematic-ghost {
     display: none;
   }
@@ -3557,6 +3609,69 @@ p {
   .page-cinematic-character-about .page-cinematic-character-image,
   .page-cinematic-character-partners .page-cinematic-character-image {
     transform: none;
+  }
+
+  .page-cinematic-hero .page-cinematic-character {
+    width: min(50vw, 228px);
+    min-height: clamp(240px, 58vw, 320px);
+    opacity: 0.64;
+  }
+
+  .page-cinematic-hero .page-cinematic-character::before {
+    inset: 18px 10px 26px 34px;
+    opacity: 0.56;
+  }
+
+  .page-cinematic-hero .page-cinematic-character::after {
+    left: 38px;
+    right: 20px;
+    bottom: 10px;
+    opacity: 0.42;
+  }
+
+  .page-cinematic-hero .page-cinematic-character-image {
+    max-width: min(100%, 244px);
+    max-height: min(54vh, 274px);
+    justify-self: end;
+  }
+
+  .festival-programme-page-hero-art .festival-programme-ghost-calendar {
+    position: absolute;
+    top: 28px;
+    right: -4px;
+    width: min(54vw, 248px);
+    height: 220px;
+    margin-top: 0;
+    opacity: 0.82;
+  }
+
+  .festival-programme-page-hero-art .festival-programme-ghost-calendar-frame {
+    width: min(100%, 204px);
+    height: 176px;
+    right: 0;
+    top: 0;
+  }
+
+  .festival-programme-page-hero-art .festival-programme-ghost-orb {
+    width: 122px;
+    height: 122px;
+    right: 10px;
+    bottom: 12px;
+    opacity: 0.72;
+  }
+
+  .festival-programme-page-hero-art .festival-programme-ghost-chip-cyan {
+    left: 8px;
+    top: 102px;
+    width: 88px;
+    height: 34px;
+  }
+
+  .festival-programme-page-hero-art .festival-programme-ghost-chip-gold {
+    right: 56px;
+    bottom: 20px;
+    width: 72px;
+    height: 26px;
   }
 
   .festival-past-editions-grid {

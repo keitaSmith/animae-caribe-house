@@ -88,6 +88,8 @@ export default async function Contact() {
   const mapSearchText = buildMapSearchText(siteSettings?.contactMapSearchText, address || fallbackContact.address);
   const heroImageSrc = hero?.image?.url || contactHeroCharacter;
   const heroImageAlt = hero?.image?.alt || fallbackContactHero.imageAlt;
+  const heroImageWidth = hero?.image?.width || contactHeroCharacter.width;
+  const heroImageHeight = hero?.image?.height || contactHeroCharacter.height;
   const formattedAddress = address.split('\n').filter(Boolean);
   const { embedUrl, directionsUrl } = buildMapUrls(mapSearchText);
   const phoneHref = `tel:${phone.replace(/[^+\d]/g, '')}`;
@@ -107,6 +109,8 @@ export default async function Contact() {
               <Image
                 src={heroImageSrc}
                 alt={heroImageAlt}
+                width={heroImageWidth}
+                height={heroImageHeight}
                 className="page-cinematic-character-image"
                 priority
                 sizes="(max-width: 680px) 72vw, (max-width: 980px) 52vw, 360px"
