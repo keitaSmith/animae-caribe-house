@@ -1,11 +1,25 @@
 import type {
+  SanityAboutPage,
+  SanityContactPage,
   SanityEvent,
   SanityFestivalEdition,
   SanityFestivalPage,
   SanityPartner,
+  SanityPartnersPage,
+  SanitySiteSettings,
   SanityUmbrellaHomePage,
 } from './types';
 import {sanityFetch} from './client';
+
+const pageHeroProjection = `
+  eyebrow,
+  title,
+  description,
+  "image": {
+    "url": image.asset->url,
+    "alt": image.alt
+  }
+`;
 
 const partnerProjection = `
   name,
@@ -61,12 +75,13 @@ const festivalEditionProjection = `
 `;
 
 export async function getSiteSettings() {
-  return sanityFetch(`*[_type == "siteSettings"][0]{
+  return sanityFetch<SanitySiteSettings>(`*[_type == "siteSettings"][0]{
     siteTitle,
     defaultSeo,
     contactEmail,
     contactPhone,
     location,
+    contactMapSearchText,
     footerCopy,
     navigationLinks,
     footerLinks,
@@ -298,6 +313,35 @@ export async function getHousePage() {
     aboutSection,
     partnersSection,
     servicesSection
+  }`);
+}
+
+export async function getAboutPage() {
+  return sanityFetch<SanityAboutPage>(`*[_type == "aboutPage"][0]{
+    hero{
+      ${pageHeroProjection}
+    }
+  }`);
+}
+
+export async function getPartnersPage() {
+  return sanityFetch<SanityPartnersPage>(`*[_type == "partnersPage"][0]{
+    hero{
+      ${pageHeroProjection}
+    }
+  }`);
+}
+
+export async function getContactPage() {
+  return sanityFetch<SanityContactPage>(`*[_type == "contactPage"][0]{
+    hero{
+      ${pageHeroProjection}
+    },
+    contentSection{
+      eyebrow,
+      title,
+      description
+    }
   }`);
 }
 

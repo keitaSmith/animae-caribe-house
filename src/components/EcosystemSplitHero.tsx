@@ -106,7 +106,9 @@ export default function EcosystemSplitHero({content}: EcosystemSplitHeroProps) {
               <div className="ecosystem-panel-scrim" />
               <div className="ecosystem-panel-content reveal-up">
                 {showEyebrow ? <span className="section-kicker">{panel?.eyebrow || experience.kicker}</span> : null}
-                {showTitle ? <h1>{panel?.title || experience.title}</h1> : null}
+                <div className="ecosystem-panel-heading-slot">
+                  {showTitle ? <h1>{panel?.title || experience.title}</h1> : null}
+                </div>
                 {showDescription ? <p>{panel?.description || experience.copy}</p> : null}
                 {showCta ? (
                   <ButtonLink href={href} variant="soft">
@@ -117,10 +119,6 @@ export default function EcosystemSplitHero({content}: EcosystemSplitHeroProps) {
             </article>
           );
         })}
-        <svg className="ecosystem-diagonal-slit" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <line className="ecosystem-diagonal-slit-core" x1="56" y1="0" x2="32" y2="100" />
-          <line className="ecosystem-diagonal-slit-glow" x1="56" y1="0" x2="32" y2="100" />
-        </svg>
       </div>
     </section>
   );

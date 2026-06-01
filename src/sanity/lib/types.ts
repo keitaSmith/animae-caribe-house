@@ -126,6 +126,39 @@ export type SanityFestivalEdition = {
   isActive?: boolean;
 };
 
+export type SanitySiteSettings = {
+  siteTitle?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  location?: string;
+  contactMapSearchText?: string;
+  footerCopy?: string;
+};
+
+export type SanityPageHeroSection = {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  image?: SanityImage;
+};
+
+export type SanityAboutPage = {
+  hero?: SanityPageHeroSection;
+};
+
+export type SanityPartnersPage = {
+  hero?: SanityPageHeroSection;
+};
+
+export type SanityContactPage = {
+  hero?: SanityPageHeroSection;
+  contentSection?: {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+  };
+};
+
 export type SanityPartnerSection = {
   isVisible?: boolean;
   eyebrow?: string;

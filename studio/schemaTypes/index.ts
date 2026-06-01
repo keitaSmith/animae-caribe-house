@@ -800,6 +800,56 @@ const heroSection = defineType({
   },
 })
 
+const pageHeroSection = defineType({
+  name: 'pageHeroSection',
+  title: 'Page hero',
+  type: 'object',
+  fields: [
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'title', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+    defineField({
+      name: 'image',
+      title: 'Right-side hero image',
+      type: 'imageWithAlt',
+      description: 'Displayed on the right side of the cinematic page hero.',
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'eyebrow',
+      media: 'image',
+    },
+    prepare: ({title, subtitle, media}) => ({
+      title: title || 'Page hero',
+      subtitle: subtitle || 'Set hero copy and image',
+      media,
+    }),
+  },
+})
+
+const contactContentSection = defineType({
+  name: 'contactContentSection',
+  title: 'Contact content section',
+  type: 'object',
+  fields: [
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'title', title: 'Title', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 4}),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'eyebrow',
+    },
+    prepare: ({title, subtitle}) => ({
+      title: title || 'Contact content section',
+      subtitle: subtitle || 'Set the intro copy below the hero',
+    }),
+  },
+})
+
 const splitHeroPanel = defineType({
   name: 'splitHeroPanel',
   title: 'Split hero panel',
@@ -1059,7 +1109,13 @@ const siteSettings = defineType({
     defineField({name: 'footerLinks', title: 'Footer links', type: 'array', of: [defineArrayMember({type: 'link'})]}),
     defineField({name: 'contactEmail', title: 'Contact email', type: 'email'}),
     defineField({name: 'contactPhone', title: 'Contact phone', type: 'string'}),
-    defineField({name: 'location', title: 'Address/location', type: 'string'}),
+    defineField({name: 'location', title: 'Address/location', type: 'text', rows: 3}),
+    defineField({
+      name: 'contactMapSearchText',
+      title: 'Contact map search text',
+      type: 'string',
+      description: 'Used to build the Google Maps embed and external map link on the Contact page.',
+    }),
     defineField({name: 'socialLinks', title: 'Social links', type: 'array', of: [defineArrayMember({type: 'socialLink'})]}),
     defineField({name: 'footerCopy', title: 'Footer copy', type: 'text', rows: 3}),
     defineField({name: 'defaultCtas', title: 'Default CTAs', type: 'array', of: [defineArrayMember({type: 'cta'})]}),
@@ -1124,6 +1180,60 @@ const housePage = defineType({
     defineField({name: 'ctaSection', title: 'CTA section', type: 'archiveTeaserSection'}),
   ],
   preview: fixedPreview('House Page', 'animaecaribehouse.com experience'),
+})
+
+const aboutPage = defineType({
+  name: 'aboutPage',
+  title: 'About page',
+  type: 'document',
+  fields: [
+    defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
+    defineField({
+      name: 'hero',
+      title: 'Hero',
+      type: 'pageHeroSection',
+      description: 'Controls the hero copy and right-side image on the About page.',
+    }),
+  ],
+  preview: fixedPreview('About Page', 'animaecaribe.com/about'),
+})
+
+const partnersPage = defineType({
+  name: 'partnersPage',
+  title: 'Partners page',
+  type: 'document',
+  fields: [
+    defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
+    defineField({
+      name: 'hero',
+      title: 'Hero',
+      type: 'pageHeroSection',
+      description: 'Controls the hero copy and right-side image on the Partners page.',
+    }),
+  ],
+  preview: fixedPreview('Partners Page', 'animaecaribe.com/partners'),
+})
+
+const contactPage = defineType({
+  name: 'contactPage',
+  title: 'Contact page',
+  type: 'document',
+  fields: [
+    defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
+    defineField({
+      name: 'hero',
+      title: 'Hero',
+      type: 'pageHeroSection',
+      description: 'Controls the Contact page hero copy and right-side image.',
+    }),
+    defineField({
+      name: 'contentSection',
+      title: 'Content section',
+      type: 'contactContentSection',
+      description: 'Controls the intro copy above the contact details. Global contact details still come from Site Settings.',
+    }),
+  ],
+  preview: fixedPreview('Contact Page', 'animaecaribe.com/contact'),
 })
 
 const festivalEdition = defineType({
@@ -1601,6 +1711,8 @@ export const schemaTypes = [
   ecosystemSection,
   festivalHeroSection,
   heroSection,
+  pageHeroSection,
+  contactContentSection,
   splitHeroPanel,
   splitHeroSection,
   partnersMarqueeSection,
@@ -1612,6 +1724,9 @@ export const schemaTypes = [
   umbrellaHomePage,
   festivalPage,
   housePage,
+  aboutPage,
+  partnersPage,
+  contactPage,
   festivalEdition,
   event,
   partner,

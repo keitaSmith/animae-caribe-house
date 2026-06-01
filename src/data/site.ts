@@ -27,9 +27,9 @@ export const site: Site = {
   showreelUrl: 'https://www.youtube.com/',
   twixalotUrl: 'https://twixalot.com',
   contact: {
-    email: 'hello@animaecaribehouse.com',
-    phone: '+1 (868) XXX-XXXX',
-    location: 'Trinidad and Tobago',
+    email: 'info@animaecaribe.com',
+    phone: '+1 (868) 704-1484',
+    location: '#2 Abercromby Street, St. Joseph',
   },
 };
 

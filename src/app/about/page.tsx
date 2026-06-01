@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import ButtonLink from '../../components/ButtonLink';
 import { ArrowRightIcon } from '../../components/Icons';
+import { getAboutPage } from '../../sanity/lib/queries';
 import aboutHeroCharacter from '../../../public/assets/characters/NewJacketFIN.webp';
 
 const processItems = [
@@ -16,24 +17,29 @@ export const metadata = {
   title: 'About | Animae Caribe',
 };
 
-export default function About() {
+export default async function About() {
+  const aboutPage = await getAboutPage();
+  const hero = aboutPage?.hero;
+  const heroImageSrc = hero?.image?.url || aboutHeroCharacter;
+  const heroImageAlt = hero?.image?.alt || 'Illustrated Animae Caribe character wearing a jacket';
+
   return (
     <section className="page-section page-section-cinematic">
       <div className="page-cinematic-hero page-cinematic-hero-about">
         <div className="container festival-programme-page-hero-shell">
           <div className="festival-programme-page-copy">
-            <span className="section-kicker">About Animae Caribe</span>
-            <h1>A Caribbean animation ecosystem with a festival and a creative house.</h1>
+            <span className="section-kicker">{hero?.eyebrow || 'About Animae Caribe'}</span>
+            <h1>{hero?.title || 'A Caribbean animation ecosystem with a festival and a creative house.'}</h1>
             <p>
-            Animae Caribe connects artists, audiences, partners and emerging talent through Festival programming,
-            House production work, community storytelling and industry development.
+              {hero?.description ||
+                'Animae Caribe connects artists, audiences, partners and emerging talent through Festival programming, House production work, community storytelling and industry development.'}
             </p>
           </div>
           <div className="festival-programme-page-side">
             <div className="page-cinematic-character page-cinematic-character-about">
               <Image
-                src={aboutHeroCharacter}
-                alt="Illustrated Animae Caribe character wearing a jacket"
+                src={heroImageSrc}
+                alt={heroImageAlt}
                 className="page-cinematic-character-image"
                 priority
                 sizes="(max-width: 680px) 72vw, (max-width: 980px) 52vw, 360px"
