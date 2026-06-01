@@ -1565,6 +1565,20 @@ p {
   margin-left: auto;
 }
 
+.ecosystem-panel-house .ecosystem-panel-content .button,
+.ecosystem-panel-festival .ecosystem-panel-content .button {
+  width: auto;
+  min-width: 0;
+}
+
+.ecosystem-panel-house .ecosystem-panel-content .button {
+  justify-self: start;
+}
+
+.ecosystem-panel-festival .ecosystem-panel-content .button {
+  justify-self: end;
+}
+
 .umbrella-hero {
   position: relative;
   min-height: 92vh;
@@ -3090,6 +3104,8 @@ p {
   }
 
   .ecosystem-panel-content .button {
+    width: auto;
+    min-width: 0;
     justify-self: start;
   }
 
@@ -3739,6 +3755,10 @@ p {
   .button,
   .contact-list a {
     width: 100%;
+  }
+
+  .ecosystem-panel-content .button {
+    width: auto;
   }
 
   .partner-marquee,
