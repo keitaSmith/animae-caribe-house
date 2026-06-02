@@ -275,7 +275,7 @@ export async function getFestivalPage() {
       },
       maxEvents,
       cta,
-      events[]->{
+      "events": events[@->._id != null]->{
         ${eventProjection}
       }
     },

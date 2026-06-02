@@ -1,9 +1,13 @@
 import FestivalExperience from '@/components/FestivalExperience';
 import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute} from '@/lib/festivalRoutes';
 import {getActiveFestivalEdition, getFestivalPage, getFestivalPartners, getUpcomingFestivalEventsByEdition} from '@/sanity/lib/queries';
-import type {SanityFestivalPage} from '@/sanity/lib/types';
+import type {SanityEvent, SanityFestivalPage} from '@/sanity/lib/types';
 
 export const revalidate = 0;
+
+function isRenderableEvent(event: SanityEvent | null | undefined): event is SanityEvent {
+  return Boolean(event?.title && (event.startDateTime || event.date));
+}
 
 export async function generateMetadata() {
   const activeEdition = await getActiveFestivalEdition();
@@ -58,9 +62,7 @@ export default async function FestivalPage() {
   const festivalEditionYear = mergedFestivalPage?.eventsPreview?.festivalEdition?.year || activeEdition?.year || DEFAULT_FESTIVAL_YEAR;
   const maxEvents = mergedFestivalPage?.eventsPreview?.maxEvents || 3;
   const upcomingEvents = festivalEditionId ? await getUpcomingFestivalEventsByEdition(festivalEditionId, maxEvents) : null;
-  const legacySelectedEvents = mergedFestivalPage?.eventsPreview?.events?.filter(
-    (event) => event.title && (event.startDateTime || event.date)
-  );
+  const legacySelectedEvents = mergedFestivalPage?.eventsPreview?.events?.filter(isRenderableEvent) || null;
   const events = upcomingEvents?.length ? upcomingEvents : legacySelectedEvents?.length ? legacySelectedEvents : null;
 
   return (
