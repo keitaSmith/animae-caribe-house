@@ -1,7 +1,7 @@
 import {notFound} from 'next/navigation';
-import FestivalProgrammePage from '../../../../../components/FestivalProgrammePage';
-import {getPastEditionsRoute, isValidFestivalYear} from '../../../../../lib/festivalRoutes';
-import {getFestivalEditionByYear, getFestivalEventsByEdition} from '../../../../../sanity/lib/queries';
+import FestivalProgrammePage from '@/components/FestivalProgrammePage';
+import {getPastEditionsRoute, isValidFestivalYear} from '@/lib/festivalRoutes';
+import {getFestivalEditionByYear, getFestivalEventsByEdition} from '@/sanity/lib/queries';
 
 type PastFestivalEventsPageProps = {
   params: Promise<{

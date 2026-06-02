@@ -1,8 +1,8 @@
 import Image from 'next/image';
-import ButtonLink from '../../components/ButtonLink';
-import { ExternalIcon, MailIcon, MapPinIcon, PhoneIcon } from '../../components/Icons';
-import { getContactPage, getSiteSettings } from '../../sanity/lib/queries';
-import contactHeroCharacter from '../../../public/assets/characters/CarnivalCharacater.webp';
+import ButtonLink from '@/components/ButtonLink';
+import { ExternalIcon, MailIcon, MapPinIcon, PhoneIcon } from '@/components/Icons';
+import { getContactPage, getSiteSettings } from '@/sanity/lib/queries';
+import contactHeroCharacter from '@/../public/assets/characters/CarnivalCharacater.webp';
 
 export const metadata = {
   title: 'Contact | Animae Caribe House',

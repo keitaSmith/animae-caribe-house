@@ -1,6 +1,6 @@
-import PastFestivalEditionsPage from '../../../components/PastFestivalEditionsPage';
-import {DEFAULT_FESTIVAL_YEAR} from '../../../lib/festivalRoutes';
-import {getActiveFestivalEdition, getPastFestivalEditions} from '../../../sanity/lib/queries';
+import PastFestivalEditionsPage from '@/components/PastFestivalEditionsPage';
+import {DEFAULT_FESTIVAL_YEAR} from '@/lib/festivalRoutes';
+import {getActiveFestivalEdition, getPastFestivalEditions} from '@/sanity/lib/queries';
 
 export const metadata = {
   title: 'Animae Caribe Festival Past Editions',

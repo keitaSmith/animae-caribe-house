@@ -1,10 +1,10 @@
 import {notFound} from 'next/navigation';
-import FestivalProgrammePage from '../../../../components/FestivalProgrammePage';
-import {festivalEvents} from '../../../../data/festival';
-import {DEFAULT_FESTIVAL_YEAR, isValidFestivalYear} from '../../../../lib/festivalRoutes';
-import {isSanityConfigured} from '../../../../sanity/lib/client';
-import {getFestivalEditionByYear, getFestivalEventsByEdition} from '../../../../sanity/lib/queries';
-import type {SanityEvent} from '../../../../sanity/lib/types';
+import FestivalProgrammePage from '@/components/FestivalProgrammePage';
+import {festivalEvents} from '@/data/festival';
+import {DEFAULT_FESTIVAL_YEAR, isValidFestivalYear} from '@/lib/festivalRoutes';
+import {isSanityConfigured} from '@/sanity/lib/client';
+import {getFestivalEditionByYear, getFestivalEventsByEdition} from '@/sanity/lib/queries';
+import type {SanityEvent} from '@/sanity/lib/types';
 
 type FestivalEventsPageProps = {
   params: Promise<{

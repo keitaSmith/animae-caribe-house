@@ -1,4 +1,4 @@
-import { featuredProjects } from '../../data/projects';
+import { featuredProjects } from '@/data/projects';
 
 export const metadata = {
   title: 'Portfolio | Animae Caribe House',

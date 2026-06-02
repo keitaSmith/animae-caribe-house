@@ -1,4 +1,4 @@
-import HouseExperience from '../../components/HouseExperience';
+import HouseExperience from '@/components/HouseExperience';
 
 export const metadata = {
   title: 'Animae Caribe House | Where Digital Creatives Find Community',

@@ -1,10 +1,10 @@
 import Image from 'next/image';
-import PartnersStrip from '../../components/PartnersStrip';
-import { ecosystemPartners } from '../../data/ecosystem';
-import { festivalPartners } from '../../data/festival';
-import { partners as housePartners } from '../../data/partners';
-import { getPartnersPage } from '../../sanity/lib/queries';
-import partnersHeroCharacter from '../../../public/assets/characters/CarnivalCharacater02-copy-scaled.webp';
+import PartnersStrip from '@/components/PartnersStrip';
+import { ecosystemPartners } from '@/data/ecosystem';
+import { festivalPartners } from '@/data/festival';
+import { partners as housePartners } from '@/data/partners';
+import { getPartnersPage } from '@/sanity/lib/queries';
+import partnersHeroCharacter from '@/../public/assets/characters/CarnivalCharacater02-copy-scaled.webp';
 
 export const metadata = {
   title: 'Partners | Animae Caribe',

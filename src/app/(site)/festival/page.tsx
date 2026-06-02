@@ -1,7 +1,7 @@
-import FestivalExperience from '../../components/FestivalExperience';
-import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute} from '../../lib/festivalRoutes';
-import {getActiveFestivalEdition, getFestivalPage, getFestivalPartners, getUpcomingFestivalEventsByEdition} from '../../sanity/lib/queries';
-import type {SanityFestivalPage} from '../../sanity/lib/types';
+import FestivalExperience from '@/components/FestivalExperience';
+import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute} from '@/lib/festivalRoutes';
+import {getActiveFestivalEdition, getFestivalPage, getFestivalPartners, getUpcomingFestivalEventsByEdition} from '@/sanity/lib/queries';
+import type {SanityFestivalPage} from '@/sanity/lib/types';
 
 export const revalidate = 0;
 

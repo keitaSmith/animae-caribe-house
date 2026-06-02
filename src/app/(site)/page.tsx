@@ -1,10 +1,10 @@
-import ButtonLink from '../components/ButtonLink';
-import EcosystemSplitHero from '../components/EcosystemSplitHero';
-import PartnersStrip from '../components/PartnersStrip';
-import { ArrowRightIcon, MailIcon } from '../components/Icons';
-import { ecosystemPartners } from '../data/ecosystem';
-import type { Partner } from '../data/partners';
-import { getUmbrellaHomePage, getUmbrellaPartners } from '../sanity/lib/queries';
+import ButtonLink from '@/components/ButtonLink';
+import EcosystemSplitHero from '@/components/EcosystemSplitHero';
+import PartnersStrip from '@/components/PartnersStrip';
+import { ArrowRightIcon, MailIcon } from '@/components/Icons';
+import { ecosystemPartners } from '@/data/ecosystem';
+import type { Partner } from '@/data/partners';
+import { getUmbrellaHomePage, getUmbrellaPartners } from '@/sanity/lib/queries';
 
 export const metadata = {
   title: 'Animae Caribe | Animation, Festival, House and Caribbean Creative Community',

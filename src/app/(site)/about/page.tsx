@@ -1,8 +1,8 @@
 import Image from 'next/image';
-import ButtonLink from '../../components/ButtonLink';
-import { ArrowRightIcon } from '../../components/Icons';
-import { getAboutPage } from '../../sanity/lib/queries';
-import aboutHeroCharacter from '../../../public/assets/characters/NewJacketFIN.webp';
+import ButtonLink from '@/components/ButtonLink';
+import { ArrowRightIcon } from '@/components/Icons';
+import { getAboutPage } from '@/sanity/lib/queries';
+import aboutHeroCharacter from '@/../public/assets/characters/NewJacketFIN.webp';
 
 const processItems = [
   'Animae Caribe umbrella',

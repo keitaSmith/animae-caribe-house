@@ -1,4 +1,4 @@
-import { articles } from '../../data/articles';
+import { articles } from '@/data/articles';
 
 export const metadata = {
   title: 'News & Articles | Animae Caribe House',
