@@ -13,7 +13,9 @@ const token = process.env.SANITY_API_READ_TOKEN;
 export const sanityClient = isSanityConfigured
   ? createClient({
       ...sanityConfig,
-      useCdn: !token,
+      // Pull directly from the Sanity API so CMS updates like reel playback IDs
+      // show up promptly in server-rendered pages instead of lingering in CDN cache.
+      useCdn: false,
       token,
       perspective: 'published',
     })

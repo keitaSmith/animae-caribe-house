@@ -3,6 +3,8 @@ import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute} from '../../lib/festivalR
 import {getActiveFestivalEdition, getFestivalPage, getFestivalPartners, getUpcomingFestivalEventsByEdition} from '../../sanity/lib/queries';
 import type {SanityFestivalPage} from '../../sanity/lib/types';
 
+export const revalidate = 0;
+
 export async function generateMetadata() {
   const activeEdition = await getActiveFestivalEdition();
 
