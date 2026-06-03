@@ -4,9 +4,9 @@ import PortableTextRenderer from '@/sanity/PortableTextRenderer';
 import {
   NewsMediaAdjacentNav,
   NewsMediaCard,
-  NewsMediaHero,
+  NewsMediaDetailHero,
 } from '@/components/NewsMediaComponents';
-import {formatNewsMediaDate, getNewsMediaRepository} from '@/lib/newsMedia';
+import {getNewsMediaRepository} from '@/lib/newsMedia';
 
 type NewsMediaDetailPageProps = {
   params: Promise<{
@@ -63,30 +63,12 @@ export default async function NewsMediaDetailPage({params}: NewsMediaDetailPageP
   }
 
   const embedUrl = item.type === 'video' ? buildYouTubeEmbedUrl(item.youtubeVideoId, item.embedUrl) : undefined;
-  const terms = [...item.categories, ...item.tags];
 
   return (
     <section className="page-section page-section-cinematic news-media-page">
-      <NewsMediaHero />
+      <NewsMediaDetailHero item={item} />
 
       <article className="container news-media-detail">
-        <div className="news-media-detail-header">
-          <span className="section-kicker">{item.type === 'video' ? 'Video' : 'Article'}</span>
-          <h1>{item.title}</h1>
-          <div className="news-media-detail-meta">
-            <time dateTime={item.publishedAt}>{formatNewsMediaDate(item.publishedAt)}</time>
-            {item.author ? <span>By {item.author}</span> : null}
-            {item.sourceLabel ? <span>{item.sourceLabel}</span> : null}
-          </div>
-          {terms.length ? (
-            <div className="news-media-term-row news-media-detail-terms" aria-label="Categories and tags">
-              {terms.map((term) => (
-                <span key={term}>{term}</span>
-              ))}
-            </div>
-          ) : null}
-        </div>
-
         {item.type === 'video' ? (
           <div className="news-media-video-shell">
             {embedUrl ? (
