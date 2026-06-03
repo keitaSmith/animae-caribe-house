@@ -44,6 +44,7 @@ export function buildNavItems(currentFestivalYear = DEFAULT_FESTIVAL_YEAR): NavI
       ],
     },
     {label: 'House', href: '/house'},
+    {label: 'News & Media', href: '/news-media'},
     {label: 'About', href: '/about'},
     {label: 'Partners', href: '/partners'},
     {label: 'Contact', href: '/contact'},

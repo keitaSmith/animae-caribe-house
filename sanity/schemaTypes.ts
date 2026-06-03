@@ -26,6 +26,30 @@ const eventTypeOptions = [
   {title: 'Community', value: 'community'},
 ]
 
+const youtubeReviewStatusOptions = [
+  {title: 'Needs review', value: 'needsReview'},
+  {title: 'Auto-published', value: 'autoPublished'},
+  {title: 'Approved', value: 'approved'},
+  {title: 'Hidden', value: 'hidden'},
+  {title: 'Rejected', value: 'rejected'},
+  {title: 'Pending review (legacy)', value: 'pending'},
+]
+
+const youtubeBackfillStatusOptions = [
+  {title: 'Pending', value: 'pending'},
+  {title: 'Running', value: 'running'},
+  {title: 'Completed', value: 'completed'},
+  {title: 'Failed', value: 'failed'},
+]
+
+const youtubeSourceTypeOptions = [
+  {title: 'Official Animae Caribe channel', value: 'official'},
+  {title: 'Trusted media channel', value: 'trustedMedia'},
+  {title: 'Channel (legacy)', value: 'channel'},
+  {title: 'Playlist (legacy)', value: 'playlist'},
+  {title: 'Search (legacy)', value: 'search'},
+]
+
 const attendanceTypeOptions = [
   {title: 'Free', value: 'free'},
   {title: 'Paid', value: 'paid'},
@@ -1606,11 +1630,20 @@ const post = defineType({
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
-    defineField({name: 'date', title: 'Date', type: 'datetime'}),
+    defineField({name: 'date', title: 'Legacy date', type: 'datetime'}),
+    defineField({
+      name: 'publishedAt',
+      title: 'Published date',
+      type: 'datetime',
+      description: 'Used by the News & Media archive. Falls back to Legacy date for older posts.',
+    }),
     defineField({name: 'excerpt', title: 'Excerpt', type: 'text', rows: 3}),
     defineField({name: 'body', title: 'Body', type: 'array', of: [defineArrayMember({type: 'block'})]}),
     defineField({name: 'featuredImage', title: 'Featured image', type: 'imageWithAlt'}),
-    defineField({name: 'categories', title: 'Categories/tags', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+    defineField({name: 'author', title: 'Author', type: 'string'}),
+    defineField({name: 'categories', title: 'Categories', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+    defineField({name: 'tags', title: 'Tags', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+    defineField({name: 'isVisible', title: 'Show on website', type: 'boolean', initialValue: true}),
     defineField({name: 'relatedExperience', title: 'Related experience', type: 'string', options: {list: relatedExperienceOptions}}),
     defineField({name: 'relatedFestivalEdition', title: 'Related festival edition', type: 'reference', to: [{type: 'festivalEdition'}]}),
     defineField({name: 'originalWordPressUrl', title: 'Original WordPress URL', type: 'url'}),
@@ -1626,6 +1659,121 @@ const post = defineType({
       title: title || 'Post',
       subtitle,
       media,
+    }),
+  },
+})
+
+const youtubeSource = defineType({
+  name: 'youtubeSource',
+  title: 'YouTube source',
+  type: 'document',
+  fields: [
+    defineField({name: 'title', title: 'Source title', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({name: 'channelId', title: 'Channel ID', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({name: 'channelTitle', title: 'Channel title', type: 'string'}),
+    defineField({
+      name: 'sourceType',
+      title: 'Source type',
+      type: 'string',
+      initialValue: 'trustedMedia',
+      options: {list: youtubeSourceTypeOptions},
+    }),
+    defineField({name: 'sourceUrl', title: 'Source URL', type: 'url'}),
+    defineField({
+      name: 'isOfficialSource',
+      title: 'Official Animae Caribe source',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Official sources import all uploads and auto-publish them.',
+    }),
+    defineField({
+      name: 'requiredKeywords',
+      title: 'Required keywords',
+      type: 'array',
+      of: [defineArrayMember({type: 'string'})],
+      description: 'Trusted external sources import only videos whose title or description contains one of these keywords.',
+    }),
+    defineField({
+      name: 'autoPublish',
+      title: 'Auto-publish matched videos',
+      type: 'boolean',
+      initialValue: false,
+      description: 'For trusted external sources, matched videos are visible immediately only when this is enabled.',
+    }),
+    defineField({name: 'trustedKeywords', title: 'Legacy trusted keywords', type: 'array', of: [defineArrayMember({type: 'string'})], hidden: true}),
+    defineField({
+      name: 'initialBackfillStatus',
+      title: 'Initial backfill status',
+      type: 'string',
+      initialValue: 'pending',
+      options: {list: youtubeBackfillStatusOptions},
+    }),
+    defineField({name: 'initialBackfillCompletedAt', title: 'Initial backfill completed at', type: 'datetime'}),
+    defineField({name: 'initialBackfillLastError', title: 'Initial backfill last error', type: 'text', rows: 3}),
+    defineField({name: 'lastCheckedAt', title: 'Last checked at', type: 'datetime'}),
+    defineField({name: 'lastSuccessfulSyncAt', title: 'Last successful sync at', type: 'datetime'}),
+    defineField({name: 'isActive', title: 'Active source', type: 'boolean', initialValue: true}),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'channelTitle',
+    },
+    prepare: ({title, subtitle}) => ({
+      title: title || 'YouTube source',
+      subtitle: subtitle || 'Trusted YouTube source',
+    }),
+  },
+})
+
+const youtubeVideo = defineType({
+  name: 'youtubeVideo',
+  title: 'YouTube video',
+  type: 'document',
+  fields: [
+    defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    defineField({name: 'youtubeVideoId', title: 'YouTube video ID', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({name: 'youtubeUrl', title: 'YouTube URL', type: 'url'}),
+    defineField({name: 'embedUrl', title: 'Embed URL', type: 'url'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 5}),
+    defineField({
+      name: 'thumbnailUrl',
+      title: 'YouTube thumbnail URL',
+      type: 'url',
+      description: 'Reference the hosted YouTube thumbnail URL. Do not upload this as a Sanity image asset.',
+    }),
+    defineField({name: 'publishedAt', title: 'Published date', type: 'datetime'}),
+    defineField({name: 'channelId', title: 'Channel ID', type: 'string'}),
+    defineField({name: 'channelTitle', title: 'Channel title', type: 'string'}),
+    defineField({name: 'source', title: 'Trusted source', type: 'reference', to: [{type: 'youtubeSource'}]}),
+    defineField({name: 'sourceType', title: 'Source type', type: 'string', options: {list: youtubeSourceTypeOptions}}),
+    defineField({name: 'youtubeCategoryId', title: 'YouTube category ID', type: 'string'}),
+    defineField({name: 'youtubeCategoryTitle', title: 'YouTube category title', type: 'string'}),
+    defineField({name: 'youtubeTags', title: 'YouTube tags', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+    defineField({name: 'matchedKeywords', title: 'Matched keywords', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+    defineField({name: 'categories', title: 'Display categories', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+    defineField({name: 'tags', title: 'Display tags', type: 'array', of: [defineArrayMember({type: 'string'})]}),
+    defineField({name: 'isVisible', title: 'Show on website', type: 'boolean', initialValue: false}),
+    defineField({
+      name: 'reviewStatus',
+      title: 'Review status',
+      type: 'string',
+      initialValue: 'needsReview',
+      options: {list: youtubeReviewStatusOptions},
+    }),
+    defineField({name: 'importedAt', title: 'Imported at', type: 'datetime'}),
+    defineField({name: 'lastSyncedAt', title: 'Last synced at', type: 'datetime'}),
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'channelTitle',
+      status: 'reviewStatus',
+    },
+    prepare: ({title, subtitle, status}) => ({
+      title: title || 'YouTube video',
+      subtitle: [subtitle, status].filter(Boolean).join(' - ') || 'Imported YouTube video',
     }),
   },
 })
@@ -1731,6 +1879,8 @@ export const schemaTypes = [
   event,
   partner,
   post,
+  youtubeSource,
+  youtubeVideo,
   page,
   mediaGallery,
   person,
