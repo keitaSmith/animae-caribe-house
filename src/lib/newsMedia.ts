@@ -4,6 +4,7 @@ import {sanityFetch} from '@/sanity/lib/client';
 import {urlForImage} from '@/sanity/lib/image';
 
 export type NewsMediaType = 'article' | 'video';
+export type ArticleFeaturedImageLayout = 'landscape' | 'fourThree' | 'square' | 'portrait' | 'natural';
 
 export type NewsMediaItem = {
   id: string;
@@ -14,6 +15,7 @@ export type NewsMediaItem = {
   imageUrl?: string;
   imageAlt?: string;
   detailImageUrl?: string;
+  featuredImageLayout: ArticleFeaturedImageLayout;
   publishedAt?: string;
   categories: string[];
   tags: string[];
@@ -56,6 +58,7 @@ type RawNewsMediaItem = {
   imageUrl?: string;
   imageAlt?: string;
   image?: SanityImageSource;
+  featuredImageLayout?: string;
   publishedAt?: string;
   date?: string;
   categories?: string[];
@@ -107,7 +110,7 @@ const PAGE_SIZE = 9;
 
 const articleVisibilityFilter = `_type == "post" && defined(slug.current) && coalesce(isVisible, true) == true`;
 const videoVisibilityFilter = `_type == "youtubeVideo" && defined(slug.current) && isVisible == true && coalesce(reviewStatus, "needsReview") in ["approved", "autoPublished"]`;
-const unifiedFilter = `(${articleVisibilityFilter}) || (${videoVisibilityFilter})`;
+const unifiedFilter = `((${articleVisibilityFilter}) || (${videoVisibilityFilter}))`;
 const unifiedOrderField = `coalesce(publishedAt, date, _createdAt)`;
 
 const normalizedProjection = `
@@ -117,6 +120,7 @@ const normalizedProjection = `
   "slug": slug.current,
   excerpt,
   description,
+  featuredImageLayout,
   "image": select(
     _type == "post" => coalesce(
       featuredImage{
@@ -194,19 +198,52 @@ function buildSanityImageUrl(image: SanityImageSource | undefined, width: number
   );
 }
 
+function normalizeFeaturedImageLayout(value?: string): ArticleFeaturedImageLayout {
+  const layoutAliases: Record<string, ArticleFeaturedImageLayout> = {
+    landscape: 'landscape',
+    landscape16x9: 'landscape',
+    fourThree: 'fourThree',
+    landscape4x3: 'fourThree',
+    square: 'square',
+    square1x1: 'square',
+    portrait: 'portrait',
+    portrait3x4: 'portrait',
+    natural: 'natural',
+  };
+
+  return value && layoutAliases[value] ? layoutAliases[value] : 'landscape';
+}
+
+function buildArticleDetailImageUrl(image: SanityImageSource | undefined, layout: ArticleFeaturedImageLayout) {
+  if (layout === 'natural') {
+    return urlForImage(image)?.width(1440).auto('format').url() || image?.asset?.url;
+  }
+
+  const dimensions: Record<Exclude<ArticleFeaturedImageLayout, 'natural'>, {width: number; height: number}> = {
+    landscape: {width: 1440, height: 810},
+    fourThree: {width: 1200, height: 900},
+    square: {width: 1000, height: 1000},
+    portrait: {width: 900, height: 1200},
+  };
+  const {width, height} = dimensions[layout];
+
+  return buildSanityImageUrl(image, width, height);
+}
+
 function normalizeItem(raw: RawNewsMediaItem): NewsMediaItem | null {
   if (!raw._id || !raw.title || !raw.slug) {
     return null;
   }
 
   const type = normalizeType(raw._type);
+  const featuredImageLayout = type === 'article' ? normalizeFeaturedImageLayout(raw.featuredImageLayout) : 'landscape';
   const cardImageUrl =
     type === 'article'
       ? buildSanityImageUrl(raw.image, 960, 600)
       : raw.imageUrl;
   const detailImageUrl =
     type === 'article'
-      ? buildSanityImageUrl(raw.image, 1440, 810)
+      ? buildArticleDetailImageUrl(raw.image, featuredImageLayout)
       : raw.imageUrl;
 
   return {
@@ -218,6 +255,7 @@ function normalizeItem(raw: RawNewsMediaItem): NewsMediaItem | null {
     imageUrl: cardImageUrl,
     imageAlt: raw.imageAlt || raw.title,
     detailImageUrl,
+    featuredImageLayout,
     publishedAt: raw.publishedAt || raw.date,
     categories: uniqueStrings(raw.categories),
     tags: uniqueStrings(raw.tags),

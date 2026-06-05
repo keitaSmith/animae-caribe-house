@@ -6,7 +6,7 @@ import {
   NewsMediaCard,
   NewsMediaDetailHero,
 } from '@/components/NewsMediaComponents';
-import {getNewsMediaRepository} from '@/lib/newsMedia';
+import {type ArticleFeaturedImageLayout, getNewsMediaRepository} from '@/lib/newsMedia';
 
 type NewsMediaDetailPageProps = {
   params: Promise<{
@@ -21,6 +21,14 @@ function buildYouTubeEmbedUrl(videoId?: string, embedUrl?: string) {
 
   return videoId ? `https://www.youtube.com/embed/${videoId}` : undefined;
 }
+
+const articleImageLayoutClasses: Record<ArticleFeaturedImageLayout, string> = {
+  landscape: 'news-media-detail-image-landscape',
+  fourThree: 'news-media-detail-image-four-three',
+  square: 'news-media-detail-image-square',
+  portrait: 'news-media-detail-image-portrait',
+  natural: 'news-media-detail-image-natural',
+};
 
 export async function generateMetadata({params}: NewsMediaDetailPageProps): Promise<Metadata> {
   const {slug} = await params;
@@ -63,6 +71,12 @@ export default async function NewsMediaDetailPage({params}: NewsMediaDetailPageP
   }
 
   const embedUrl = item.type === 'video' ? buildYouTubeEmbedUrl(item.youtubeVideoId, item.embedUrl) : undefined;
+  const articleImageClassName = [
+    'news-media-detail-image',
+    item.type === 'article' ? articleImageLayoutClasses[item.featuredImageLayout] : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <section className="page-section page-section-cinematic news-media-page">
@@ -86,7 +100,7 @@ export default async function NewsMediaDetailPage({params}: NewsMediaDetailPageP
             )}
           </div>
         ) : item.detailImageUrl || item.imageUrl ? (
-          <figure className="news-media-detail-image">
+          <figure className={articleImageClassName}>
             <img src={item.detailImageUrl || item.imageUrl} alt={item.imageAlt || item.title} />
           </figure>
         ) : null}

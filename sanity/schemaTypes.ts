@@ -262,6 +262,71 @@ const imageWithAlt = defineType({
   },
 })
 
+const articleBodyImage = defineArrayMember({
+  name: 'bodyImage',
+  title: 'Image',
+  type: 'image',
+  options: {hotspot: true},
+  fields: [
+    defineField({
+      name: 'alt',
+      title: 'Alt text',
+      type: 'string',
+      description: 'Describe the image for accessibility.',
+    }),
+    defineField({
+      name: 'caption',
+      title: 'Caption',
+      type: 'string',
+      description: 'Optional caption shown below the image.',
+    }),
+    defineField({
+      name: 'size',
+      title: 'Size',
+      type: 'string',
+      initialValue: 'large',
+      description: 'Controls how large the image appears inside the article body.',
+      options: {
+        list: [
+          {title: 'Small', value: 'small'},
+          {title: 'Medium', value: 'medium'},
+          {title: 'Large', value: 'large'},
+          {title: 'Full width', value: 'full'},
+        ],
+        layout: 'radio',
+      },
+    }),
+    defineField({
+      name: 'alignment',
+      title: 'Alignment',
+      type: 'string',
+      initialValue: 'center',
+      description:
+        'Left or right images can allow article text to wrap around them on desktop. On mobile, images stack normally.',
+      options: {
+        list: [
+          {title: 'Left', value: 'left'},
+          {title: 'Right', value: 'right'},
+          {title: 'Center', value: 'center'},
+        ],
+        layout: 'radio',
+      },
+    }),
+  ],
+  preview: {
+    select: {
+      media: 'asset',
+      title: 'alt',
+      subtitle: 'caption',
+    },
+    prepare: ({media, title, subtitle}) => ({
+      title: title || 'Article body image',
+      subtitle,
+      media,
+    }),
+  },
+})
+
 const seoFields = defineType({
   name: 'seoFields',
   title: 'SEO fields',
@@ -1836,8 +1901,26 @@ const post = defineType({
       description: 'Used by the News & Media archive. Falls back to Legacy date for older posts.',
     }),
     defineField({name: 'excerpt', title: 'Excerpt', type: 'text', rows: 3}),
-    defineField({name: 'body', title: 'Body', type: 'array', of: [defineArrayMember({type: 'block'})]}),
+    defineField({name: 'body', title: 'Body', type: 'array', of: [defineArrayMember({type: 'block'}), articleBodyImage]}),
     defineField({name: 'featuredImage', title: 'Featured image', type: 'imageWithAlt'}),
+    defineField({
+      name: 'featuredImageLayout',
+      title: 'Article detail featured image layout',
+      type: 'string',
+      initialValue: 'landscape',
+      description:
+        'Controls how the featured image is displayed on the individual article page. News & Media cards stay consistent. Video posts are not affected. Crop/hotspot controls the focus area; this controls the detail-page image shape.',
+      options: {
+        list: [
+          {title: '16:9 / Landscape', value: 'landscape'},
+          {title: '4:3', value: 'fourThree'},
+          {title: '1:1 / Square', value: 'square'},
+          {title: '3:4 / Portrait', value: 'portrait'},
+          {title: 'Original / Natural', value: 'natural'},
+        ],
+        layout: 'radio',
+      },
+    }),
     defineField({name: 'author', title: 'Author', type: 'string'}),
     defineField({name: 'categories', title: 'Categories', type: 'array', of: [defineArrayMember({type: 'string'})]}),
     defineField({name: 'tags', title: 'Tags', type: 'array', of: [defineArrayMember({type: 'string'})]}),
