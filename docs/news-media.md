@@ -165,6 +165,44 @@ Dry-run an import or backfill without writing source status or video documents:
 npm run import:youtube -- --backfill --channel-id=YOUTUBE_CHANNEL_ID --dry-run
 ```
 
+Import a real uploads-playlist date range for a channel:
+
+```bash
+npm run youtube:import -- --channel-id=YOUTUBE_CHANNEL_ID --from=2025-01-01 --to=2025-12-31
+```
+
+If the official-channel allowlist is not set in the environment, pass it explicitly for a one-time official import:
+
+```bash
+npm run youtube:import -- --channel-id=YOUTUBE_CHANNEL_ID --official-channel-id=YOUTUBE_CHANNEL_ID --from=2025-01-01 --to=2025-12-31
+```
+
+Date-range imports use the channel uploads playlist and split each `playlistItems.list` page by date before fetching metadata. Uploads newer than `--to` are counted as `skippedTooNew`, uploads between `--from` and `--to` are fetched with `videos.list`, and uploads older than `--from` are counted as `skippedTooOld`.
+
+Only in-range video IDs are sent to `videos.list`. Existing Sanity video documents are skipped, not updated. Duplicate checks use `youtubeVideoId` first and also compare existing `youtubeUrl` / `embedUrl` values against canonical YouTube watch, short, and embed URLs.
+
+Date-range imports do not use a default internal max-pages or max-results cap. They keep paginating until the requested date range is fully scanned, the uploads playlist ends, YouTube returns an API/quota error, an empty page is returned, or the scan has definitely moved before the requested start date. If a page contains videos older than `--from`, the importer processes any in-range videos from that page and then stops immediately without requesting older pages. For development-only testing, an optional cap can be passed:
+
+```bash
+npm run youtube:import -- --channel-id=YOUTUBE_CHANNEL_ID --from=2025-01-01 --to=2025-12-31 --max-pages=2
+```
+
+The importer writes progress to `.cache/youtube-import-progress.json` during date-range scans. It includes the requested range, last/next page token, newest and oldest published dates seen, imported count, skipped count, and timestamp.
+
+If the uploads playlist scan ends before it reaches the requested start date, the importer prints a coverage warning. For very large channels, use explicit targeted search fallback mode for older coverage:
+
+```bash
+npm run youtube:import -- --channel-id=UCf58CbplZsDbH9wPMYoOTFw --from=2020-01-01 --to=2023-06-01 --mode=search --q="Animae Caribe"
+```
+
+Search fallback mode uses YouTube `search.list`, so it is more quota-expensive than uploads playlist scanning. Keep the date range and query targeted. You can run repeated commands with different `--q` values, or pass multiple queries:
+
+```bash
+npm run youtube:import -- --channel-id=UCf58CbplZsDbH9wPMYoOTFw --from=2020-01-01 --to=2023-06-01 --mode=search --queries="Animae Caribe|Animae|animation festival|Caribbean animation|Camille Selvon"
+```
+
+Search fallback dedupes results by YouTube video ID across queries before fetching metadata, then applies the same local keyword/content filter and Sanity duplicate checks.
+
 ## Historical Keyword Search
 
 For large trusted media channels, uploads backfill may spend a lot of quota walking unrelated newest-first uploads before it reaches older relevant coverage. Historical search is a search-first mode for trusted external channels.

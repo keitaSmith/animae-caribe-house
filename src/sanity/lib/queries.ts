@@ -1,5 +1,7 @@
 import type {
   SanityAboutPage,
+  SanityAboutJobListing,
+  SanityAboutSectionPage,
   SanityContactPage,
   SanityEvent,
   SanityFestivalEdition,
@@ -21,6 +23,76 @@ const pageHeroProjection = `
     "width": image.asset->metadata.dimensions.width,
     "height": image.asset->metadata.dimensions.height
   }
+`;
+
+const aboutGalleryImageProjection = `
+  "url": asset->url,
+  alt,
+  caption,
+  "width": asset->metadata.dimensions.width,
+  "height": asset->metadata.dimensions.height
+`;
+
+const aboutSectionPageProjection = `
+  title,
+  "slug": slug.current,
+  pageType,
+  isVisible,
+  heroVisualType,
+  hero{
+    ${pageHeroProjection}
+  },
+  "directorImage": {
+    "url": directorImage.asset->url,
+    "alt": directorImage.alt,
+    "width": directorImage.asset->metadata.dimensions.width,
+    "height": directorImage.asset->metadata.dimensions.height
+  },
+  youtubeUrl,
+  content{
+    heading,
+    subheading,
+    body
+  },
+  galleryProvider,
+  "galleryImages": galleryImages[]{
+    ${aboutGalleryImageProjection}
+  },
+  externalGalleryImages[]{
+    url,
+    alt,
+    caption
+  },
+  externalGalleryUrl,
+  googleDriveFolderId,
+  seo{
+    seoTitle,
+    seoDescription,
+    "seoImage": {
+      "url": seoImage.asset->url,
+      "alt": seoImage.alt,
+      "width": seoImage.asset->metadata.dimensions.width,
+      "height": seoImage.asset->metadata.dimensions.height
+    }
+  }
+`;
+
+const aboutJobListingProjection = `
+  _id,
+  eyebrow,
+  title,
+  "slug": slug.current,
+  description,
+  body,
+  "featuredImage": {
+    "url": featuredImage.asset->url,
+    "alt": featuredImage.alt,
+    "width": featuredImage.asset->metadata.dimensions.width,
+    "height": featuredImage.asset->metadata.dimensions.height
+  },
+  applicationInfo,
+  applicationUrl,
+  expiryDate
 `;
 
 const partnerProjection = `
@@ -324,6 +396,37 @@ export async function getAboutPage() {
       ${pageHeroProjection}
     }
   }`);
+}
+
+export async function getAboutSectionPage(slug: string) {
+  return sanityFetch<SanityAboutSectionPage>(
+    `*[_type == "aboutSectionPage" && slug.current == $slug && coalesce(isVisible, true) == true][0]{
+      ${aboutSectionPageProjection}
+    }`,
+    {slug}
+  );
+}
+
+export async function getAboutSectionPageSlugs() {
+  return sanityFetch<Array<{slug?: string}>>(
+    `*[_type == "aboutSectionPage" && defined(slug.current) && coalesce(isVisible, true) == true]{
+      "slug": slug.current
+    }`
+  );
+}
+
+export async function getActiveAboutJobListings(todayIsoDate: string) {
+  return sanityFetch<SanityAboutJobListing[]>(
+    `*[
+      _type == "aboutJobListing" &&
+      coalesce(isActive, true) == true &&
+      coalesce(positionFilled, false) == false &&
+      (!defined(expiryDate) || expiryDate >= $todayIsoDate)
+    ] | order(expiryDate asc, title asc){
+      ${aboutJobListingProjection}
+    }`,
+    {todayIsoDate}
+  );
 }
 
 export async function getPartnersPage() {

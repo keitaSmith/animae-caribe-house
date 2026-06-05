@@ -1,3 +1,5 @@
+import type {PortableTextBlock} from '@portabletext/types';
+
 export type SanityCta = {
   label?: string;
   href?: string;
@@ -142,6 +144,57 @@ export type SanityPageHeroSection = {
   title?: string;
   description?: string;
   image?: SanityImage;
+};
+
+export type SanityAboutSectionPageType =
+  | 'directorsRemarks'
+  | 'communityOutreach'
+  | 'iammNetwork'
+  | 'liveWorkPlayLocal'
+  | 'acToonMarketplace'
+  | 'tobagoEdition';
+
+export type SanityAboutGalleryImage = SanityImage & {
+  caption?: string;
+};
+
+export type SanityAboutSectionPage = {
+  title?: string;
+  slug?: string;
+  pageType?: SanityAboutSectionPageType;
+  isVisible?: boolean;
+  heroVisualType?: 'ghost' | 'image';
+  hero?: SanityPageHeroSection;
+  directorImage?: SanityImage;
+  youtubeUrl?: string;
+  content?: {
+    heading?: string;
+    subheading?: string;
+    body?: PortableTextBlock[];
+  };
+  galleryProvider?: 'sanity' | 'external';
+  galleryImages?: SanityAboutGalleryImage[];
+  externalGalleryImages?: SanityAboutGalleryImage[];
+  externalGalleryUrl?: string;
+  googleDriveFolderId?: string;
+  seo?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    seoImage?: SanityImage;
+  };
+};
+
+export type SanityAboutJobListing = {
+  _id?: string;
+  eyebrow?: string;
+  title?: string;
+  slug?: string;
+  description?: string;
+  body?: PortableTextBlock[];
+  featuredImage?: SanityImage;
+  applicationInfo?: PortableTextBlock[];
+  applicationUrl?: string;
+  expiryDate?: string;
 };
 
 export type SanityAboutPage = {

@@ -27,9 +27,22 @@ async function handleImport(request) {
     loadEnv: false,
     forceBackfill: url.searchParams.get('backfill') === '1',
     historicalSearch: url.searchParams.get('historicalSearch') === '1',
+    searchMode: url.searchParams.get('mode') === 'search' || url.searchParams.get('fallbackSearch') === '1',
     dryRun: url.searchParams.get('dryRun') === '1',
     historicalFromYear: url.searchParams.get('fromYear') ? Number(url.searchParams.get('fromYear')) : undefined,
     historicalToYear: url.searchParams.get('toYear') ? Number(url.searchParams.get('toYear')) : undefined,
+    from: url.searchParams.get('from') || undefined,
+    to: url.searchParams.get('to') || undefined,
+    pageToken: url.searchParams.get('pageToken') || undefined,
+    dateRangeMaxPages: url.searchParams.get('maxPages') ? Number(url.searchParams.get('maxPages')) : undefined,
+    searchQueries: url.searchParams.get('q')
+      ? [url.searchParams.get('q')]
+      : url.searchParams.get('queries')
+        ? url.searchParams
+            .get('queries')
+            .split(/[|,]/)
+            .map((value) => value.trim())
+        : undefined,
     sourceId: url.searchParams.get('sourceId') || undefined,
     channelId: url.searchParams.get('channelId') || undefined,
   });

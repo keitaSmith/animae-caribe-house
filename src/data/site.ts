@@ -1,4 +1,5 @@
 import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute, getPastEditionsRoute} from '../lib/festivalRoutes';
+import {aboutSectionNavItems} from '../lib/aboutSectionPages';
 
 export type Site = {
   name: string;
@@ -45,7 +46,7 @@ export function buildNavItems(currentFestivalYear = DEFAULT_FESTIVAL_YEAR): NavI
     },
     {label: 'House', href: '/house'},
     {label: 'News & Media', href: '/news-media'},
-    {label: 'About', href: '/about'},
+    {label: 'About', href: '/about', children: aboutSectionNavItems},
     {label: 'Partners', href: '/partners'},
     {label: 'Contact', href: '/contact'},
   ];

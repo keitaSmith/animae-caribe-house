@@ -50,6 +50,25 @@ const youtubeSourceTypeOptions = [
   {title: 'Search (legacy)', value: 'search'},
 ]
 
+const aboutSectionPageTypeOptions = [
+  {title: "Director's Remarks", value: 'directorsRemarks'},
+  {title: 'Community Outreach', value: 'communityOutreach'},
+  {title: 'IAMM Network', value: 'iammNetwork'},
+  {title: 'Live Work & Play Like a Local', value: 'liveWorkPlayLocal'},
+  {title: 'AC Toon Marketplace', value: 'acToonMarketplace'},
+  {title: 'Animae Caribe Tobago Edition', value: 'tobagoEdition'},
+]
+
+const aboutHeroVisualOptions = [
+  {title: 'Abstract ghost visual', value: 'ghost'},
+  {title: 'Hero image', value: 'image'},
+]
+
+const aboutGalleryProviderOptions = [
+  {title: 'Sanity images', value: 'sanity'},
+  {title: 'External gallery reference', value: 'external'},
+]
+
 const attendanceTypeOptions = [
   {title: 'Free', value: 'free'},
   {title: 'Paid', value: 'paid'},
@@ -227,7 +246,10 @@ const imageWithAlt = defineType({
   title: 'Image with alt text',
   type: 'image',
   options: {hotspot: true},
-  fields: [defineField({name: 'alt', title: 'Alt text', type: 'string'})],
+  fields: [
+    defineField({name: 'alt', title: 'Alt text', type: 'string'}),
+    defineField({name: 'caption', title: 'Caption', type: 'string'}),
+  ],
   preview: {
     select: {
       media: 'asset',
@@ -848,6 +870,182 @@ const pageHeroSection = defineType({
     prepare: ({title, subtitle, media}) => ({
       title: title || 'Page hero',
       subtitle: subtitle || 'Set hero copy and image',
+      media,
+    }),
+  },
+})
+
+const aboutSectionContent = defineType({
+  name: 'aboutSectionContent',
+  title: 'About section content',
+  type: 'object',
+  fields: [
+    defineField({name: 'heading', title: 'Heading', type: 'string'}),
+    defineField({name: 'subheading', title: 'Subheading', type: 'text', rows: 2}),
+    defineField({
+      name: 'body',
+      title: 'Body',
+      type: 'array',
+      of: [defineArrayMember({type: 'block'})],
+      description: 'Main write-up shown below the hero and optional media.',
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      subtitle: 'subheading',
+    },
+    prepare: ({title, subtitle}) => ({
+      title: title || 'About section content',
+      subtitle: subtitle || 'Set heading, subheading, and body',
+    }),
+  },
+})
+
+const externalGalleryImage = defineType({
+  name: 'externalGalleryImage',
+  title: 'External gallery image',
+  type: 'object',
+  fields: [
+    defineField({name: 'url', title: 'Image URL', type: 'url', validation: (Rule) => Rule.uri({scheme: ['http', 'https']})}),
+    defineField({name: 'alt', title: 'Alt text', type: 'string'}),
+    defineField({name: 'caption', title: 'Caption', type: 'string'}),
+  ],
+  preview: {
+    select: {
+      title: 'caption',
+      subtitle: 'url',
+    },
+    prepare: ({title, subtitle}) => ({
+      title: title || 'External image',
+      subtitle,
+    }),
+  },
+})
+
+const aboutSectionPage = defineType({
+  name: 'aboutSectionPage',
+  title: 'About section page',
+  type: 'document',
+  fields: [
+    defineField({name: 'title', title: 'Editor title', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}, validation: (Rule) => Rule.required()}),
+    defineField({
+      name: 'pageType',
+      title: 'Page type',
+      type: 'string',
+      options: {list: aboutSectionPageTypeOptions},
+      validation: (Rule) => Rule.required(),
+      description: 'Controls page-specific frontend sections such as video, gallery, or job listings.',
+    }),
+    defineField({name: 'isVisible', title: 'Show this page publicly', type: 'boolean', initialValue: true}),
+    defineField({
+      name: 'heroVisualType',
+      title: 'Hero visual type',
+      type: 'string',
+      options: {list: aboutHeroVisualOptions},
+      initialValue: 'ghost',
+      description: 'Choose an uploaded image or the default abstract visual.',
+    }),
+    defineField({name: 'hero', title: 'Hero', type: 'pageHeroSection'}),
+    defineField({
+      name: 'directorImage',
+      title: 'Legacy director image',
+      type: 'imageWithAlt',
+      description: "Deprecated hidden fallback. Use Hero > Right-side hero image for Director's Remarks.",
+      hidden: true,
+    }),
+    defineField({
+      name: 'youtubeUrl',
+      title: "Director's Remarks YouTube URL",
+      type: 'url',
+      description: 'Paste a normal YouTube watch, short, or embed URL. The frontend converts it to a responsive embed.',
+      hidden: ({document}) => document?.pageType !== 'directorsRemarks',
+    }),
+    defineField({name: 'content', title: 'Main content', type: 'aboutSectionContent'}),
+    defineField({
+      name: 'galleryProvider',
+      title: 'Gallery provider',
+      type: 'string',
+      options: {list: aboutGalleryProviderOptions},
+      initialValue: 'sanity',
+      description: 'Sanity images are supported immediately. External fields are stored for future integrations.',
+      hidden: ({document}) => document?.pageType !== 'communityOutreach',
+    }),
+    defineField({
+      name: 'galleryImages',
+      title: 'Sanity gallery images',
+      type: 'array',
+      description:
+        'Gallery images must be optimised for web and must be 1 MB or smaller per image. You can drag multiple images into this field to add them in a batch.',
+      options: {layout: 'grid'},
+      of: [defineArrayMember({type: 'imageWithAlt'})],
+      hidden: ({document}) => document?.pageType !== 'communityOutreach',
+      validation: (Rule) =>
+        Rule.custom(async (images, context) => {
+          const imageItems = Array.isArray(images) ? images : []
+          const assetRefs = imageItems
+            .map((image) => (image as {_type?: string; asset?: {_ref?: string}} | undefined)?.asset?._ref)
+            .filter((assetRef): assetRef is string => typeof assetRef === 'string')
+
+          if (!assetRefs.length) {
+            return true
+          }
+
+          const client = context.getClient({apiVersion: '2026-05-27'})
+          const assets = await client.fetch<Array<{_id: string; size?: number}>>(
+            `*[_id in $assetRefs]{_id, size}`,
+            {assetRefs}
+          )
+          const assetSizeById = new Map(assets.map((asset) => [asset._id, asset.size || 0]))
+          const oversizedCount = assetRefs.filter((assetRef) => (assetSizeById.get(assetRef) || 0) > 1024 * 1024).length
+
+          if (oversizedCount > 0) {
+            return `${oversizedCount} gallery image${oversizedCount === 1 ? '' : 's'} exceed the 1 MB limit. Please optimise or replace oversized images before publishing.`
+          }
+
+          return true
+        }),
+    }),
+    defineField({
+      name: 'externalGalleryImages',
+      title: 'Manual external image URLs',
+      type: 'array',
+      of: [defineArrayMember({type: 'externalGalleryImage'})],
+      description: 'Use only stable direct image URLs. Google Photos album pages are not direct image URLs.',
+      hidden: ({document}) => document?.pageType !== 'communityOutreach',
+    }),
+    defineField({
+      name: 'externalGalleryUrl',
+      title: 'External gallery URL',
+      type: 'url',
+      description: 'Optional link to a gallery page. This is displayed as a link, not scraped.',
+      hidden: ({document}) => document?.pageType !== 'communityOutreach',
+    }),
+    defineField({
+      name: 'googleDriveFolderId',
+      title: 'Google Drive folder ID',
+      type: 'string',
+      description: 'Stored for a future server-side provider integration. The frontend does not scrape Drive/Photos.',
+      hidden: ({document}) => document?.pageType !== 'communityOutreach',
+    }),
+    defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
+  ],
+  initialValue: {
+    isVisible: true,
+    heroVisualType: 'ghost',
+  },
+  preview: {
+    select: {
+      title: 'title',
+      slug: 'slug.current',
+      pageType: 'pageType',
+      isVisible: 'isVisible',
+      media: 'hero.image',
+    },
+    prepare: ({title, slug, pageType, isVisible, media}) => ({
+      title: title || 'About section page',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${pageType ? ` - ${pageType}` : ''}${slug ? ` - /about/${slug}` : ''}`,
       media,
     }),
   },
@@ -1663,6 +1861,85 @@ const post = defineType({
   },
 })
 
+const aboutJobListing = defineType({
+  name: 'aboutJobListing',
+  title: 'About job listing',
+  type: 'document',
+  fields: [
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string', initialValue: 'Job Listing'}),
+    defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
+    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    defineField({
+      name: 'description',
+      title: 'Short description',
+      type: 'text',
+      rows: 3,
+      description: 'Brief summary shown on the job card.',
+    }),
+    defineField({
+      name: 'body',
+      title: 'Description / body',
+      type: 'array',
+      of: [defineArrayMember({type: 'block'})],
+      description: 'Full opportunity description shown inside the card.',
+    }),
+    defineField({name: 'featuredImage', title: 'Featured image', type: 'imageWithAlt'}),
+    defineField({
+      name: 'applicationInfo',
+      title: 'Contact / application information',
+      type: 'array',
+      of: [defineArrayMember({type: 'block'})],
+      description: 'How people should apply or contact the team.',
+    }),
+    defineField({
+      name: 'applicationUrl',
+      title: 'Application URL',
+      type: 'url',
+      description: 'Optional link to an application or recruitment portal.',
+    }),
+    defineField({
+      name: 'expiryDate',
+      title: 'Expiry / hide date',
+      type: 'date',
+      description: 'After this date, the listing is hidden from the public page.',
+    }),
+    defineField({
+      name: 'positionFilled',
+      title: 'Position filled',
+      type: 'boolean',
+      initialValue: false,
+      description: 'When enabled, this listing is hidden from the public page.',
+    }),
+    defineField({
+      name: 'isActive',
+      title: 'Published / active',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Turn off to hide this listing without deleting it.',
+    }),
+  ],
+  initialValue: {
+    eyebrow: 'Job Listing',
+    isActive: true,
+    positionFilled: false,
+  },
+  preview: {
+    select: {
+      title: 'title',
+      eyebrow: 'eyebrow',
+      expiryDate: 'expiryDate',
+      isActive: 'isActive',
+      positionFilled: 'positionFilled',
+      media: 'featuredImage',
+    },
+    prepare: ({title, eyebrow, expiryDate, isActive, positionFilled, media}) => ({
+      title: title || 'Job listing',
+      subtitle: `${isActive === false ? 'Inactive' : positionFilled ? 'Filled' : 'Active'}${eyebrow ? ` - ${eyebrow}` : ''}${expiryDate ? ` - expires ${expiryDate}` : ''}`,
+      media,
+    }),
+  },
+})
+
 const youtubeSource = defineType({
   name: 'youtubeSource',
   title: 'YouTube source',
@@ -1860,6 +2137,8 @@ export const schemaTypes = [
   festivalHeroSection,
   heroSection,
   pageHeroSection,
+  aboutSectionContent,
+  externalGalleryImage,
   contactContentSection,
   splitHeroPanel,
   splitHeroSection,
@@ -1873,12 +2152,14 @@ export const schemaTypes = [
   festivalPage,
   housePage,
   aboutPage,
+  aboutSectionPage,
   partnersPage,
   contactPage,
   festivalEdition,
   event,
   partner,
   post,
+  aboutJobListing,
   youtubeSource,
   youtubeVideo,
   page,
