@@ -3366,6 +3366,7 @@ p {
 
 .news-media-detail-image {
   margin: 0;
+  aspect-ratio: 16 / 9;
   max-height: 680px;
 }
 

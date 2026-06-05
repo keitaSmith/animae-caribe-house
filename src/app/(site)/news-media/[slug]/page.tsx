@@ -34,7 +34,7 @@ export async function generateMetadata({params}: NewsMediaDetailPageProps): Prom
 
   const title = item.seoTitle || `${item.title} | Animae Caribe`;
   const description = item.seoDescription || item.excerpt || item.description;
-  const imageUrl = item.seoImageUrl || item.imageUrl;
+  const imageUrl = item.seoImageUrl || item.detailImageUrl || item.imageUrl;
 
   return {
     title,
@@ -85,9 +85,9 @@ export default async function NewsMediaDetailPage({params}: NewsMediaDetailPageP
               </div>
             )}
           </div>
-        ) : item.imageUrl ? (
+        ) : item.detailImageUrl || item.imageUrl ? (
           <figure className="news-media-detail-image">
-            <img src={item.imageUrl} alt={item.imageAlt || item.title} />
+            <img src={item.detailImageUrl || item.imageUrl} alt={item.imageAlt || item.title} />
           </figure>
         ) : null}
 

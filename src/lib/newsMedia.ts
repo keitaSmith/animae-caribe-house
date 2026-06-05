@@ -1,6 +1,7 @@
 import {cache} from 'react';
 import type {PortableTextBlock} from '@portabletext/types';
 import {sanityFetch} from '@/sanity/lib/client';
+import {urlForImage} from '@/sanity/lib/image';
 
 export type NewsMediaType = 'article' | 'video';
 
@@ -12,6 +13,7 @@ export type NewsMediaItem = {
   excerpt?: string;
   imageUrl?: string;
   imageAlt?: string;
+  detailImageUrl?: string;
   publishedAt?: string;
   categories: string[];
   tags: string[];
@@ -53,6 +55,7 @@ type RawNewsMediaItem = {
   description?: string;
   imageUrl?: string;
   imageAlt?: string;
+  image?: SanityImageSource;
   publishedAt?: string;
   date?: string;
   categories?: string[];
@@ -67,7 +70,37 @@ type RawNewsMediaItem = {
   seoTitle?: string;
   seoDescription?: string;
   seoImageUrl?: string;
+  seoImage?: SanityImageSource;
   matchedKeywords?: string[];
+};
+
+type SanityImageSource = {
+  _type?: 'image';
+  alt?: string;
+  caption?: string;
+  asset?: {
+    _id?: string;
+    _ref?: string;
+    url?: string;
+    metadata?: {
+      dimensions?: {
+        width?: number;
+        height?: number;
+      };
+    };
+  };
+  crop?: {
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
+  hotspot?: {
+    x?: number;
+    y?: number;
+    height?: number;
+    width?: number;
+  };
 };
 
 const PAGE_SIZE = 9;
@@ -84,11 +117,34 @@ const normalizedProjection = `
   "slug": slug.current,
   excerpt,
   description,
+  "image": select(
+    _type == "post" => coalesce(
+      featuredImage{
+        ...,
+        asset->{
+          _id,
+          url,
+          metadata {
+            dimensions
+          }
+        }
+      },
+      seo.seoImage{
+        ...,
+        asset->{
+          _id,
+          url,
+          metadata {
+            dimensions
+          }
+        }
+      }
+    )
+  ),
   "imageUrl": select(
-    _type == "post" => coalesce(seo.seoImage.asset->url, featuredImage.asset->url),
     _type == "youtubeVideo" => thumbnailUrl
   ),
-  "imageAlt": featuredImage.alt,
+  "imageAlt": coalesce(featuredImage.alt, seo.seoImage.alt),
   "publishedAt": ${unifiedOrderField},
   "categories": coalesce(categories, []),
   "tags": coalesce(tags, []),
@@ -105,6 +161,16 @@ const detailProjection = `
   body,
   "seoTitle": seo.seoTitle,
   "seoDescription": seo.seoDescription,
+  "seoImage": seo.seoImage{
+    ...,
+    asset->{
+      _id,
+      url,
+      metadata {
+        dimensions
+      }
+    }
+  },
   "seoImageUrl": seo.seoImage.asset->url,
   "matchedKeywords": coalesce(matchedKeywords, [])
 `;
@@ -117,12 +183,31 @@ function normalizeType(type?: RawNewsMediaItem['_type']): NewsMediaType {
   return type === 'youtubeVideo' ? 'video' : 'article';
 }
 
+function buildSanityImageUrl(image: SanityImageSource | undefined, width: number, height: number) {
+  return (
+    urlForImage(image)
+      ?.width(width)
+      .height(height)
+      .fit('crop')
+      .auto('format')
+      .url() || image?.asset?.url
+  );
+}
+
 function normalizeItem(raw: RawNewsMediaItem): NewsMediaItem | null {
   if (!raw._id || !raw.title || !raw.slug) {
     return null;
   }
 
   const type = normalizeType(raw._type);
+  const cardImageUrl =
+    type === 'article'
+      ? buildSanityImageUrl(raw.image, 960, 600)
+      : raw.imageUrl;
+  const detailImageUrl =
+    type === 'article'
+      ? buildSanityImageUrl(raw.image, 1440, 810)
+      : raw.imageUrl;
 
   return {
     id: raw._id,
@@ -130,8 +215,9 @@ function normalizeItem(raw: RawNewsMediaItem): NewsMediaItem | null {
     title: raw.title,
     slug: raw.slug,
     excerpt: raw.excerpt || raw.description,
-    imageUrl: raw.imageUrl,
+    imageUrl: cardImageUrl,
     imageAlt: raw.imageAlt || raw.title,
+    detailImageUrl,
     publishedAt: raw.publishedAt || raw.date,
     categories: uniqueStrings(raw.categories),
     tags: uniqueStrings(raw.tags),
@@ -156,7 +242,7 @@ function normalizeDetail(raw: RawNewsMediaItem): NewsMediaDetail | null {
     description: raw.description,
     seoTitle: raw.seoTitle,
     seoDescription: raw.seoDescription,
-    seoImageUrl: raw.seoImageUrl,
+    seoImageUrl: buildSanityImageUrl(raw.seoImage, 1200, 630) || raw.seoImageUrl,
     matchedKeywords: uniqueStrings(raw.matchedKeywords),
   };
 }
