@@ -109,6 +109,26 @@ const partnerProjection = `
   sortOrder
 `;
 
+const personProjection = `
+  _id,
+  name,
+  "slug": slug.current,
+  active,
+  sortOrder,
+  role,
+  bio,
+  "image": image{
+    alt,
+    caption,
+    crop,
+    hotspot,
+    asset,
+    "url": asset->url,
+    "width": asset->metadata.dimensions.width,
+    "height": asset->metadata.dimensions.height
+  }
+`;
+
 const eventProjection = `
   _id,
   title,
@@ -285,6 +305,16 @@ export async function getUmbrellaHomePage() {
 
 export async function getFestivalPage() {
   return sanityFetch<SanityFestivalPage>(`*[_type == "festivalPage"][0]{
+    seo{
+      seoTitle,
+      seoDescription,
+      "seoImage": {
+        "url": seoImage.asset->url,
+        "alt": seoImage.alt,
+        "width": seoImage.asset->metadata.dimensions.width,
+        "height": seoImage.asset->metadata.dimensions.height
+      }
+    },
     hero{
       isVisible,
       heading,
@@ -330,8 +360,20 @@ export async function getFestivalPage() {
         ${partnerProjection}
       }
     },
-    programmingSection{isVisible, showEyebrow, showHeading, showDescription, eyebrow, heading, description, intro, cards[]{isVisible, number, title, description}},
-    calendarSection{
+	    programmingSection{isVisible, showEyebrow, showHeading, showDescription, eyebrow, heading, description, intro, cards[]{isVisible, number, title, description}},
+	    speakersSection{
+	      isVisible,
+	      showEyebrow,
+	      showHeading,
+	      showDescription,
+	      eyebrow,
+	      heading,
+	      description,
+	      "people": people[@->._id != null && coalesce(@->active, true) == true]->{
+	        ${personProjection}
+	      }
+	    },
+	    calendarSection{
       isVisible,
       eyebrow,
       heading,

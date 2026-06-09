@@ -113,16 +113,6 @@ async function loadEnvFile(filePath) {
   }
 }
 
-function toSlug(input) {
-  return input
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/\+/g, ' plus ')
-    .replace(/[.!']/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-}
-
 function normalizeName(input) {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, '')
 }

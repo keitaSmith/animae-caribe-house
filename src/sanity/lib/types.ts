@@ -13,6 +13,31 @@ export type SanityImage = {
   height?: number;
 };
 
+export type SanityImageSource = {
+  alt?: string;
+  caption?: string;
+  url?: string;
+  width?: number;
+  height?: number;
+  asset?: {
+    _ref?: string;
+    _id?: string;
+    url?: string;
+  };
+  crop?: {
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
+  hotspot?: {
+    x?: number;
+    y?: number;
+    height?: number;
+    width?: number;
+  };
+};
+
 export type SanityMuxVideo = {
   title?: string;
   muxPlaybackId?: string;
@@ -55,6 +80,17 @@ export type SanityPartner = {
   partnerTypes?: string[];
   partnerType?: string;
   sortOrder?: number;
+};
+
+export type SanityPerson = {
+  _id?: string;
+  name?: string;
+  slug?: string;
+  active?: boolean;
+  sortOrder?: number;
+  role?: string;
+  bio?: string;
+  image?: SanityImageSource;
 };
 
 export type SanityCardItem = SanityVisibilityFields & {
@@ -264,6 +300,11 @@ export type SanityUmbrellaHomePage = {
 };
 
 export type SanityFestivalPage = {
+  seo?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    seoImage?: SanityImage;
+  };
   hero?: SanityVisibilityFields & {
     heading?: string;
     copy?: string;
@@ -292,6 +333,12 @@ export type SanityFestivalPage = {
     description?: string;
     intro?: string;
     cards?: SanityCardItem[];
+  };
+  speakersSection?: SanityVisibilityFields & {
+    eyebrow?: string;
+    heading?: string;
+    description?: string;
+    people?: SanityPerson[];
   };
   eventsPreview?: SanityVisibilityFields & {
     eyebrow?: string;

@@ -4,20 +4,22 @@ import {normalizeSanityPartners} from '@/lib/partners';
 import {getActiveFestivalEdition, getFestivalPage, getFestivalPartners, getUpcomingFestivalEventsByEdition} from '@/sanity/lib/queries';
 import type {SanityEvent, SanityFestivalPage} from '@/sanity/lib/types';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 function isRenderableEvent(event: SanityEvent | null | undefined): event is SanityEvent {
   return Boolean(event?.title && (event.startDateTime || event.date));
 }
 
 export async function generateMetadata() {
-  const activeEdition = await getActiveFestivalEdition();
+  const [festivalPage, activeEdition] = await Promise.all([getFestivalPage(), getActiveFestivalEdition()]);
+  const seo = festivalPage?.seo;
 
   return {
-    title: activeEdition?.title
+    title: seo?.seoTitle || (activeEdition?.title
       ? `${activeEdition.title} | Screenings, Workshops and Caribbean Animation`
-      : 'Animae Caribe Festival | Screenings, Workshops and Caribbean Animation',
+      : 'Animae Caribe Festival | Screenings, Workshops and Caribbean Animation'),
     description:
+      seo?.seoDescription ||
       activeEdition?.description ||
       'The Animae Caribe Festival experience for screenings, workshops, panels, animation showcases, industry development and community programming.',
   };

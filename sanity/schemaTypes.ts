@@ -1321,6 +1321,41 @@ const festivalEventsSection = defineType({
   },
 })
 
+const festivalSpeakersSection = defineType({
+  name: 'festivalSpeakersSection',
+  title: 'Speakers & Guests section',
+  type: 'object',
+  fields: [
+    defineField({name: 'isVisible', title: 'Show this section', type: 'boolean', initialValue: true}),
+    defineField({name: 'showEyebrow', title: 'Show eyebrow/label', type: 'boolean', initialValue: true}),
+    defineField({name: 'showHeading', title: 'Show heading', type: 'boolean', initialValue: true}),
+    defineField({name: 'showDescription', title: 'Show description', type: 'boolean', initialValue: true}),
+    defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string'}),
+    defineField({name: 'heading', title: 'Heading', type: 'string'}),
+    defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
+    defineField({
+      name: 'people',
+      title: 'Selected speakers / guests',
+      type: 'array',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'person'}]})],
+      description:
+        'Choose the speakers and guests to show on the Festival page. Inactive people are automatically hidden on the website.',
+    }),
+  ],
+  preview: {
+    select: {
+      title: 'heading',
+      subtitle: 'eyebrow',
+      count: 'people.length',
+      isVisible: 'isVisible',
+    },
+    prepare: ({title, subtitle, count, isVisible}) => ({
+      title: title || 'Speakers & Guests section',
+      subtitle: `${isVisible === false ? 'Hidden' : 'Visible'}${subtitle ? ` · ${subtitle}` : ''}${typeof count === 'number' ? ` · ${count} selected` : ''}`,
+    }),
+  },
+})
+
 const eventsPreviewSection = defineType({
   name: 'eventsPreviewSection',
   title: 'Events preview section',
@@ -1439,6 +1474,7 @@ const festivalPage = defineType({
     defineField({name: 'aboutSection', title: 'About section', type: 'teaserSection'}),
     defineField({name: 'partnersSection', title: 'Partners section', type: 'partnersMarqueeSection'}),
     defineField({name: 'programmingSection', title: 'Programming/highlights', type: 'simpleCardGridSection'}),
+    defineField({name: 'speakersSection', title: 'Speakers & Guests', type: 'festivalSpeakersSection'}),
     defineField({name: 'calendarSection', title: 'Festival Calendar Image', type: 'festivalCalendarSection'}),
     defineField({name: 'eventsPreview', title: 'Events/programme preview', type: 'festivalEventsSection'}),
     defineField({name: 'venueSection', title: 'Venue / Location Map', type: 'venueMapSection'}),
@@ -1772,20 +1808,33 @@ const person = defineType({
   fields: [
     defineField({name: 'name', title: 'Name', type: 'string', validation: (Rule) => Rule.required()}),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'name'}}),
+    defineField({
+      name: 'active',
+      title: 'Active',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Turn off to hide this person from the public website without deleting them.',
+    }),
+    defineField({name: 'sortOrder', title: 'Sort order', type: 'number'}),
     defineField({name: 'role', title: 'Role/title', type: 'string'}),
     defineField({name: 'bio', title: 'Bio', type: 'text', rows: 4}),
     defineField({name: 'image', title: 'Image', type: 'imageWithAlt'}),
     defineField({name: 'links', title: 'Links', type: 'array', of: [defineArrayMember({type: 'link'})]}),
   ],
+  initialValue: {
+    active: true,
+  },
   preview: {
     select: {
       title: 'name',
+      active: 'active',
+      sortOrder: 'sortOrder',
       subtitle: 'role',
       media: 'image',
     },
-    prepare: ({title, subtitle, media}) => ({
+    prepare: ({title, active, sortOrder, subtitle, media}) => ({
       title: title || 'Person',
-      subtitle,
+      subtitle: `${active === false ? 'Inactive' : 'Active'}${typeof sortOrder === 'number' ? ` · Order ${sortOrder}` : ''}${subtitle ? ` · ${subtitle}` : ''}`,
       media,
     }),
   },
@@ -2258,6 +2307,7 @@ export const schemaTypes = [
   partnersMarqueeSection,
   partnerSectionSettings,
   festivalEventsSection,
+  festivalSpeakersSection,
   eventsPreviewSection,
   archiveTeaserSection,
   siteSettings,
