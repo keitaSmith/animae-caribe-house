@@ -165,6 +165,16 @@ export async function getSiteSettings() {
 
 export async function getUmbrellaHomePage() {
   return sanityFetch<SanityUmbrellaHomePage>(`*[_type == "umbrellaHomePage"][0]{
+    seo{
+      seoTitle,
+      seoDescription,
+      "seoImage": {
+        "url": seoImage.asset->url,
+        "alt": seoImage.alt,
+        "width": seoImage.asset->metadata.dimensions.width,
+        "height": seoImage.asset->metadata.dimensions.height
+      }
+    },
     splitHero{
       isVisible,
       leftPanel{

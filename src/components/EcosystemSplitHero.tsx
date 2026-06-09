@@ -4,7 +4,7 @@ import type { ComponentProps, ComponentType } from 'react';
 import MuxPlayer from '@mux/mux-player-react';
 import ButtonLink from './ButtonLink';
 import { ArrowRightIcon } from './Icons';
-import type { SanityUmbrellaHomePage } from '../sanity/lib/types';
+import type { SanityCta, SanityUmbrellaHomePage } from '../sanity/lib/types';
 
 type SplitHeroMuxPlayerProps = ComponentProps<typeof MuxPlayer> & {
   tabIndex?: number;
@@ -47,6 +47,7 @@ export default function EcosystemSplitHero({content}: EcosystemSplitHeroProps) {
     return null;
   }
 
+  const getCtaVariant = (cta?: SanityCta) => cta?.style || 'soft';
   const panelContent = [content?.leftPanel, content?.rightPanel];
 
   return (
@@ -111,7 +112,7 @@ export default function EcosystemSplitHero({content}: EcosystemSplitHeroProps) {
                 </div>
                 {showDescription ? <p>{panel?.description || experience.copy}</p> : null}
                 {showCta ? (
-                  <ButtonLink href={href} variant="soft">
+                  <ButtonLink href={href} variant={getCtaVariant(panel?.cta)}>
                     {ctaLabel} <ArrowRightIcon />
                   </ButtonLink>
                 ) : null}

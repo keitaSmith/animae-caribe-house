@@ -222,6 +222,11 @@ export type SanityPartnerSection = {
 };
 
 export type SanityUmbrellaHomePage = {
+  seo?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    seoImage?: SanityImage;
+  };
   splitHero?: {
     isVisible?: boolean;
     leftPanel?: SanityVisibilityFields & {

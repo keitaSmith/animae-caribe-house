@@ -5,12 +5,29 @@ import { ArrowRightIcon, MailIcon } from '@/components/Icons';
 import { ecosystemPartners } from '@/data/ecosystem';
 import type { Partner } from '@/data/partners';
 import { getUmbrellaHomePage, getUmbrellaPartners } from '@/sanity/lib/queries';
+import type { SanityCta } from '@/sanity/lib/types';
 
-export const metadata = {
+export const revalidate = 60;
+
+const defaultMetadata = {
   title: 'Animae Caribe | Animation, Festival, House and Caribbean Creative Community',
   description:
     'The umbrella home for Animae Caribe, connecting the Festival, Animae Caribe House, partners and Caribbean animation community.',
 };
+
+function getCtaVariant(cta?: SanityCta, fallback: 'primary' | 'soft' | 'outline' = 'primary') {
+  return cta?.style || fallback;
+}
+
+export async function generateMetadata() {
+  const umbrellaPage = await getUmbrellaHomePage();
+  const seo = umbrellaPage?.seo;
+
+  return {
+    title: seo?.seoTitle || defaultMetadata.title,
+    description: seo?.seoDescription || defaultMetadata.description,
+  };
+}
 
 function normalizePartners(partners?: Array<{name?: string; logoUrl?: string}> | null): Partner[] {
   if (!partners?.length) {
@@ -57,7 +74,10 @@ export default async function UmbrellaHome() {
                 </p>
               ) : null}
               {aboutSection?.showCta !== false ? (
-                <ButtonLink href={aboutSection?.cta?.href || '/contact'} variant="outline">
+                <ButtonLink
+                  href={aboutSection?.cta?.href || '/contact'}
+                  variant={getCtaVariant(aboutSection?.cta, 'outline')}
+                >
                   {aboutSection?.cta?.label || 'Contact Animae Caribe'} <MailIcon />
                 </ButtonLink>
               ) : null}
@@ -87,7 +107,10 @@ export default async function UmbrellaHome() {
               {ecosystemSection?.showIntro !== false && ecosystemSection?.intro ? <p>{ecosystemSection.intro}</p> : null}
             </div>
             {ecosystemSection?.showCta !== false ? (
-              <ButtonLink href={ecosystemSection?.cta?.href || '/festival'} variant="primary">
+              <ButtonLink
+                href={ecosystemSection?.cta?.href || '/festival'}
+                variant={getCtaVariant(ecosystemSection?.cta, 'primary')}
+              >
                 {ecosystemSection?.cta?.label || 'Start with the festival'} <ArrowRightIcon />
               </ButtonLink>
             ) : null}
