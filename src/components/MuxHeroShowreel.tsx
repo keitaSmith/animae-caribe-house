@@ -19,6 +19,8 @@ const HERO_SHOWREEL_CLIP = {
 export default function MuxHeroShowreel() {
   const {
     backgroundPlaybackId,
+    backgroundPosterSrc,
+    backgroundPosterMode,
     isBackgroundPaused,
     backgroundVideoTitle,
     backgroundStartTimeSeconds,
@@ -52,6 +54,7 @@ export default function MuxHeroShowreel() {
         paused={isBackgroundPaused}
         playsInline
         streamType="on-demand"
+        poster={backgroundPosterMode === 'muxFrame' ? undefined : backgroundPosterSrc}
         thumbnailTime={thumbnailTime}
         nohotkeys
         aria-hidden="true"

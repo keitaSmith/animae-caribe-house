@@ -1,24 +1,49 @@
+import type {PortableTextBlock} from '@portabletext/types';
 import { featuredProjects } from '../data/projects';
+import PortableTextRenderer from '@/sanity/PortableTextRenderer';
 import ButtonLink from './ButtonLink';
 import { ArrowRightIcon, MailIcon } from './Icons';
 
-export default function FeaturedWork() {
+type FeaturedWorkProps = {
+  title?: string;
+  copy?: string;
+  body?: PortableTextBlock[] | null;
+  primaryCtaHref?: string;
+  primaryCtaLabel?: string;
+  secondaryCtaHref?: string;
+  secondaryCtaLabel?: string;
+  showCta?: boolean;
+};
+
+export default function FeaturedWork({
+  title = 'Featured Projects',
+  copy = 'A curated look at the stories, visual worlds and creative experiments taking shape inside Animae Caribe House. We Animate in Sunshine.',
+  body,
+  primaryCtaHref = '/portfolio',
+  primaryCtaLabel = 'View portfolio',
+  secondaryCtaHref = 'mailto:info@animaecaribehouse.com',
+  secondaryCtaLabel = 'Get in touch',
+  showCta = true,
+}: FeaturedWorkProps) {
   return (
     <section className="section featured-work" id="featured-work">
       <div className="container featured-work-header centered">
-        <h2>Featured Projects</h2>
-        <p>
-          A curated look at the stories, visual worlds and creative experiments taking shape inside Animae Caribe House.
-          We Animate in Sunshine.
-        </p>
-        <div className="featured-work-actions">
-          <ButtonLink href="/portfolio" variant="outline">
-            View portfolio <ArrowRightIcon />
-          </ButtonLink>
-          <ButtonLink href="mailto:info@animaecaribehouse.com" variant="soft">
-            <MailIcon /> Get in touch
-          </ButtonLink>
-        </div>
+        <h2>{title}</h2>
+        {body?.length ? (
+          <PortableTextRenderer value={body} />
+        ) : (
+          <p>{copy}</p>
+        )}
+        {showCta !== false ? (
+          <div className="featured-work-actions">
+            <ButtonLink href={primaryCtaHref} variant="outline">
+              {primaryCtaLabel} <ArrowRightIcon />
+            </ButtonLink>
+            <ButtonLink href={secondaryCtaHref} variant="soft">
+              <MailIcon /> {secondaryCtaLabel}
+            </ButtonLink>
+          </div>
+        ) : null}
       </div>
 
       <div className="container work-grid">

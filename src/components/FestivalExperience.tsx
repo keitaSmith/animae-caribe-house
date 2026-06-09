@@ -92,6 +92,26 @@ function normalizeHighlights(cards?: SanityCardItem[] | null) {
     }));
 }
 
+function resolveMuxPosterSrc(
+  posterMode: 'muxFrame' | 'customImage' | 'fallbackImage' | undefined,
+  customPosterSrc?: string,
+  fallbackPosterSrc?: string
+) {
+  if (posterMode === 'customImage') {
+    return customPosterSrc || fallbackPosterSrc;
+  }
+
+  if (posterMode === 'fallbackImage') {
+    return fallbackPosterSrc || customPosterSrc;
+  }
+
+  if (posterMode === 'muxFrame') {
+    return undefined;
+  }
+
+  return customPosterSrc || fallbackPosterSrc;
+}
+
 export default function FestivalExperience({content, partners, events, currentProgrammeHref}: FestivalExperienceProps) {
   const firstHeroCta = content?.hero?.primaryCta || content?.hero?.ctas?.[0];
   const aboutCta = content?.aboutSection?.cta;
@@ -120,16 +140,24 @@ export default function FestivalExperience({content, partners, events, currentPr
         contactLabel={firstHeroCta?.label || 'Attend the festival'}
         showreelLabel={content?.hero?.showreel?.buttonLabel || 'Watch festival reel'}
         showreelPlaybackId={content?.hero?.showreel?.muxPlaybackId}
-        showreelPosterSrc={content?.hero?.showreel?.customPosterImageUrl || content?.hero?.showreel?.fallbackImageUrl}
+        showreelPosterSrc={resolveMuxPosterSrc(
+          content?.hero?.showreel?.posterMode,
+          content?.hero?.showreel?.customPosterImageUrl,
+          content?.hero?.showreel?.fallbackImageUrl
+        )}
+        showreelPosterMode={content?.hero?.showreel?.posterMode}
         showreelTitle={content?.hero?.showreel?.modalTitle || 'Animae Caribe Festival Showreel'}
         showreelStartTimeSeconds={content?.hero?.showreel?.startTimeSeconds}
         showreelEndTimeSeconds={content?.hero?.showreel?.endTimeSeconds}
         showreelPosterTimeSeconds={content?.hero?.showreel?.posterTimeSeconds}
         showreelAriaLabel={content?.hero?.showreel?.ariaLabel}
         backgroundPlaybackId={content?.hero?.backgroundVideo?.muxPlaybackId}
-        backgroundPosterSrc={
-          content?.hero?.backgroundVideo?.customPosterImage?.url || content?.hero?.backgroundVideo?.fallbackImage?.url
-        }
+        backgroundPosterSrc={resolveMuxPosterSrc(
+          content?.hero?.backgroundVideo?.posterMode,
+          content?.hero?.backgroundVideo?.customPosterImage?.url,
+          content?.hero?.backgroundVideo?.fallbackImage?.url
+        )}
+        backgroundPosterMode={content?.hero?.backgroundVideo?.posterMode}
         backgroundVideoTitle={content?.hero?.backgroundVideo?.title || 'Animae Caribe Festival Hero Background'}
         backgroundStartTimeSeconds={content?.hero?.backgroundVideo?.startTimeSeconds}
         backgroundEndTimeSeconds={content?.hero?.backgroundVideo?.endTimeSeconds}

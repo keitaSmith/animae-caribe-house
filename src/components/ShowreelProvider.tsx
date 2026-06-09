@@ -9,6 +9,7 @@ export type ShowreelVariant = 'house' | 'festival' | 'none';
 export type VideoPlaybackConfig = {
   playbackId?: string;
   posterSrc?: string;
+  posterMode?: 'muxFrame' | 'customImage' | 'fallbackImage';
   videoTitle?: string;
   startTimeSeconds?: number;
   endTimeSeconds?: number;
@@ -20,13 +21,15 @@ export type VideoPlaybackConfig = {
 type ShowreelContextValue = {
   variant: ShowreelVariant;
   backgroundPlaybackId?: string;
-  backgroundPosterSrc: string;
+  backgroundPosterSrc?: string;
+  backgroundPosterMode?: 'muxFrame' | 'customImage' | 'fallbackImage';
   backgroundVideoTitle: string;
   backgroundStartTimeSeconds?: number;
   backgroundEndTimeSeconds?: number;
   backgroundPosterTimeSeconds?: number;
   modalPlaybackId?: string;
-  modalPosterSrc: string;
+  modalPosterSrc?: string;
+  modalPosterMode?: 'muxFrame' | 'customImage' | 'fallbackImage';
   modalVideoTitle: string;
   modalStartTimeSeconds?: number;
   modalEndTimeSeconds?: number;
@@ -36,8 +39,8 @@ type ShowreelContextValue = {
   canOpenShowreel: boolean;
   isShowreelOpen: boolean;
   isBackgroundPaused: boolean;
-  setPageShowreel: (config: VideoPlaybackConfig | null) => void;
-  setPageBackgroundVideo: (config: VideoPlaybackConfig | null) => void;
+  setPageShowreel: (config: VideoPlaybackConfig | null | undefined) => void;
+  setPageBackgroundVideo: (config: VideoPlaybackConfig | null | undefined) => void;
   openShowreel: () => void;
   closeShowreel: () => void;
 };
@@ -50,8 +53,8 @@ type ShowreelProviderProps = {
 
 export function ShowreelProvider({ children }: ShowreelProviderProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [pageShowreel, setPageShowreel] = useState<VideoPlaybackConfig | null>(null);
-  const [pageBackgroundVideo, setPageBackgroundVideo] = useState<VideoPlaybackConfig | null>(null);
+  const [pageShowreel, setPageShowreel] = useState<VideoPlaybackConfig | null | undefined>(undefined);
+  const [pageBackgroundVideo, setPageBackgroundVideo] = useState<VideoPlaybackConfig | null | undefined>(undefined);
   const pathname = usePathname() || '/';
   const housePlaybackId =
     process.env.NEXT_PUBLIC_MUX_HOUSE_SHOWREEL_PLAYBACK_ID || process.env.NEXT_PUBLIC_MUX_SHOWREEL_PLAYBACK_ID;
@@ -59,10 +62,16 @@ export function ShowreelProvider({ children }: ShowreelProviderProps) {
   const variant: ShowreelVariant = pathname === '/house' ? 'house' : pathname === '/festival' ? 'festival' : 'none';
   const routePlaybackId = variant === 'festival' ? festivalPlaybackId : variant === 'house' ? housePlaybackId : undefined;
   const routePosterSrc = variant === 'festival' ? '/assets/animae-caribe-festival-feature.webp' : '/assets/hero-poster.webp';
+  const routePosterMode: 'muxFrame' | 'customImage' | 'fallbackImage' =
+    routePlaybackId && (variant === 'house' || variant === 'festival') ? 'muxFrame' : 'fallbackImage';
   const canOpenShowreel = variant === 'house' || variant === 'festival';
 
+  const hasPageShowreelOverride = typeof pageShowreel !== 'undefined';
+  const hasPageBackgroundOverride = typeof pageBackgroundVideo !== 'undefined';
+
   const modalPlaybackId = pageShowreel?.playbackId || routePlaybackId;
-  const modalPosterSrc = pageShowreel?.posterSrc || routePosterSrc;
+  const modalPosterSrc = hasPageShowreelOverride ? pageShowreel?.posterSrc : routePosterSrc;
+  const modalPosterMode = hasPageShowreelOverride ? pageShowreel?.posterMode : routePosterMode;
   const modalVideoTitle =
     pageShowreel?.videoTitle ||
     (variant === 'festival'
@@ -78,30 +87,33 @@ export function ShowreelProvider({ children }: ShowreelProviderProps) {
     pageShowreel?.buttonLabel ||
     (variant === 'festival' ? 'Watch festival reel' : 'Watch showreel');
 
-  const backgroundPlaybackId = pageBackgroundVideo?.playbackId || routePlaybackId;
-  const backgroundPosterSrc = pageBackgroundVideo?.posterSrc || routePosterSrc;
+  const backgroundPlaybackId = hasPageBackgroundOverride ? pageBackgroundVideo?.playbackId : routePlaybackId;
+  const backgroundPosterSrc = hasPageBackgroundOverride ? pageBackgroundVideo?.posterSrc : routePosterSrc;
+  const backgroundPosterMode = hasPageBackgroundOverride ? pageBackgroundVideo?.posterMode : routePosterMode;
   const backgroundVideoTitle =
-    pageBackgroundVideo?.videoTitle ||
+    (hasPageBackgroundOverride ? pageBackgroundVideo?.videoTitle : undefined) ||
     (variant === 'festival'
       ? 'Animae Caribe Festival Hero Background'
       : variant === 'house'
         ? 'Animae Caribe House Showreel'
         : 'Animae Caribe Background');
-  const backgroundStartTimeSeconds = pageBackgroundVideo?.startTimeSeconds;
-  const backgroundEndTimeSeconds = pageBackgroundVideo?.endTimeSeconds;
-  const backgroundPosterTimeSeconds = pageBackgroundVideo?.posterTimeSeconds;
+  const backgroundStartTimeSeconds = hasPageBackgroundOverride ? pageBackgroundVideo?.startTimeSeconds : undefined;
+  const backgroundEndTimeSeconds = hasPageBackgroundOverride ? pageBackgroundVideo?.endTimeSeconds : undefined;
+  const backgroundPosterTimeSeconds = hasPageBackgroundOverride ? pageBackgroundVideo?.posterTimeSeconds : undefined;
 
   const value = useMemo(
     () => ({
       variant,
       backgroundPlaybackId,
       backgroundPosterSrc,
+      backgroundPosterMode,
       backgroundVideoTitle,
       backgroundStartTimeSeconds,
       backgroundEndTimeSeconds,
       backgroundPosterTimeSeconds,
       modalPlaybackId,
       modalPosterSrc,
+      modalPosterMode,
       modalVideoTitle,
       modalStartTimeSeconds,
       modalEndTimeSeconds,
@@ -126,6 +138,7 @@ export function ShowreelProvider({ children }: ShowreelProviderProps) {
       backgroundEndTimeSeconds,
       backgroundPlaybackId,
       backgroundPosterSrc,
+      backgroundPosterMode,
       backgroundPosterTimeSeconds,
       backgroundStartTimeSeconds,
       backgroundVideoTitle,
@@ -135,6 +148,7 @@ export function ShowreelProvider({ children }: ShowreelProviderProps) {
       modalEndTimeSeconds,
       modalPlaybackId,
       modalPosterSrc,
+      modalPosterMode,
       modalPosterTimeSeconds,
       modalStartTimeSeconds,
       modalVideoTitle,

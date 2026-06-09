@@ -828,6 +828,19 @@ p {
   z-index: 2;
 }
 
+.partners-section-intro {
+  max-width: 720px;
+  margin: 14px auto 0;
+  text-align: center;
+  color: rgba(11, 17, 32, 0.68);
+}
+
+.partners-section-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
 .partner-marquee-shell {
   position: relative;
   overflow: hidden;
@@ -4994,6 +5007,11 @@ p {
 
   .partners-section .section-kicker {
     text-align: center;
+  }
+
+  .partners-section-intro {
+    margin-top: 12px;
+    font-size: 0.95rem;
   }
 
   .partner-marquee {

@@ -29,46 +29,32 @@ export default function Header({currentFestivalYear}: HeaderProps) {
   useEffect(() => {
     const syncScrollState = () => {
       setIsScrolled(window.scrollY > 24);
+
+      if (!hasLandingHero) {
+        setHeroInView(false);
+        return;
+      }
+
+      const hero = document.getElementById('home');
+
+      if (!hero) {
+        setHeroInView(true);
+        return;
+      }
+
+      const rect = hero.getBoundingClientRect();
+      const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+      const heroVisible = visibleHeight > rect.height * 0.08;
+      setHeroInView(heroVisible);
     };
 
     syncScrollState();
     window.addEventListener('scroll', syncScrollState, { passive: true });
-
-    return () => window.removeEventListener('scroll', syncScrollState);
-  }, []);
-
-  useEffect(() => {
-    if (!hasLandingHero) return undefined;
-
-    let observer: IntersectionObserver | null = null;
-    let frameId = 0;
-
-    const attachObserver = () => {
-      const hero = document.getElementById('home');
-      if (!hero) return;
-
-      observer = new IntersectionObserver(
-        ([entry]) => {
-          setHeroInView(entry.isIntersecting);
-        },
-        {
-          threshold: 0.08,
-        }
-      );
-
-      observer.observe(hero);
-    };
-
-    frameId = window.requestAnimationFrame(attachObserver);
+    window.addEventListener('resize', syncScrollState);
 
     return () => {
-      if (frameId) {
-        window.cancelAnimationFrame(frameId);
-      }
-
-      if (observer) {
-        observer.disconnect();
-      }
+      window.removeEventListener('scroll', syncScrollState);
+      window.removeEventListener('resize', syncScrollState);
     };
   }, [hasLandingHero]);
 

@@ -10,6 +10,7 @@ export default function ShowreelModal() {
     isShowreelOpen,
     closeShowreel,
     modalPosterSrc,
+    modalPosterMode,
     variant,
     modalVideoTitle,
     modalStartTimeSeconds,
@@ -85,6 +86,7 @@ export default function ShowreelModal() {
               assetEndTime={modalEndTimeSeconds}
               playsInline
               streamType="on-demand"
+              poster={modalPosterMode === 'muxFrame' ? undefined : modalPosterSrc}
               thumbnailTime={typeof modalPosterTimeSeconds === 'number' ? modalPosterTimeSeconds : 28}
               metadata={{
                 video_title: modalVideoTitle,

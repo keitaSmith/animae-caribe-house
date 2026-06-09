@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { stats, type Stat } from '../data/stats';
+import type {SanityCardItem} from '@/sanity/lib/types';
 
 function useCountUp(targetValue: number, duration = 1400) {
   const [value, setValue] = useState(0);
@@ -67,18 +68,57 @@ function StatCard({ stat }: StatCardProps) {
   );
 }
 
-export default function StatsSection() {
+type StatsSectionProps = {
+  kicker?: string;
+  title?: string;
+  intro?: string;
+  items?: Array<Stat | SanityCardItem>;
+};
+
+function normalizeStats(items?: Array<Stat | SanityCardItem>) {
+  if (!items?.length) {
+    return stats;
+  }
+
+  return items
+    .filter((item) => ('isVisible' in item ? item.isVisible !== false : true))
+    .map((item) => {
+      if ('value' in item) {
+        return item;
+      }
+
+      const rawNumber = typeof item.number === 'string' ? item.number.trim() : '';
+      const match = rawNumber.match(/^(\d+(?:\.\d+)?)(.*)$/);
+      const numericValue = match ? Number(match[1]) : Number(rawNumber);
+      const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
+      const suffix = match?.[2]?.trim() || '';
+
+      return {
+        value: safeValue,
+        suffix,
+        label: item.title || item.description || '',
+      };
+    })
+    .filter((item) => item.label);
+}
+
+export default function StatsSection({
+  kicker = 'Reach and impact',
+  title = 'Numbers that can grow with the story.',
+  intro = 'Replace these starter values with confirmed figures for years, creators, countries, completed projects or hours of animation produced.',
+  items,
+}: StatsSectionProps) {
+  const renderedStats = normalizeStats(items);
+
   return (
     <section className="section stats-section">
       <div className="container narrow-heading centered stats-intro">
-        <span className="section-kicker">Reach and impact</span>
-        <h2>Numbers that can grow with the story.</h2>
-        <p>
-          Replace these starter values with confirmed figures for years, creators, countries, completed projects or hours of animation produced.
-        </p>
+        <span className="section-kicker">{kicker}</span>
+        <h2>{title}</h2>
+        <p>{intro}</p>
       </div>
       <div className="container stats-grid">
-        {stats.map((stat) => (
+        {renderedStats.map((stat) => (
           <StatCard key={stat.label} stat={stat} />
         ))}
       </div>

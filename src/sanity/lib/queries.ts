@@ -6,12 +6,128 @@ import type {
   SanityEvent,
   SanityFestivalEdition,
   SanityFestivalPage,
+  SanityHousePage,
   SanityPartner,
   SanityPartnersPage,
+  SanityPostTeaser,
   SanitySiteSettings,
   SanityUmbrellaHomePage,
 } from './types';
 import {sanityFetch} from './client';
+
+const imageWithAltProjection = `
+  alt,
+  caption,
+  crop,
+  hotspot,
+  asset,
+  "url": asset->url,
+  "width": asset->metadata.dimensions.width,
+  "height": asset->metadata.dimensions.height
+`;
+
+const seoProjection = `
+  seoTitle,
+  seoDescription,
+  "seoImage": {
+    ${imageWithAltProjection}
+  }
+`;
+
+const muxVideoProjection = `
+  title,
+  muxPlaybackId,
+  startTimeSeconds,
+  endTimeSeconds,
+  posterMode,
+  posterTimeSeconds,
+  "customPosterImage": {
+    ${imageWithAltProjection}
+  },
+  "fallbackImage": {
+    ${imageWithAltProjection}
+  },
+  ariaLabel
+`;
+
+const videoShowreelProjection = `
+  title,
+  label,
+  muxPlaybackId,
+  startTimeSeconds,
+  endTimeSeconds,
+  posterMode,
+  posterTimeSeconds,
+  buttonLabel,
+  modalTitle,
+  modalDescription,
+  ariaLabel,
+  "customPosterImage": {
+    ${imageWithAltProjection}
+  },
+  "fallbackImage": {
+    ${imageWithAltProjection}
+  }
+`;
+
+const richTextSectionProjection = `
+  isVisible,
+  showEyebrow,
+  showHeading,
+  showBody,
+  showCta,
+  showImage,
+  eyebrow,
+  heading,
+  body,
+  plainText,
+  "image": {
+    ${imageWithAltProjection}
+  },
+  cta
+`;
+
+const cardItemProjection = `
+  isVisible,
+  number,
+  title,
+  description,
+  "image": {
+    ${imageWithAltProjection}
+  },
+  cta
+`;
+
+const cardGridSectionProjection = `
+  isVisible,
+  showEyebrow,
+  showHeading,
+  showIntro,
+  showCta,
+  eyebrow,
+  heading,
+  intro,
+  cards[]{
+    ${cardItemProjection}
+  },
+  cta
+`;
+
+const archiveTeaserSectionProjection = `
+  isVisible,
+  showEyebrow,
+  showHeading,
+  showCopy,
+  showCta,
+  showImage,
+  eyebrow,
+  heading,
+  copy,
+  "image": {
+    ${imageWithAltProjection}
+  },
+  cta
+`;
 
 const pageHeroProjection = `
   eyebrow,
@@ -107,6 +223,19 @@ const partnerProjection = `
   partnerTypes,
   partnerType,
   sortOrder
+`;
+
+const partnerSectionSettingsProjection = `
+  isVisible,
+  showHeading,
+  showIntro,
+  showCta,
+  heading,
+  intro,
+  cta,
+  "partners": partners[coalesce(@->active, true) == true]->{
+    ${partnerProjection}
+  }
 `;
 
 const personProjection = `
@@ -437,12 +566,65 @@ export async function getFestivalPage() {
 }
 
 export async function getHousePage() {
-  return sanityFetch(`*[_type == "housePage"][0]{
-    seo,
-    hero,
-    aboutSection,
-    partnersSection,
-    servicesSection
+  return sanityFetch<SanityHousePage>(`*[_type == "housePage"][0]{
+    seo{
+      ${seoProjection}
+    },
+    hero{
+      isVisible,
+      showEyebrow,
+      showHeading,
+      showCopy,
+      showCtas,
+      showLogo,
+      showBackgroundMedia,
+      eyebrow,
+      heading,
+      copy,
+      "logo": {
+        ${imageWithAltProjection}
+      },
+      "backgroundImage": {
+        ${imageWithAltProjection}
+      },
+      backgroundVideo{
+        ${muxVideoProjection}
+      },
+      showreel{
+        ${videoShowreelProjection}
+      },
+      ctas
+    },
+    aboutSection{
+      ${richTextSectionProjection}
+    },
+    partnersSection{
+      ${partnerSectionSettingsProjection}
+    },
+    servicesSection{
+      ${cardGridSectionProjection}
+    },
+    featuredWorkSection{
+      ${richTextSectionProjection}
+    },
+    statsSection{
+      ${cardGridSectionProjection}
+    },
+    teamSection{
+      ${richTextSectionProjection}
+    },
+    festivalTeaserSection{
+      ${richTextSectionProjection}
+    },
+    newsSection{
+      ${richTextSectionProjection}
+    },
+    faqSection[]{
+      ${cardItemProjection}
+    },
+    ctaSection{
+      ${archiveTeaserSectionProjection}
+    }
   }`);
 }
 
@@ -634,10 +816,14 @@ export async function getHousePartners() {
 
 export async function getRecentPosts() {
   // News cards link to /news-media/[slug], so missing slugs stay out of public lists.
-  return sanityFetch(`*[_type == "post" && defined(slug.current)] | order(date desc)[0...6]{
+  return sanityFetch<SanityPostTeaser[]>(`*[
+    _type == "post" &&
+    defined(slug.current) &&
+    coalesce(isVisible, true) == true
+  ] | order(coalesce(publishedAt, date) desc)[0...6]{
     title,
     "slug": slug.current,
-    date,
+    "date": coalesce(publishedAt, date),
     excerpt,
     relatedExperience,
     "featuredImageUrl": featuredImage.asset->url

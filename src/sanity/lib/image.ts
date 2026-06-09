@@ -11,5 +11,17 @@ export function urlForImage(source: Parameters<NonNullable<typeof builder>['imag
     return null;
   }
 
-  return builder.image(source);
+  if (typeof source === 'object' && source !== null && 'asset' in source) {
+    const asset = source.asset as { _ref?: string; _id?: string; url?: string } | null | undefined;
+
+    if (!asset?._ref && !asset?._id && !asset?.url) {
+      return null;
+    }
+  }
+
+  try {
+    return builder.image(source);
+  } catch {
+    return null;
+  }
 }

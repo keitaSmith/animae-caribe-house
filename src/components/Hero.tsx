@@ -4,25 +4,34 @@ import ButtonLink from './ButtonLink';
 import { MailIcon, PlayIcon } from './Icons';
 import MuxHeroShowreel from './MuxHeroShowreel';
 import { useShowreel } from './ShowreelProvider';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 
 type HeroProps = {
   ariaLabel?: string;
+  eyebrow?: string;
   logoSrc?: string | null;
   logoAlt?: string;
   title?: string;
   copy?: string;
+  showEyebrow?: boolean;
+  showLogo?: boolean;
+  showTitle?: boolean;
+  showCopy?: boolean;
+  showActions?: boolean;
+  showBackgroundMedia?: boolean;
   contactHref?: string;
   contactLabel?: string;
   showreelLabel?: string;
   backgroundPlaybackId?: string;
   backgroundPosterSrc?: string;
+  backgroundPosterMode?: 'muxFrame' | 'customImage' | 'fallbackImage';
   backgroundVideoTitle?: string;
   backgroundStartTimeSeconds?: number;
   backgroundEndTimeSeconds?: number;
   backgroundPosterTimeSeconds?: number;
   showreelPlaybackId?: string;
   showreelPosterSrc?: string;
+  showreelPosterMode?: 'muxFrame' | 'customImage' | 'fallbackImage';
   showreelTitle?: string;
   showreelStartTimeSeconds?: number;
   showreelEndTimeSeconds?: number;
@@ -32,21 +41,30 @@ type HeroProps = {
 
 export default function Hero({
   ariaLabel = 'Animae Caribe House introduction',
+  eyebrow,
   logoSrc = '/assets/animae-house-logo-white.png',
   logoAlt = 'Animae Caribe House',
   title,
   copy = 'A cinematic digital home for animated stories, creative production, community building and Caribbean imagination.',
+  showEyebrow = true,
+  showLogo = true,
+  showTitle = true,
+  showCopy = true,
+  showActions = true,
+  showBackgroundMedia = true,
   contactHref = 'mailto:info@animaecaribehouse.com',
   contactLabel = 'Get in touch',
   showreelLabel = 'Watch showreel',
   backgroundPlaybackId,
   backgroundPosterSrc,
+  backgroundPosterMode,
   backgroundVideoTitle,
   backgroundStartTimeSeconds,
   backgroundEndTimeSeconds,
   backgroundPosterTimeSeconds,
   showreelPlaybackId,
   showreelPosterSrc,
+  showreelPosterMode,
   showreelTitle,
   showreelStartTimeSeconds,
   showreelEndTimeSeconds,
@@ -62,7 +80,12 @@ export default function Hero({
   } = useShowreel();
   const hasMuxBackground = Boolean(activeBackgroundPlaybackId);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (showBackgroundMedia === false) {
+      setPageBackgroundVideo(null);
+      return () => setPageBackgroundVideo(undefined);
+    }
+
     if (
       !backgroundPlaybackId &&
       !backgroundPosterSrc &&
@@ -77,24 +100,27 @@ export default function Hero({
     setPageBackgroundVideo({
       playbackId: backgroundPlaybackId,
       posterSrc: backgroundPosterSrc,
+      posterMode: backgroundPosterMode,
       videoTitle: backgroundVideoTitle,
       startTimeSeconds: backgroundStartTimeSeconds,
       endTimeSeconds: backgroundEndTimeSeconds,
       posterTimeSeconds: backgroundPosterTimeSeconds,
     });
 
-    return () => setPageBackgroundVideo(null);
+    return () => setPageBackgroundVideo(undefined);
   }, [
     backgroundEndTimeSeconds,
     backgroundPlaybackId,
     backgroundPosterSrc,
+    backgroundPosterMode,
     backgroundPosterTimeSeconds,
     backgroundStartTimeSeconds,
     backgroundVideoTitle,
     setPageBackgroundVideo,
+    showBackgroundMedia,
   ]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (
       !showreelLabel &&
       !showreelPlaybackId &&
@@ -111,6 +137,7 @@ export default function Hero({
     setPageShowreel({
       playbackId: showreelPlaybackId,
       posterSrc: showreelPosterSrc,
+      posterMode: showreelPosterMode,
       videoTitle: showreelTitle,
       startTimeSeconds: showreelStartTimeSeconds,
       endTimeSeconds: showreelEndTimeSeconds,
@@ -119,7 +146,7 @@ export default function Hero({
       buttonLabel: showreelLabel,
     });
 
-    return () => setPageShowreel(null);
+    return () => setPageShowreel(undefined);
   }, [
     setPageShowreel,
     showreelAriaLabel,
@@ -127,6 +154,7 @@ export default function Hero({
     showreelLabel,
     showreelPlaybackId,
     showreelPosterSrc,
+    showreelPosterMode,
     showreelPosterTimeSeconds,
     showreelStartTimeSeconds,
     showreelTitle,
@@ -134,25 +162,28 @@ export default function Hero({
 
   return (
     <section className="hero-section" id="home" aria-label={ariaLabel}>
-      <MuxHeroShowreel />
-      {!hasMuxBackground ? (
+      {showBackgroundMedia !== false ? <MuxHeroShowreel /> : null}
+      {showBackgroundMedia !== false && !hasMuxBackground ? (
         <div className="hero-poster" style={{ backgroundImage: `url(${activeBackgroundPosterSrc})` }} />
       ) : null}
       <div className="hero-scrim" />
 
       <div className="container hero-content">
         <div className="hero-card reveal-up">
-          {logoSrc ? <img className="hero-logo" src={logoSrc} alt={logoAlt} /> : null}
-          {title ? <h1 className="hero-title">{title}</h1> : null}
-          <p className="hero-copy">{copy}</p>
-          <div className="hero-actions">
-            <ButtonLink href={contactHref} variant="soft">
-              <MailIcon /> {contactLabel}
-            </ButtonLink>
-            <button className="button button-primary" type="button" onClick={openShowreel}>
-              <PlayIcon /> {showreelLabel}
-            </button>
-          </div>
+          {showEyebrow !== false && eyebrow ? <span className="section-kicker">{eyebrow}</span> : null}
+          {showLogo !== false && logoSrc ? <img className="hero-logo" src={logoSrc} alt={logoAlt} /> : null}
+          {showTitle !== false && title ? <h1 className="hero-title">{title}</h1> : null}
+          {showCopy !== false ? <p className="hero-copy">{copy}</p> : null}
+          {showActions !== false ? (
+            <div className="hero-actions">
+              <ButtonLink href={contactHref} variant="soft">
+                <MailIcon /> {contactLabel}
+              </ButtonLink>
+              <button className="button button-primary" type="button" onClick={openShowreel}>
+                <PlayIcon /> {showreelLabel}
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type {SanityCardItem} from '@/sanity/lib/types';
 
 const faqItems = [
   {
@@ -33,20 +34,46 @@ function ChevronIcon() {
   );
 }
 
-export default function FaqSection() {
+type FaqSectionProps = {
+  kicker?: string;
+  title?: string;
+  intro?: string;
+  items?: SanityCardItem[] | null;
+};
+
+function normalizeFaqItems(items?: SanityCardItem[] | null) {
+  if (!items?.length) {
+    return faqItems;
+  }
+
+  return items
+    .filter((item) => item.isVisible !== false && item.title && item.description)
+    .map((item) => ({
+      question: item.title as string,
+      answer: item.description as string,
+    }));
+}
+
+export default function FaqSection({
+  kicker = 'FAQ',
+  title = 'Answers for ambitious projects, studio partnerships and big creative plans.',
+  intro = 'Everything here is built to make the next conversation easier, faster and clearer.',
+  items,
+}: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState(0);
+  const faqEntries = normalizeFaqItems(items);
 
   return (
     <section className="section faq-section" id="faq">
       <div className="container faq-shell">
         <div className="faq-intro reveal-up">
-          <span className="section-kicker">FAQ</span>
-          <h2>Answers for ambitious projects, studio partnerships and big creative plans.</h2>
-          <p>Everything here is built to make the next conversation easier, faster and clearer.</p>
+          <span className="section-kicker">{kicker}</span>
+          <h2>{title}</h2>
+          <p>{intro}</p>
         </div>
 
         <div className="faq-list reveal-up">
-          {faqItems.map((item, index) => {
+          {faqEntries.map((item, index) => {
             const panelId = `faq-panel-${index}`;
             const buttonId = `faq-button-${index}`;
             const isOpen = openIndex === index;

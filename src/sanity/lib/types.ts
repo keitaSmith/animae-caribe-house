@@ -50,6 +50,22 @@ export type SanityMuxVideo = {
   ariaLabel?: string;
 };
 
+export type SanityVideoShowreel = {
+  title?: string;
+  label?: string;
+  muxPlaybackId?: string;
+  startTimeSeconds?: number;
+  endTimeSeconds?: number;
+  posterMode?: 'muxFrame' | 'customImage' | 'fallbackImage';
+  posterTimeSeconds?: number;
+  customPosterImage?: SanityImage;
+  fallbackImage?: SanityImage;
+  buttonLabel?: string;
+  modalTitle?: string;
+  modalDescription?: string;
+  ariaLabel?: string;
+};
+
 export type SanityVisibilityFields = {
   isVisible?: boolean;
   showEyebrow?: boolean;
@@ -105,6 +121,23 @@ export type SanityTeaserSection = SanityVisibilityFields & {
   heading?: string;
   description?: string;
   plainText?: string;
+  cta?: SanityCta;
+};
+
+export type SanityRichTextSection = SanityVisibilityFields & {
+  eyebrow?: string;
+  heading?: string;
+  body?: PortableTextBlock[];
+  plainText?: string;
+  image?: SanityImageSource;
+  cta?: SanityCta;
+};
+
+export type SanityCardGridSection = SanityVisibilityFields & {
+  eyebrow?: string;
+  heading?: string;
+  intro?: string;
+  cards?: SanityCardItem[];
   cta?: SanityCta;
 };
 
@@ -256,9 +289,22 @@ export type SanityContactPage = {
 
 export type SanityPartnerSection = {
   isVisible?: boolean;
+  showHeading?: boolean;
+  showIntro?: boolean;
+  showCta?: boolean;
   eyebrow?: string;
   heading?: string;
+  intro?: string;
+  cta?: SanityCta;
   partners?: SanityPartner[];
+};
+
+export type SanityArchiveTeaserSection = SanityVisibilityFields & {
+  eyebrow?: string;
+  heading?: string;
+  copy?: string;
+  image?: SanityImageSource;
+  cta?: SanityCta;
 };
 
 export type SanityUmbrellaHomePage = {
@@ -356,4 +402,41 @@ export type SanityFestivalPage = {
   };
   calendarSection?: SanityCalendarSection;
   venueSection?: SanityVenueSection;
+};
+
+export type SanityHousePage = {
+  seo?: {
+    seoTitle?: string;
+    seoDescription?: string;
+    seoImage?: SanityImage;
+  };
+  hero?: SanityVisibilityFields & {
+    eyebrow?: string;
+    heading?: string;
+    copy?: string;
+    logo?: SanityImageSource;
+    backgroundImage?: SanityImageSource;
+    backgroundVideo?: SanityMuxVideo;
+    showreel?: SanityVideoShowreel;
+    ctas?: SanityCta[];
+  };
+  aboutSection?: SanityRichTextSection;
+  partnersSection?: SanityPartnerSection;
+  servicesSection?: SanityCardGridSection;
+  featuredWorkSection?: SanityRichTextSection;
+  statsSection?: SanityCardGridSection;
+  teamSection?: SanityRichTextSection;
+  festivalTeaserSection?: SanityRichTextSection;
+  newsSection?: SanityRichTextSection;
+  faqSection?: SanityCardItem[];
+  ctaSection?: SanityArchiveTeaserSection;
+};
+
+export type SanityPostTeaser = {
+  title?: string;
+  slug?: string;
+  date?: string;
+  excerpt?: string;
+  relatedExperience?: string;
+  featuredImageUrl?: string;
 };
