@@ -9,13 +9,18 @@ import TeamTeaser from './TeamTeaser';
 import FestivalFeatureSection from './FestivalFeatureSection';
 import NewsTeaser from './NewsTeaser';
 import FaqSection from './FaqSection';
+import type { Partner } from '../data/partners';
 
-export default function HouseExperience() {
+type HouseExperienceProps = {
+  partners?: Partner[] | null;
+};
+
+export default function HouseExperience({partners}: HouseExperienceProps) {
   return (
     <>
       <Hero />
       <AboutTeaser />
-      <PartnersStrip />
+      <PartnersStrip items={partners || undefined} />
       <ServicesSection />
       <SunriseDivider />
       <FeaturedWork />

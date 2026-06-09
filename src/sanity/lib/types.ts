@@ -45,12 +45,16 @@ export type SanityVisibilityFields = {
 
 export type SanityPartner = {
   name?: string;
+  url?: string;
   website?: string;
   logoUrl?: string;
+  active?: boolean;
+  relationship?: string;
   relatedExperiences?: string[];
   relatedExperience?: string;
   partnerTypes?: string[];
   partnerType?: string;
+  sortOrder?: number;
 };
 
 export type SanityCardItem = SanityVisibilityFields & {

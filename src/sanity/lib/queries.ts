@@ -97,12 +97,16 @@ const aboutJobListingProjection = `
 
 const partnerProjection = `
   name,
+  "url": coalesce(url, website),
   website,
   "logoUrl": logo.asset->url,
+  active,
+  relationship,
   relatedExperiences,
   relatedExperience,
   partnerTypes,
-  partnerType
+  partnerType,
+  sortOrder
 `;
 
 const eventProjection = `
@@ -272,7 +276,7 @@ export async function getUmbrellaHomePage() {
       isVisible,
       eyebrow,
       heading,
-      partners[]->{
+      "partners": partners[coalesce(@->active, true) == true]->{
         ${partnerProjection}
       }
     }
@@ -322,7 +326,7 @@ export async function getFestivalPage() {
       isVisible,
       eyebrow,
       heading,
-      partners[]->{
+      "partners": partners[coalesce(@->active, true) == true]->{
         ${partnerProjection}
       }
     },
@@ -553,11 +557,21 @@ export async function getPartnersByExperience(experience: 'umbrella' | 'festival
   return sanityFetch<SanityPartner[]>(
     `*[
       _type == "partner" &&
+      coalesce(active, true) == true &&
       (
-        $experience in coalesce(relatedExperiences, []) ||
-        relatedExperience == $experience
+        (
+          (
+            !defined(relatedExperiences) ||
+            count(relatedExperiences) == 0
+          ) &&
+          !defined(relatedExperience)
+        ) ||
+        (
+          $experience in coalesce(relatedExperiences, []) ||
+          relatedExperience == $experience
+        )
       )
-    ] | order(sortOrder asc, name asc){
+    ] | order(coalesce(sortOrder, 999999) asc, name asc){
       ${partnerProjection}
     }`,
     {experience}

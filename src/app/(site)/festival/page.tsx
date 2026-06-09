@@ -1,5 +1,6 @@
 import FestivalExperience from '@/components/FestivalExperience';
 import {DEFAULT_FESTIVAL_YEAR, getFestivalEventsRoute} from '@/lib/festivalRoutes';
+import {normalizeSanityPartners} from '@/lib/partners';
 import {getActiveFestivalEdition, getFestivalPage, getFestivalPartners, getUpcomingFestivalEventsByEdition} from '@/sanity/lib/queries';
 import type {SanityEvent, SanityFestivalPage} from '@/sanity/lib/types';
 
@@ -54,10 +55,7 @@ export default async function FestivalPage() {
     getActiveFestivalEdition(),
   ]);
   const mergedFestivalPage = mergeFestivalPageWithActiveEdition(festivalPage, activeEdition);
-  const partners =
-    sanityPartners
-      ?.filter((partner) => partner.name && partner.logoUrl)
-      .map((partner) => ({name: partner.name as string, src: partner.logoUrl as string})) || null;
+  const partners = normalizeSanityPartners(sanityPartners);
   const festivalEditionId = mergedFestivalPage?.eventsPreview?.festivalEdition?._id;
   const festivalEditionYear = mergedFestivalPage?.eventsPreview?.festivalEdition?.year || activeEdition?.year || DEFAULT_FESTIVAL_YEAR;
   const maxEvents = mergedFestivalPage?.eventsPreview?.maxEvents || 3;
@@ -68,7 +66,7 @@ export default async function FestivalPage() {
   return (
     <FestivalExperience
       content={mergedFestivalPage}
-      partners={partners}
+      partners={partners.length ? partners : null}
       events={events}
       currentProgrammeHref={getFestivalEventsRoute(festivalEditionYear)}
     />

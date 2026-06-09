@@ -1,16 +1,21 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { site } from '../data/site';
 import { MailIcon, PhoneIcon } from './Icons';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const pathname = usePathname() || '/';
+  const isHousePage = pathname === '/house' || pathname.startsWith('/house/');
+  const footerLogoSrc = isHousePage ? '/assets/animae-house-logo-white.png' : '/assets/anime-caribe-logo-white.png';
+  const footerLogoAlt = isHousePage ? 'Animae Caribe House' : 'Animae Caribe';
 
   return (
     <footer className="site-footer" id="contact">
       <div className="container footer-grid">
         <div className="footer-image footer-logo">
-          <img src="/assets/animae-house-logo-white.png" alt="Animae Caribe House" />
+          <img src={footerLogoSrc} alt={footerLogoAlt} />
         </div>
         <div className="footer-copy">
           <span className="section-kicker">Contact</span>

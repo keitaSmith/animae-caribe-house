@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "sanity:import:partners": "node scripts/sanity/importEcosystemPartners.mjs",
     "youtube:import": "node scripts/youtube/importTrustedYouTube.mjs",
     "import:youtube": "node scripts/youtube/importTrustedYouTube.mjs",
     "import:youtube:backfill": "node scripts/youtube/importTrustedYouTube.mjs --backfill",

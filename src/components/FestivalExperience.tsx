@@ -102,11 +102,7 @@ export default function FestivalExperience({content, partners, events, currentPr
   const eventCards = normalizeEvents(events);
   const programmeHref = resolveProgrammeHref(eventCta?.href, currentProgrammeHref);
   const pastEditionsHref = resolvePastEditionsHref(archiveCta?.href);
-  const selectedPartners =
-    content?.partnersSection?.partners
-      ?.filter((partner) => partner.name && partner.logoUrl)
-      .map((partner) => ({name: partner.name as string, src: partner.logoUrl as string})) || null;
-  const partnerItems = selectedPartners?.length ? selectedPartners : partners;
+  const partnerItems = partners;
 
   return (
     <>

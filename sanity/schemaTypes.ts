@@ -1680,20 +1680,35 @@ const festivalEdition = defineType({
 
 const partner = defineType({
   name: 'partner',
-  title: 'Partner',
+  title: 'Partner / collaborator',
   type: 'document',
   fields: [
     defineField({name: 'name', title: 'Name', type: 'string', validation: (Rule) => Rule.required()}),
     defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'name'}}),
-    defineField({name: 'logo', title: 'Logo', type: 'imageWithAlt'}),
-    defineField({name: 'website', title: 'Website', type: 'url'}),
+    defineField({name: 'logo', title: 'Logo', type: 'imageWithAlt', validation: (Rule) => Rule.required()}),
+    defineField({
+      name: 'active',
+      title: 'Active',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Turn off to hide this partner/collaborator from frontend queries without deleting the document.',
+    }),
+    defineField({name: 'url', title: 'URL', type: 'url'}),
+    defineField({
+      name: 'relationship',
+      title: 'Relationship',
+      type: 'string',
+      options: {list: partnerTypeOptions},
+      description: 'Optional classification only. This can be left blank for now.',
+    }),
     defineField({
       name: 'partnerTypes',
-      title: 'Partner types',
+      title: 'Legacy partner types',
       type: 'array',
       of: [defineArrayMember({type: 'string'})],
       options: {list: partnerTypeOptions},
       description: 'A partner can belong to more than one category.',
+      hidden: true,
     }),
     defineField({
       name: 'relatedExperiences',
@@ -1701,7 +1716,8 @@ const partner = defineType({
       type: 'array',
       of: [defineArrayMember({type: 'string'})],
       options: {list: relatedExperienceOptions},
-      description: 'A partner can appear across umbrella, festival, and house.',
+      description:
+        'Optional experience scoping. Leave empty for ecosystem-wide partners/collaborators that should appear everywhere.',
     }),
     defineField({
       name: 'partnerType',
@@ -1717,21 +1733,35 @@ const partner = defineType({
       options: {list: relatedExperienceOptions},
       hidden: true,
     }),
+    defineField({name: 'website', title: 'Legacy website', type: 'url', hidden: true}),
     defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
     defineField({name: 'sortOrder', title: 'Sort order', type: 'number'}),
     defineField({name: 'isFeatured', title: 'Featured', type: 'boolean', initialValue: false}),
   ],
+  initialValue: {
+    active: true,
+  },
   preview: {
     select: {
       title: 'name',
+      active: 'active',
       experiences: 'relatedExperiences',
       legacyExperience: 'relatedExperience',
+      relationship: 'relationship',
+      legacyRelationship: 'partnerType',
+      media: 'logo',
     },
-    prepare: ({title, experiences, legacyExperience}) => ({
-      title: title || 'Partner',
-      subtitle:
-        experiences?.length ? experiences.join(', ') : legacyExperience ? String(legacyExperience) : 'Partner document',
-    }),
+    prepare: ({title, active, experiences, legacyExperience, relationship, legacyRelationship, media}) => {
+      const scope =
+        experiences?.length ? experiences.join(', ') : legacyExperience ? String(legacyExperience) : 'Ecosystem-wide'
+      const relationshipLabel = relationship || legacyRelationship
+
+      return {
+        title: title || 'Partner / collaborator',
+        subtitle: `${active === false ? 'Inactive' : 'Active'} · ${scope}${relationshipLabel ? ` · ${relationshipLabel}` : ''}`,
+        media,
+      }
+    },
   },
 })
 

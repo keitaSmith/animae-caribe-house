@@ -2,8 +2,7 @@ import ButtonLink from '@/components/ButtonLink';
 import EcosystemSplitHero from '@/components/EcosystemSplitHero';
 import PartnersStrip from '@/components/PartnersStrip';
 import { ArrowRightIcon, MailIcon } from '@/components/Icons';
-import { ecosystemPartners } from '@/data/ecosystem';
-import type { Partner } from '@/data/partners';
+import { normalizeSanityPartners } from '@/lib/partners';
 import { getUmbrellaHomePage, getUmbrellaPartners } from '@/sanity/lib/queries';
 import type { SanityCta } from '@/sanity/lib/types';
 
@@ -29,22 +28,9 @@ export async function generateMetadata() {
   };
 }
 
-function normalizePartners(partners?: Array<{name?: string; logoUrl?: string}> | null): Partner[] {
-  if (!partners?.length) {
-    return ecosystemPartners;
-  }
-
-  const mapped = partners
-    .filter((partner) => partner.name && partner.logoUrl)
-    .map((partner) => ({name: partner.name as string, src: partner.logoUrl as string}));
-
-  return mapped.length ? mapped : ecosystemPartners;
-}
-
 export default async function UmbrellaHome() {
   const [umbrellaPage, sanityPartners] = await Promise.all([getUmbrellaHomePage(), getUmbrellaPartners()]);
-  const orderedSelectedPartners = umbrellaPage?.partnersSection?.partners;
-  const partners = normalizePartners(orderedSelectedPartners?.length ? orderedSelectedPartners : sanityPartners);
+  const partners = normalizeSanityPartners(sanityPartners);
   const aboutSection = umbrellaPage?.aboutSection;
   const ecosystemSection = umbrellaPage?.ecosystemSection;
   const partnersSection = umbrellaPage?.partnersSection;

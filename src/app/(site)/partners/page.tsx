@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import PartnersStrip from '@/components/PartnersStrip';
-import { ecosystemPartners } from '@/data/ecosystem';
-import { festivalPartners } from '@/data/festival';
-import { partners as housePartners } from '@/data/partners';
-import { getPartnersPage } from '@/sanity/lib/queries';
+import { normalizeSanityPartners } from '@/lib/partners';
+import { getHousePartners, getPartnersPage, getUmbrellaPartners } from '@/sanity/lib/queries';
 import partnersHeroCharacter from '@/../public/assets/characters/CarnivalCharacater02-copy-scaled.webp';
+
+export const revalidate = 60;
 
 export const metadata = {
   title: 'Partners | Animae Caribe',
@@ -12,12 +12,22 @@ export const metadata = {
 };
 
 export default async function PartnersPage() {
-  const partnersPage = await getPartnersPage();
+  const [partnersPage, ecosystemPartners, housePartners] = await Promise.all([
+    getPartnersPage(),
+    getUmbrellaPartners(),
+    getHousePartners(),
+  ]);
   const hero = partnersPage?.hero;
   const heroImageSrc = hero?.image?.url || partnersHeroCharacter;
   const heroImageAlt = hero?.image?.alt || 'Illustrated carnival character representing Animae Caribe partners';
   const heroImageWidth = hero?.image?.width || partnersHeroCharacter.width;
   const heroImageHeight = hero?.image?.height || partnersHeroCharacter.height;
+  const ecosystemPartnerItems = normalizeSanityPartners(ecosystemPartners);
+  const houseSpecificPartners =
+    housePartners?.filter(
+      (partner) => partner.relatedExperiences?.includes('house') || partner.relatedExperience === 'house'
+    ) || [];
+  const housePartnerItems = normalizeSanityPartners(houseSpecificPartners);
 
   return (
     <section className="page-section page-section-cinematic partners-page">
@@ -47,9 +57,10 @@ export default async function PartnersPage() {
         </div>
       </div>
 
-      <PartnersStrip items={ecosystemPartners} kicker="Featured ecosystem partners" ariaLabel="Ecosystem partners" />
-      <PartnersStrip items={festivalPartners} kicker="Festival collaborators" ariaLabel="Festival partners" />
-      <PartnersStrip items={housePartners} kicker="House collaborators" ariaLabel="House partners" />
+      <PartnersStrip items={ecosystemPartnerItems} kicker="Featured ecosystem partners" ariaLabel="Ecosystem partners" />
+      {housePartnerItems.length ? (
+        <PartnersStrip items={housePartnerItems} kicker="House collaborators" ariaLabel="House partners" />
+      ) : null}
     </section>
   );
 }
