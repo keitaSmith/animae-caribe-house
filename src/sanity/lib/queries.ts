@@ -633,7 +633,8 @@ export async function getHousePartners() {
 }
 
 export async function getRecentPosts() {
-  return sanityFetch(`*[_type == "post"] | order(date desc)[0...6]{
+  // News cards link to /news-media/[slug], so missing slugs stay out of public lists.
+  return sanityFetch(`*[_type == "post" && defined(slug.current)] | order(date desc)[0...6]{
     title,
     "slug": slug.current,
     date,

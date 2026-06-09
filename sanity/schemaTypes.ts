@@ -1,4 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
+import {AutoSlugInput} from './AutoSlugInput'
+import {buildUniqueSlugForType, createTypeScopedSlugIsUnique, defaultSlugify, SANITY_API_VERSION} from './slugUtils'
 
 const relatedExperienceOptions = [
   {title: 'Umbrella', value: 'umbrella'},
@@ -90,6 +92,57 @@ function fixedPreview(title: string, subtitle?: string) {
       subtitle,
     }),
   }
+}
+
+function createSlugField({
+  documentType,
+  source,
+  description,
+  requiredForPublicUrl = false,
+  publicLabel = 'document',
+}: {
+  documentType: string
+  source: string
+  description: string
+  requiredForPublicUrl?: boolean
+  publicLabel?: string
+}) {
+  return defineField({
+    name: 'slug',
+    title: 'Slug',
+    type: 'slug',
+    description,
+    options: {
+      source,
+      slugify: async (input: string, _schemaType, context) => {
+        const baseSlug = defaultSlugify(input)
+        const parentDocument = Array.isArray(context.parent) ? undefined : (context.parent as {_id?: string} | undefined)
+
+        if (!baseSlug) {
+          return ''
+        }
+
+        return buildUniqueSlugForType({
+          client: context.getClient({apiVersion: SANITY_API_VERSION}),
+          baseSlug,
+          type: documentType,
+          documentId: typeof parentDocument?._id === 'string' ? parentDocument._id : undefined,
+        })
+      },
+      isUnique: createTypeScopedSlugIsUnique(documentType),
+    },
+    components: {
+      input: AutoSlugInput,
+    },
+    validation: requiredForPublicUrl
+      ? (Rule) =>
+          Rule.required().custom((value) =>
+            typeof value?.current === 'string' && value.current.trim().length > 0
+              ? true
+              : `A slug is required before publishing because this ${publicLabel} has a public page URL.`
+          )
+      : undefined,
+  })
 }
 
 function formatPreviewDate(dateTime?: string) {
@@ -994,7 +1047,13 @@ const aboutSectionPage = defineType({
   type: 'document',
   fields: [
     defineField({name: 'title', title: 'Editor title', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}, validation: (Rule) => Rule.required()}),
+    createSlugField({
+      documentType: 'aboutSectionPage',
+      source: 'title',
+      requiredForPublicUrl: true,
+      publicLabel: 'About section page',
+      description: 'Click Generate before publishing. This controls the public URL for this About page.',
+    }),
     defineField({
       name: 'pageType',
       title: 'Page type',
@@ -1571,7 +1630,12 @@ const festivalEdition = defineType({
       description: 'The public name of the festival edition, e.g. “Animae Caribe Festival 2026”.',
       validation: (Rule) => Rule.required(),
     }),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    createSlugField({
+      documentType: 'festivalEdition',
+      source: 'title',
+      description:
+        'Optional for now. Generate this if you want a stable identifier for this edition in Sanity, but the public programme/archive routes currently use the year field.',
+    }),
       defineField({
         name: 'year',
         title: 'Year',
@@ -1720,7 +1784,12 @@ const partner = defineType({
   type: 'document',
   fields: [
     defineField({name: 'name', title: 'Name', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'name'}}),
+    createSlugField({
+      documentType: 'partner',
+      source: 'name',
+      description:
+        'Optional for now. Click Generate if you want a clean internal identifier, but partner cards and frontend queries do not require this slug today.',
+    }),
     defineField({name: 'logo', title: 'Logo', type: 'imageWithAlt', validation: (Rule) => Rule.required()}),
     defineField({
       name: 'active',
@@ -1807,7 +1876,12 @@ const person = defineType({
   type: 'document',
   fields: [
     defineField({name: 'name', title: 'Name', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'name'}}),
+    createSlugField({
+      documentType: 'person',
+      source: 'name',
+      description:
+        'Optional for now. Click Generate if you want a stable editorial identifier, but speakers/guests are selected internally by document ID rather than slug.',
+    }),
     defineField({
       name: 'active',
       title: 'Active',
@@ -1846,7 +1920,12 @@ const event = defineType({
   type: 'document',
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    createSlugField({
+      documentType: 'event',
+      source: 'title',
+      description:
+        'Optional for now. Generate this if you want a stable identifier for future event detail pages, but the current festival programme does not route to events by slug.',
+    }),
     defineField({
       name: 'festivalEdition',
       title: 'Festival Year / Edition',
@@ -1971,7 +2050,13 @@ const post = defineType({
   type: 'document',
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    createSlugField({
+      documentType: 'post',
+      source: 'title',
+      requiredForPublicUrl: true,
+      publicLabel: 'News & Media post',
+      description: 'Click Generate before publishing. This controls the public URL for this News & Media article.',
+    }),
     defineField({name: 'date', title: 'Legacy date', type: 'datetime'}),
     defineField({
       name: 'publishedAt',
@@ -2030,7 +2115,12 @@ const aboutJobListing = defineType({
   fields: [
     defineField({name: 'eyebrow', title: 'Eyebrow', type: 'string', initialValue: 'Job Listing'}),
     defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    createSlugField({
+      documentType: 'aboutJobListing',
+      source: 'title',
+      description:
+        'Optional for now. Click Generate if this listing may later need its own public page, but the current About experience renders job listings inline without using this slug.',
+    }),
     defineField({
       name: 'description',
       title: 'Short description',
@@ -2171,7 +2261,13 @@ const youtubeVideo = defineType({
   type: 'document',
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    createSlugField({
+      documentType: 'youtubeVideo',
+      source: 'title',
+      requiredForPublicUrl: true,
+      publicLabel: 'YouTube video',
+      description: 'Click Generate before publishing. This controls the public URL for this News & Media video page.',
+    }),
     defineField({name: 'youtubeVideoId', title: 'YouTube video ID', type: 'string', validation: (Rule) => Rule.required()}),
     defineField({name: 'youtubeUrl', title: 'YouTube URL', type: 'url'}),
     defineField({name: 'embedUrl', title: 'Embed URL', type: 'url'}),
@@ -2223,7 +2319,12 @@ const page = defineType({
   type: 'document',
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string', validation: (Rule) => Rule.required()}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    createSlugField({
+      documentType: 'page',
+      source: 'title',
+      description:
+        'Optional for now. Click Generate if this page will be routed publicly later. The current frontend does not expose a public route for this general page type.',
+    }),
     defineField({name: 'excerpt', title: 'Excerpt', type: 'text', rows: 3}),
     defineField({name: 'body', title: 'Body', type: 'array', of: [defineArrayMember({type: 'block'})]}),
     defineField({name: 'relatedExperience', title: 'Related experience', type: 'string', options: {list: relatedExperienceOptions}}),
@@ -2258,7 +2359,12 @@ const mediaGallery = defineType({
   type: 'document',
   fields: [
     defineField({name: 'title', title: 'Title', type: 'string'}),
-    defineField({name: 'slug', title: 'Slug', type: 'slug', options: {source: 'title'}}),
+    createSlugField({
+      documentType: 'mediaGallery',
+      source: 'title',
+      description:
+        'Optional for now. Click Generate if this gallery will later get its own public page. The current frontend does not route directly to media galleries by slug.',
+    }),
     defineField({name: 'description', title: 'Description', type: 'text', rows: 3}),
     defineField({name: 'relatedExperience', title: 'Related experience', type: 'string', options: {list: relatedExperienceOptions}}),
     defineField({name: 'relatedFestivalEdition', title: 'Related festival edition', type: 'reference', to: [{type: 'festivalEdition'}]}),
