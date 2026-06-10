@@ -1,6 +1,6 @@
 'use client';
 
-import {Component, forwardRef, useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties, type ReactNode, type RefAttributes} from 'react';
+import {Component, forwardRef, useCallback, useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties, type ReactNode, type RefAttributes} from 'react';
 import {ChevronLeftIcon, ChevronRightIcon, CollapseIcon, DownloadIcon, ExpandIcon, ExternalIcon} from './Icons';
 
 type BusinessDevelopmentPdfViewerProps = {
@@ -34,12 +34,12 @@ type FlipBookEvent = {
   data?: number | string;
 };
 
+type FlipBookState = 'user_fold' | 'fold_corner' | 'flipping' | 'read';
+
 type FlipBookRef = {
   pageFlip?: () => {
     flipNext?: (corner?: 'top' | 'bottom') => void;
     flipPrev?: (corner?: 'top' | 'bottom') => void;
-    turnToPage?: (pageNumber: number) => void;
-    update?: () => void;
   };
 };
 
@@ -68,7 +68,9 @@ type FlipBookProps = {
   autoSize: boolean;
   startZIndex: number;
   swipeDistance: number;
+  renderOnlyPageLengthChange: boolean;
   onFlip: (event: FlipBookEvent) => void;
+  onChangeState: (event: FlipBookEvent) => void;
   onInit: () => void;
   onUpdate: () => void;
 };
@@ -96,6 +98,7 @@ const DEFAULT_PAGE_SIZE = {
 const SPREAD_GUTTER = 14;
 const DESKTOP_STAGE_INSET = 36;
 const MOBILE_STAGE_INSET = 20;
+const LAYOUT_SETTLE_TIME = 180;
 
 class FlipbookErrorBoundary extends Component<FlipbookErrorBoundaryProps, FlipbookErrorBoundaryState> {
   state: FlipbookErrorBoundaryState = {
@@ -148,23 +151,47 @@ export default function BusinessDevelopmentPdfViewer({
   const canvasRefs = useRef<Record<number, HTMLCanvasElement | null>>({});
   const flipBookRef = useRef<FlipBookRef | null>(null);
   const documentRef = useRef<PdfDocument | null>(null);
+  const isFlippingRef = useRef(false);
+  const pendingLayoutRef = useRef<{width: number; height: number} | null>(null);
+  const pendingFullscreenLayoutRef = useRef<boolean | null>(null);
+  const layoutTimeoutRef = useRef<number | null>(null);
   const [FlipBookComponent, setFlipBookComponent] = useState<FlipBookComponent | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [pageCount, setPageCount] = useState(0);
   const [zoom, setZoom] = useState(1);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [viewportHeight, setViewportHeight] = useState(720);
+  const [layoutBounds, setLayoutBounds] = useState({width: 0, height: 720});
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [renderVersion, setRenderVersion] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [initializedFlipbookKey, setInitializedFlipbookKey] = useState<string | null>(null);
+  const [readyAnimatedRenderKey, setReadyAnimatedRenderKey] = useState<string | null>(null);
+  const [isFlipping, setIsFlipping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [turnDirection, setTurnDirection] = useState<'previous' | 'next' | null>(null);
   const [flipbookUnavailable, setFlipbookUnavailable] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreenLayout, setIsFullscreenLayout] = useState(false);
 
+  const containerWidth = layoutBounds.width;
+  const viewportHeight = layoutBounds.height;
   const isSpreadCapable = containerWidth >= 760;
   const downloadFilename = filename || 'animae-caribe-business-development.pdf';
+  const downloadUrl = `/api/pdf-download?url=${encodeURIComponent(pdfUrl)}&filename=${encodeURIComponent(downloadFilename)}`;
   const pageNumbers = useMemo(() => Array.from({length: pageCount}, (_, index) => index + 1), [pageCount]);
+  const setCanvasRef = useCallback((canvasPageNumber: number, node: HTMLCanvasElement | null) => {
+    canvasRefs.current[canvasPageNumber] = node;
+  }, []);
+  const flipbookPages = useMemo(
+    () =>
+      pageNumbers.map((bookPageNumber) => (
+        <FlipbookPage
+          key={bookPageNumber}
+          pageNumber={bookPageNumber}
+          title={title}
+          setCanvasRef={setCanvasRef}
+        />
+      )),
+    [pageNumbers, setCanvasRef, title]
+  );
   const canUseAnimatedFlipbook = Boolean(FlipBookComponent && !flipbookUnavailable && pageCount > 0 && isSpreadCapable);
   const maxZoom = isFullscreen ? FULLSCREEN_MAX_ZOOM : MAX_ZOOM;
   const zoomPercent = Math.round(zoom * 100);
@@ -175,7 +202,7 @@ export default function BusinessDevelopmentPdfViewer({
     const stageInset = isSpreadCapable ? DESKTOP_STAGE_INSET : MOBILE_STAGE_INSET;
     const availableWidth = Math.max(260, stageWidth - stageInset);
     const pageWidthFromStage = isSpreadCapable ? (availableWidth - SPREAD_GUTTER) / 2 : availableWidth;
-    const maxPageHeight = isFullscreen ? Math.max(360, viewportHeight - 86) : Math.max(420, viewportHeight * 0.88);
+    const maxPageHeight = isFullscreenLayout ? Math.max(360, viewportHeight - 86) : Math.max(420, viewportHeight * 0.88);
     const pageWidthFromHeight = maxPageHeight * pageAspectRatio;
     const pageWidth = Math.max(240, Math.floor(Math.min(pageWidthFromStage, pageWidthFromHeight)));
     const pageHeight = Math.max(180, Math.round(pageWidth / pageAspectRatio));
@@ -185,7 +212,25 @@ export default function BusinessDevelopmentPdfViewer({
       pageWidth,
       pageHeight,
     };
-  }, [containerWidth, isFullscreen, isSpreadCapable, pageAspectRatio, viewportHeight]);
+  }, [containerWidth, isFullscreenLayout, isSpreadCapable, pageAspectRatio, viewportHeight]);
+
+  const renderedFlipbookSize = useMemo(() => {
+    const pageWidth = Math.max(168, Math.round(flipbookSize.pageWidth * zoom));
+    const pageHeight = Math.max(126, Math.round(flipbookSize.pageHeight * zoom));
+
+    return {
+      bookWidth: isSpreadCapable ? pageWidth * 2 : pageWidth,
+      pageWidth,
+      pageHeight,
+    };
+  }, [flipbookSize.pageHeight, flipbookSize.pageWidth, isSpreadCapable, zoom]);
+  const animatedRenderKey = `${pageCount}-${renderedFlipbookSize.pageWidth}x${renderedFlipbookSize.pageHeight}`;
+  const flipbookInstanceKey = `${isSpreadCapable ? 'spread' : 'portrait'}-${animatedRenderKey}`;
+  const isAnimatedFlipbookInitialized = initializedFlipbookKey === flipbookInstanceKey;
+  const areAnimatedPagesReady = readyAnimatedRenderKey === animatedRenderKey;
+  const isClosedFrontCover = canUseAnimatedFlipbook && pageNumber === 1;
+  const isClosedBackCover = canUseAnimatedFlipbook && pageNumber === pageCount;
+  const isClosedCover = isClosedFrontCover || isClosedBackCover;
 
   const visiblePages = useMemo(() => {
     if (!pageCount) {
@@ -210,6 +255,47 @@ export default function BusinessDevelopmentPdfViewer({
 
     return `Page ${visiblePages[0] || pageNumber} of ${pageCount}`;
   }, [pageCount, pageNumber, visiblePages]);
+  const pagesToRender = useMemo(
+    () => (canUseAnimatedFlipbook ? pageNumbers : visiblePages),
+    [canUseAnimatedFlipbook, pageNumbers, visiblePages]
+  );
+
+  const commitLayout = useCallback((nextLayout: {width: number; height: number}) => {
+    if (isFlippingRef.current) {
+      pendingLayoutRef.current = nextLayout;
+      return;
+    }
+
+    setLayoutBounds((current) =>
+      current.width === nextLayout.width && current.height === nextLayout.height ? current : nextLayout
+    );
+  }, []);
+
+  const scheduleLayoutCommit = useCallback((width: number, height: number) => {
+    pendingLayoutRef.current = {
+      width: Math.round(width),
+      height: Math.round(height),
+    };
+
+    if (layoutTimeoutRef.current !== null) {
+      window.clearTimeout(layoutTimeoutRef.current);
+    }
+
+    layoutTimeoutRef.current = window.setTimeout(() => {
+      layoutTimeoutRef.current = null;
+      const pendingLayout = pendingLayoutRef.current;
+      pendingLayoutRef.current = null;
+
+      if (pendingLayout) {
+        commitLayout(pendingLayout);
+      }
+
+      if (!isFlippingRef.current && pendingFullscreenLayoutRef.current !== null) {
+        setIsFullscreenLayout(pendingFullscreenLayoutRef.current);
+        pendingFullscreenLayoutRef.current = null;
+      }
+    }, LAYOUT_SETTLE_TIME);
+  }, [commitLayout]);
 
   useEffect(() => {
     const shell = canvasShellRef.current;
@@ -218,30 +304,32 @@ export default function BusinessDevelopmentPdfViewer({
       return;
     }
 
-    const observer = new ResizeObserver(([entry]) => {
-      setContainerWidth(entry.contentRect.width);
-    });
+    const measure = (width = shell.clientWidth) => {
+      scheduleLayoutCommit(width, window.innerHeight || 720);
+    };
+    const observer = new ResizeObserver(([entry]) => measure(entry.contentRect.width));
+    const handleWindowResize = () => measure();
 
     observer.observe(shell);
-    setContainerWidth(shell.clientWidth);
+    measure();
+    window.addEventListener('resize', handleWindowResize);
 
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const updateViewportHeight = () => setViewportHeight(window.innerHeight || 720);
-
-    updateViewportHeight();
-    window.addEventListener('resize', updateViewportHeight);
-
-    return () => window.removeEventListener('resize', updateViewportHeight);
-  }, []);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', handleWindowResize);
+      if (layoutTimeoutRef.current !== null) {
+        window.clearTimeout(layoutTimeoutRef.current);
+      }
+    };
+  }, [scheduleLayoutCommit]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
       const nextIsFullscreen = document.fullscreenElement === shellRef.current;
 
       setIsFullscreen(nextIsFullscreen);
+      pendingFullscreenLayoutRef.current = nextIsFullscreen;
+      scheduleLayoutCommit(canvasShellRef.current?.clientWidth || window.innerWidth, window.innerHeight || 720);
 
       if (!nextIsFullscreen) {
         setZoom((current) => Math.min(current, MAX_ZOOM));
@@ -251,27 +339,7 @@ export default function BusinessDevelopmentPdfViewer({
     document.addEventListener('fullscreenchange', handleFullscreenChange);
 
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setRenderVersion((current) => current + 1), 0);
-
-    return () => window.clearTimeout(timeout);
-  }, [canUseAnimatedFlipbook, flipbookSize.pageHeight, flipbookSize.pageWidth, pageCount]);
-
-  useEffect(() => {
-    if (!canUseAnimatedFlipbook) {
-      return;
-    }
-
-    const timeout = window.setTimeout(() => {
-      const pageFlip = flipBookRef.current?.pageFlip?.();
-      pageFlip?.update?.();
-      pageFlip?.turnToPage?.(Math.max(0, pageNumber - 1));
-    }, 160);
-
-    return () => window.clearTimeout(timeout);
-  }, [canUseAnimatedFlipbook, flipbookSize.pageHeight, flipbookSize.pageWidth, pageNumber, renderVersion]);
+  }, [scheduleLayoutCommit]);
 
   useEffect(() => {
     let cancelled = false;
@@ -299,6 +367,7 @@ export default function BusinessDevelopmentPdfViewer({
         setPageCount(pdfDocument.numPages);
         canvasRefs.current = {};
         setPageNumber(1);
+        setReadyAnimatedRenderKey(null);
 
         const firstPage = await pdfDocument.getPage(1);
 
@@ -358,17 +427,22 @@ export default function BusinessDevelopmentPdfViewer({
 
   useEffect(() => {
     const pdfDocument = documentRef.current;
-    const pagesToRender = canUseAnimatedFlipbook ? pageNumbers : visiblePages;
 
-    if (!pdfDocument || !containerWidth || !pagesToRender.length) {
+    if (
+      !pdfDocument ||
+      !containerWidth ||
+      !pagesToRender.length ||
+      (canUseAnimatedFlipbook && !isAnimatedFlipbookInitialized)
+    ) {
       return;
     }
 
     const activePdfDocument = pdfDocument;
     let cancelled = false;
+    let readinessTimeout: number | null = null;
     const renderTasks: Array<{cancel: () => void; promise: Promise<unknown>}> = [];
 
-    async function renderPage(pageToRender: number) {
+    async function renderPage(pageToRender: number, onRenderStarted?: () => void) {
       const canvas = canvasRefs.current[pageToRender];
 
       if (!canvas) {
@@ -383,7 +457,7 @@ export default function BusinessDevelopmentPdfViewer({
 
         const baseViewport = page.getViewport({scale: 1});
         const scale = canUseAnimatedFlipbook
-          ? flipbookSize.pageWidth / baseViewport.width
+          ? renderedFlipbookSize.pageWidth / baseViewport.width
           : Math.max(flipbookSize.pageWidth / baseViewport.width, 0.35) * zoom;
         const viewport = page.getViewport({scale});
         const context = canvas.getContext('2d');
@@ -403,6 +477,7 @@ export default function BusinessDevelopmentPdfViewer({
 
         const activeRenderTask = page.render({canvasContext: context, viewport});
         renderTasks.push(activeRenderTask);
+        onRenderStarted?.();
         await activeRenderTask.promise;
       } catch (renderError) {
         if (!cancelled && (renderError as {name?: string})?.name !== 'RenderingCancelledException') {
@@ -412,13 +487,47 @@ export default function BusinessDevelopmentPdfViewer({
     }
 
     setError(null);
-    void Promise.all(pagesToRender.map((pageToRender) => renderPage(pageToRender)));
+    const currentPage = pageNumber;
+    const orderedPages = canUseAnimatedFlipbook
+      ? Array.from(
+          new Set([
+            currentPage,
+            Math.min(pageCount, currentPage + 1),
+            Math.max(1, currentPage - 1),
+            ...pagesToRender,
+          ])
+        )
+      : pagesToRender;
+
+    void (async () => {
+      for (const [index, pageToRender] of orderedPages.entries()) {
+        if (cancelled) {
+          return;
+        }
+
+        await renderPage(
+          pageToRender,
+          canUseAnimatedFlipbook && index === 0
+            ? () => {
+                readinessTimeout = window.setTimeout(() => {
+                  if (!cancelled) {
+                    setReadyAnimatedRenderKey(animatedRenderKey);
+                  }
+                }, 450);
+              }
+            : undefined
+        );
+      }
+    })();
 
     return () => {
       cancelled = true;
+      if (readinessTimeout !== null) {
+        window.clearTimeout(readinessTimeout);
+      }
       renderTasks.forEach((renderTask) => renderTask.cancel());
     };
-  }, [canUseAnimatedFlipbook, containerWidth, flipbookSize.pageWidth, pageCount, pageNumbers, renderVersion, visiblePages, zoom]);
+  }, [animatedRenderKey, canUseAnimatedFlipbook, containerWidth, flipbookSize.pageWidth, isAnimatedFlipbookInitialized, pageCount, pageNumber, pagesToRender, renderedFlipbookSize.pageWidth, zoom]);
 
   useEffect(() => {
     if (!turnDirection) {
@@ -435,7 +544,7 @@ export default function BusinessDevelopmentPdfViewer({
   const canZoomIn = zoom < maxZoom;
 
   const goPrevious = () => {
-    if (!canGoPrevious) {
+    if (!canGoPrevious || isFlipping || (canUseAnimatedFlipbook && !areAnimatedPagesReady)) {
       return;
     }
 
@@ -460,7 +569,7 @@ export default function BusinessDevelopmentPdfViewer({
   };
 
   const goNext = () => {
-    if (!canGoNext) {
+    if (!canGoNext || isFlipping || (canUseAnimatedFlipbook && !areAnimatedPagesReady)) {
       return;
     }
 
@@ -511,6 +620,30 @@ export default function BusinessDevelopmentPdfViewer({
     }
   };
 
+  const handleFlipbookInit = () => {
+    setFlipbookUnavailable(false);
+    setInitializedFlipbookKey(flipbookInstanceKey);
+  };
+
+  const handleFlipState = (event: FlipBookEvent) => {
+    const nextState = event.data as FlipBookState;
+    const nextIsFlipping = nextState === 'flipping';
+
+    isFlippingRef.current = nextIsFlipping;
+    setIsFlipping(nextIsFlipping);
+
+    if (!nextIsFlipping && pendingLayoutRef.current && layoutTimeoutRef.current === null) {
+      const pendingLayout = pendingLayoutRef.current;
+      pendingLayoutRef.current = null;
+      commitLayout(pendingLayout);
+    }
+
+    if (!nextIsFlipping && pendingFullscreenLayoutRef.current !== null) {
+      setIsFullscreenLayout(pendingFullscreenLayoutRef.current);
+      pendingFullscreenLayoutRef.current = null;
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const activeElement = document.activeElement;
@@ -540,10 +673,6 @@ export default function BusinessDevelopmentPdfViewer({
 
     return () => window.removeEventListener('keydown', handleKeyDown);
   });
-
-  const setCanvasRef = (canvasPageNumber: number, node: HTMLCanvasElement | null) => {
-    canvasRefs.current[canvasPageNumber] = node;
-  };
 
   const stableBook = (
     <div
@@ -581,52 +710,62 @@ export default function BusinessDevelopmentPdfViewer({
     canUseAnimatedFlipbook && FlipBookComponent ? (
       <FlipbookErrorBoundary fallback={stableBook} onError={() => setFlipbookUnavailable(true)}>
         <div
-          className="business-pdf-flipbook-shell"
+          className={[
+            'business-pdf-flipbook-shell',
+            areAnimatedPagesReady ? 'is-ready' : 'is-preparing',
+            isClosedFrontCover ? 'is-closed-front' : '',
+            isClosedBackCover ? 'is-closed-back' : '',
+            !isClosedCover ? 'is-open-spread' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
           style={{
-            '--business-pdf-zoom': zoom,
-            width: `${flipbookSize.bookWidth}px`,
-            height: `${flipbookSize.pageHeight}px`,
+            width: `${isClosedCover ? renderedFlipbookSize.pageWidth : renderedFlipbookSize.bookWidth}px`,
+            height: `${renderedFlipbookSize.pageHeight}px`,
           } as CSSProperties}
         >
-          <FlipBookComponent
-            key={`${isSpreadCapable ? 'spread' : 'portrait'}-${pageCount}-${flipbookSize.pageWidth}x${flipbookSize.pageHeight}`}
-            ref={flipBookRef}
-            className="business-pdf-flipbook"
-            style={{width: `${flipbookSize.bookWidth}px`, height: `${flipbookSize.pageHeight}px`}}
-            width={flipbookSize.pageWidth}
-            height={flipbookSize.pageHeight}
-            minWidth={260}
-            maxWidth={flipbookSize.bookWidth}
-            minHeight={180}
-            maxHeight={flipbookSize.pageHeight}
-            size="stretch"
-            startPage={0}
-            showCover
-            usePortrait={!isSpreadCapable}
-            drawShadow
-            flippingTime={820}
-            maxShadowOpacity={0.32}
-            mobileScrollSupport
-            useMouseEvents
-            clickEventForward
-            showPageCorners
-            disableFlipByClick={false}
-            autoSize={false}
-            startZIndex={0}
-            swipeDistance={24}
-            onFlip={handleFlip}
-            onInit={() => setFlipbookUnavailable(false)}
-            onUpdate={() => undefined}
+          <div
+            className="business-pdf-flipbook-positioner"
+            style={{
+              width: `${renderedFlipbookSize.bookWidth}px`,
+              height: `${renderedFlipbookSize.pageHeight}px`,
+            }}
           >
-            {pageNumbers.map((bookPageNumber) => (
-              <FlipbookPage
-                key={bookPageNumber}
-                pageNumber={bookPageNumber}
-                title={title}
-                setCanvasRef={setCanvasRef}
-              />
-            ))}
-          </FlipBookComponent>
+            <FlipBookComponent
+              key={flipbookInstanceKey}
+              ref={flipBookRef}
+              className="business-pdf-flipbook"
+              style={{width: `${renderedFlipbookSize.bookWidth}px`, height: `${renderedFlipbookSize.pageHeight}px`}}
+              width={renderedFlipbookSize.pageWidth}
+              height={renderedFlipbookSize.pageHeight}
+              minWidth={renderedFlipbookSize.pageWidth}
+              maxWidth={renderedFlipbookSize.pageWidth}
+              minHeight={renderedFlipbookSize.pageHeight}
+              maxHeight={renderedFlipbookSize.pageHeight}
+              size="fixed"
+              startPage={Math.max(0, pageNumber - 1)}
+              showCover
+              usePortrait={!isSpreadCapable}
+              drawShadow
+              flippingTime={820}
+              maxShadowOpacity={0.32}
+              mobileScrollSupport
+              useMouseEvents
+              clickEventForward
+              showPageCorners
+              disableFlipByClick={false}
+              autoSize={false}
+              startZIndex={0}
+              swipeDistance={24}
+              renderOnlyPageLengthChange
+              onFlip={handleFlip}
+              onChangeState={handleFlipState}
+              onInit={handleFlipbookInit}
+              onUpdate={() => undefined}
+            >
+              {flipbookPages}
+            </FlipBookComponent>
+          </div>
         </div>
       </FlipbookErrorBoundary>
     ) : (
@@ -645,13 +784,21 @@ export default function BusinessDevelopmentPdfViewer({
         <div className="business-pdf-toolbar" aria-label="PDF controls">
           <span className="business-pdf-page-indicator">{pageIndicator}</span>
           <span className="business-pdf-zoom-indicator">{zoomPercent}%</span>
-          <button type="button" onClick={() => setZoom((current) => Math.max(MIN_ZOOM, current - ZOOM_STEP))} disabled={!canZoomOut}>
+          <button
+            type="button"
+            onClick={() => setZoom((current) => Math.max(MIN_ZOOM, current - ZOOM_STEP))}
+            disabled={!canZoomOut || isFlipping}
+          >
             Zoom out
           </button>
-          <button type="button" onClick={() => setZoom((current) => Math.min(maxZoom, current + ZOOM_STEP))} disabled={!canZoomIn}>
+          <button
+            type="button"
+            onClick={() => setZoom((current) => Math.min(maxZoom, current + ZOOM_STEP))}
+            disabled={!canZoomIn || isFlipping}
+          >
             Zoom in
           </button>
-          <button type="button" onClick={toggleFullscreen}>
+          <button type="button" onClick={toggleFullscreen} disabled={isFlipping}>
             {isFullscreen ? (
               <>
                 <CollapseIcon /> Exit fullscreen
@@ -662,7 +809,7 @@ export default function BusinessDevelopmentPdfViewer({
               </>
             )}
           </button>
-          <a className="business-pdf-download" href={pdfUrl} download={downloadFilename}>
+          <a className="business-pdf-download" href={downloadUrl}>
             <DownloadIcon /> {downloadLabel}
           </a>
           <a className="business-pdf-open" href={pdfUrl} target="_blank" rel="noreferrer" aria-label="Open PDF in browser" title="Open PDF in browser">
@@ -670,12 +817,24 @@ export default function BusinessDevelopmentPdfViewer({
           </a>
         </div>
 
-        <div className="business-pdf-canvas-shell" ref={canvasShellRef}>
+        <div
+          className={[
+            'business-pdf-canvas-shell',
+            isFlipping ? 'is-flipping' : '',
+            isClosedCover ? 'is-closed-cover' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          ref={canvasShellRef}
+        >
           {isLoading ? <div className="business-pdf-state">Loading PDF...</div> : null}
+          {!isLoading && canUseAnimatedFlipbook && !areAnimatedPagesReady ? (
+            <div className="business-pdf-state">Preparing pages...</div>
+          ) : null}
           {error ? (
             <div className="business-pdf-state business-pdf-error">
               <p>{error}</p>
-              <a className="business-pdf-error-download" href={pdfUrl} download={downloadFilename}>
+              <a className="business-pdf-error-download" href={downloadUrl}>
                 {downloadLabel}
               </a>
             </div>
@@ -685,7 +844,7 @@ export default function BusinessDevelopmentPdfViewer({
             type="button"
             aria-label="Previous PDF page"
             onClick={goPrevious}
-            disabled={!canGoPrevious}
+            disabled={!canGoPrevious || isFlipping || (canUseAnimatedFlipbook && !areAnimatedPagesReady)}
           >
             <ChevronLeftIcon />
             <span aria-hidden="true">‹</span>
@@ -696,7 +855,7 @@ export default function BusinessDevelopmentPdfViewer({
             type="button"
             aria-label="Next PDF page"
             onClick={goNext}
-            disabled={!canGoNext}
+            disabled={!canGoNext || isFlipping || (canUseAnimatedFlipbook && !areAnimatedPagesReady)}
           >
             <ChevronRightIcon />
             <span aria-hidden="true">›</span>

@@ -4335,6 +4335,11 @@ p {
     linear-gradient(180deg, #f7f3eb 0%, #e4ebee 100%);
 }
 
+.business-pdf-canvas-shell.is-flipping,
+.business-pdf-canvas-shell.is-closed-cover {
+  overflow-x: hidden;
+}
+
 .business-pdf-viewer:fullscreen .business-pdf-canvas-shell {
   min-height: 0;
   height: 100%;
@@ -4362,7 +4367,6 @@ p {
 }
 
 .business-pdf-flipbook-shell {
-  --business-pdf-zoom: 1;
   position: relative;
   z-index: 1;
   display: grid;
@@ -4370,9 +4374,20 @@ p {
   width: max-content;
   max-width: 100%;
   min-width: 0;
-  transform: scale(var(--business-pdf-zoom));
-  transform-origin: center center;
-  transition: transform 220ms ease;
+  transition: width 260ms ease;
+}
+
+.business-pdf-flipbook-shell.is-preparing {
+  pointer-events: none;
+}
+
+.business-pdf-flipbook-positioner {
+  flex: 0 0 auto;
+  transition: transform 260ms ease;
+}
+
+.business-pdf-flipbook-shell.is-closed-front .business-pdf-flipbook-positioner {
+  transform: translateX(-50%);
 }
 
 .business-pdf-flipbook {
@@ -4388,28 +4403,19 @@ p {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-radius: 16px;
-}
-
-.business-pdf-flipbook .stf__block > .business-pdf-page-cover {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  z-index: 1;
-  display: block;
-  width: 50%;
-  height: 100%;
+  border-radius: 0;
 }
 
 .business-pdf-flipbook .business-pdf-page[data-density="hard"],
 .business-pdf-flipbook .business-pdf-page-cover,
 .business-pdf-flipbook .business-pdf-page-back-cover {
-  border-radius: 20px;
+  border-radius: 0;
 }
 
 .business-pdf-flipbook .business-pdf-page canvas {
   width: 100% !important;
   height: 100% !important;
+  border-radius: 0;
 }
 
 .business-pdf-book.is-turning-next {
