@@ -10,7 +10,7 @@ type AboutSectionPageProps = {
   }>;
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);

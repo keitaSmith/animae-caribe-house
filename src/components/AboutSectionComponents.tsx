@@ -4,6 +4,7 @@ import type {SanityAboutJobListing, SanityAboutSectionPage, SanityImage} from '@
 import type {AboutSectionPageFallback} from '@/lib/aboutSectionPages';
 import {getYouTubeEmbedUrl} from '@/lib/aboutSectionPages';
 import AboutGalleryLightbox from './AboutGalleryLightbox';
+import BusinessDevelopmentPdfViewer from './BusinessDevelopmentPdfViewer';
 import {ArrowRightIcon} from './Icons';
 
 type AboutSectionHeroProps = {
@@ -40,6 +41,25 @@ export function AboutSectionGhostVisual() {
   );
 }
 
+export function BusinessDevelopmentGhostVisual() {
+  return (
+    <div className="business-development-ghost" aria-hidden="true">
+      <span className="business-development-ghost-glow" />
+      <span className="business-development-ghost-bar business-development-ghost-bar-one" />
+      <span className="business-development-ghost-bar business-development-ghost-bar-two" />
+      <span className="business-development-ghost-bar business-development-ghost-bar-three" />
+      <span className="business-development-ghost-bar business-development-ghost-bar-four" />
+      <span className="business-development-ghost-axis" />
+      <span className="business-development-ghost-line business-development-ghost-line-one" />
+      <span className="business-development-ghost-line business-development-ghost-line-two" />
+      <span className="business-development-ghost-line business-development-ghost-line-three" />
+      <span className="business-development-ghost-arrow" />
+      <span className="business-development-ghost-spark business-development-ghost-spark-one" />
+      <span className="business-development-ghost-spark business-development-ghost-spark-two" />
+    </div>
+  );
+}
+
 export function TobagoEditionHeroVisual() {
   return (
     <div className="tobago-edition-hero-visual" aria-hidden="true">
@@ -52,7 +72,7 @@ export function TobagoEditionHeroVisual() {
 export function AboutSectionHero({page, fallback}: AboutSectionHeroProps) {
   const hero = page?.hero;
   const image = resolveImage(page);
-  const pageType = page?.pageType || fallback.pageType;
+  const pageType = fallback.pageType;
   const eyebrow = hero?.eyebrow || fallback.hero.eyebrow;
   const title = hero?.title || fallback.hero.title;
   const description = hero?.description || fallback.hero.description;
@@ -88,6 +108,8 @@ export function AboutSectionHero({page, fallback}: AboutSectionHeroProps) {
             </div>
           ) : pageType === 'tobagoEdition' ? (
             <TobagoEditionHeroVisual />
+          ) : pageType === 'businessDevelopment' ? (
+            <BusinessDevelopmentGhostVisual />
           ) : (
             <AboutSectionGhostVisual />
           )}
@@ -107,7 +129,7 @@ function FallbackParagraphs({paragraphs}: {paragraphs: string[]}) {
   );
 }
 
-function AboutSectionVideo({youtubeUrl}: {youtubeUrl?: string}) {
+function AboutSectionVideo({youtubeUrl, title = "Director's Remarks video"}: {youtubeUrl?: string; title?: string}) {
   const embedUrl = getYouTubeEmbedUrl(youtubeUrl);
 
   if (!embedUrl) {
@@ -118,7 +140,7 @@ function AboutSectionVideo({youtubeUrl}: {youtubeUrl?: string}) {
     <div className="about-section-video-shell">
       <iframe
         src={embedUrl}
-        title="Director's Remarks video"
+        title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         referrerPolicy="strict-origin-when-cross-origin"
         allowFullScreen
@@ -199,10 +221,15 @@ function JobListings({jobs = []}: {jobs?: SanityAboutJobListing[]}) {
 
 export function AboutSectionMain({page, fallback, jobs}: AboutSectionMainProps) {
   const content = page?.content;
+  const isBusinessDevelopment = fallback.pageType === 'businessDevelopment';
+  const pdf = page?.pdfResource;
 
   return (
     <div className="container page-feature about-section-main">
       {page?.pageType === 'directorsRemarks' ? <AboutSectionVideo youtubeUrl={page.youtubeUrl} /> : null}
+      {isBusinessDevelopment ? (
+        <AboutSectionVideo youtubeUrl={page?.youtubeUrl} title="Business Development video" />
+      ) : null}
 
       <div className="glass-panel content-panel about-section-content-panel">
         <span className="section-kicker">{fallback.hero.eyebrow}</span>
@@ -213,6 +240,18 @@ export function AboutSectionMain({page, fallback, jobs}: AboutSectionMainProps) 
         </div>
       </div>
 
+      {isBusinessDevelopment ? (
+        <AboutSectionVideo youtubeUrl={page?.secondaryYoutubeUrl} title="Business Development second video" />
+      ) : null}
+      {isBusinessDevelopment && pdf?.file?.url ? (
+        <BusinessDevelopmentPdfViewer
+          pdfUrl={pdf.file.url}
+          title={pdf.title}
+          description={pdf.description}
+          downloadLabel={pdf.downloadLabel}
+          filename={pdf.file.originalFilename}
+        />
+      ) : null}
       {page?.pageType === 'communityOutreach' ? <AboutSectionGallery page={page} /> : null}
       {fallback.pageType === 'liveWorkPlayLocal' ? <JobListings jobs={jobs} /> : null}
     </div>

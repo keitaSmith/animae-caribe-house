@@ -225,7 +225,8 @@ export type SanityAboutSectionPageType =
   | 'iammNetwork'
   | 'liveWorkPlayLocal'
   | 'acToonMarketplace'
-  | 'tobagoEdition';
+  | 'tobagoEdition'
+  | 'businessDevelopment';
 
 export type SanityAboutGalleryImage = SanityImage & {
   caption?: string;
@@ -240,10 +241,21 @@ export type SanityAboutSectionPage = {
   hero?: SanityPageHeroSection;
   directorImage?: SanityImage;
   youtubeUrl?: string;
+  secondaryYoutubeUrl?: string;
   content?: {
     heading?: string;
     subheading?: string;
     body?: PortableTextBlock[];
+  };
+  pdfResource?: {
+    title?: string;
+    description?: string;
+    downloadLabel?: string;
+    file?: {
+      url?: string;
+      originalFilename?: string;
+      mimeType?: string;
+    };
   };
   galleryProvider?: 'sanity' | 'external';
   galleryImages?: SanityAboutGalleryImage[];

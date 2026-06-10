@@ -62,6 +62,52 @@ export function DownloadIcon() {
   );
 }
 
+export function ChevronLeftIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="m15 6-6 6 6 6" />
+    </svg>
+  );
+}
+
+export function ChevronRightIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="m9 6 6 6-6 6" />
+    </svg>
+  );
+}
+
+export function ExpandIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="M8 3H3v5" />
+      <path d="M3 3l7 7" />
+      <path d="M16 3h5v5" />
+      <path d="m21 3-7 7" />
+      <path d="M8 21H3v-5" />
+      <path d="m3 21 7-7" />
+      <path d="M16 21h5v-5" />
+      <path d="m21 21-7-7" />
+    </svg>
+  );
+}
+
+export function CollapseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
+      <path d="M10 3v7H3" />
+      <path d="m10 10-7-7" />
+      <path d="M14 3v7h7" />
+      <path d="m14 10 7-7" />
+      <path d="M10 21v-7H3" />
+      <path d="m10 14-7 7" />
+      <path d="M14 21v-7h7" />
+      <path d="m14 14 7 7" />
+    </svg>
+  );
+}
+
 export function ShareIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">

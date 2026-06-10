@@ -95,6 +95,30 @@ const portableTextComponents: PortableTextComponents = {
   types: {
     bodyImage: PortableTextBodyImage,
   },
+  marks: {
+    link: ({children, value}) => {
+      const href = typeof value?.href === 'string' ? value.href : '';
+      const isExternal = /^https?:\/\//.test(href);
+
+      if (!href) {
+        return <>{children}</>;
+      }
+
+      return (
+        <a href={href} target={isExternal ? '_blank' : undefined} rel={isExternal ? 'noreferrer' : undefined}>
+          {children}
+        </a>
+      );
+    },
+    textColor: ({children, value}) => {
+      const color = typeof value?.color === 'string' ? value.color : '';
+      const className = ['cyan', 'magenta', 'yellow', 'ink'].includes(color)
+        ? `portable-text-color-${color}`
+        : '';
+
+      return className ? <span className={className}>{children}</span> : <>{children}</>;
+    },
+  },
 };
 
 export default function PortableTextRenderer({value}: PortableTextRendererProps) {

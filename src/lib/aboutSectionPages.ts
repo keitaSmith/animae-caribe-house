@@ -127,6 +127,24 @@ export const aboutSectionFallbacks: Record<string, AboutSectionPageFallback> = {
       ],
     },
   },
+  'business-development': {
+    slug: 'business-development',
+    pageType: 'businessDevelopment',
+    title: 'Business Development',
+    hero: {
+      eyebrow: 'Business Development',
+      title: 'Growing Caribbean animation into sustainable opportunity.',
+      description:
+        'Business development resources, conversations, and market-facing material for creators, producers, and partners building momentum with Animae Caribe.',
+    },
+    content: {
+      heading: 'Business Development',
+      subheading: 'Resources and context for turning creative ambition into stronger business pathways.',
+      paragraphs: [
+        'Use Sanity to add the Business Development write-up, YouTube videos, and PDF resource for this page.',
+      ],
+    },
+  },
 };
 
 export const aboutSectionNavItems = Object.values(aboutSectionFallbacks).map((page) => ({

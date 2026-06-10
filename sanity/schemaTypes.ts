@@ -59,6 +59,7 @@ const aboutSectionPageTypeOptions = [
   {title: 'Live Work & Play Like a Local', value: 'liveWorkPlayLocal'},
   {title: 'AC Toon Marketplace', value: 'acToonMarketplace'},
   {title: 'Animae Caribe Tobago Edition', value: 'tobagoEdition'},
+  {title: 'Business Development', value: 'businessDevelopment'},
 ]
 
 const aboutHeroVisualOptions = [
@@ -377,6 +378,61 @@ const articleBodyImage = defineArrayMember({
       subtitle,
       media,
     }),
+  },
+})
+
+const aboutSectionBodyBlock = defineArrayMember({
+  type: 'block',
+  styles: [
+    {title: 'Normal', value: 'normal'},
+    {title: 'Heading 2', value: 'h2'},
+    {title: 'Heading 3', value: 'h3'},
+    {title: 'Quote', value: 'blockquote'},
+  ],
+  lists: [
+    {title: 'Bullet', value: 'bullet'},
+    {title: 'Numbered', value: 'number'},
+  ],
+  marks: {
+    decorators: [
+      {title: 'Strong', value: 'strong'},
+      {title: 'Emphasis', value: 'em'},
+    ],
+    annotations: [
+      defineArrayMember({
+        name: 'link',
+        title: 'Link',
+        type: 'object',
+        fields: [
+          defineField({
+            name: 'href',
+            title: 'URL or path',
+            type: 'string',
+            validation: (Rule) => Rule.required(),
+          }),
+        ],
+      }),
+      defineArrayMember({
+        name: 'textColor',
+        title: 'Text colour',
+        type: 'object',
+        fields: [
+          defineField({
+            name: 'color',
+            title: 'Colour',
+            type: 'string',
+            options: {
+              list: [
+                {title: 'Cyan', value: 'cyan'},
+                {title: 'Magenta', value: 'magenta'},
+                {title: 'Yellow', value: 'yellow'},
+                {title: 'Ink', value: 'ink'},
+              ],
+            },
+          }),
+        ],
+      }),
+    ],
   },
 })
 
@@ -1004,7 +1060,7 @@ const aboutSectionContent = defineType({
       name: 'body',
       title: 'Body',
       type: 'array',
-      of: [defineArrayMember({type: 'block'})],
+      of: [aboutSectionBodyBlock, articleBodyImage],
       description: 'Main write-up shown below the hero and optional media.',
     }),
   ],
@@ -1063,6 +1119,7 @@ const aboutSectionPage = defineType({
       description: 'Controls page-specific frontend sections such as video, gallery, or job listings.',
     }),
     defineField({name: 'isVisible', title: 'Show this page publicly', type: 'boolean', initialValue: true}),
+    defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
     defineField({
       name: 'heroVisualType',
       title: 'Hero visual type',
@@ -1081,12 +1138,38 @@ const aboutSectionPage = defineType({
     }),
     defineField({
       name: 'youtubeUrl',
-      title: "Director's Remarks YouTube URL",
+      title: 'First YouTube video URL',
       type: 'url',
-      description: 'Paste a normal YouTube watch, short, or embed URL. The frontend converts it to a responsive embed.',
-      hidden: ({document}) => document?.pageType !== 'directorsRemarks',
+      description: 'Paste a normal YouTube video URL.',
+      hidden: ({document}) => !['directorsRemarks', 'businessDevelopment'].includes(String(document?.pageType || '')),
     }),
     defineField({name: 'content', title: 'Main content', type: 'aboutSectionContent'}),
+    defineField({
+      name: 'secondaryYoutubeUrl',
+      title: 'Second YouTube video URL',
+      type: 'url',
+      description: 'Paste a normal YouTube video URL.',
+      hidden: ({document}) => document?.pageType !== 'businessDevelopment',
+    }),
+    defineField({
+      name: 'pdfResource',
+      title: 'PDF / flipbook',
+      type: 'object',
+      description: 'Upload the PDF that should appear as a flipbook/viewer on the page.',
+      hidden: ({document}) => document?.pageType !== 'businessDevelopment',
+      fields: [
+        defineField({
+          name: 'file',
+          title: 'PDF file',
+          type: 'file',
+          description: 'Upload the PDF that should appear as a flipbook/viewer on the page.',
+          options: {accept: '.pdf,application/pdf'},
+        }),
+        defineField({name: 'title', title: 'PDF heading', type: 'string'}),
+        defineField({name: 'description', title: 'PDF description', type: 'text', rows: 3}),
+        defineField({name: 'downloadLabel', title: 'Download button label', type: 'string'}),
+      ],
+    }),
     defineField({
       name: 'galleryProvider',
       title: 'Gallery provider',
@@ -1153,7 +1236,6 @@ const aboutSectionPage = defineType({
       description: 'Stored for a future server-side provider integration. The frontend does not scrape Drive/Photos.',
       hidden: ({document}) => document?.pageType !== 'communityOutreach',
     }),
-    defineField({name: 'seo', title: 'SEO', type: 'seoFields'}),
   ],
   initialValue: {
     isVisible: true,

@@ -165,10 +165,21 @@ const aboutSectionPageProjection = `
     "height": directorImage.asset->metadata.dimensions.height
   },
   youtubeUrl,
+  secondaryYoutubeUrl,
   content{
     heading,
     subheading,
     body
+  },
+  pdfResource{
+    title,
+    description,
+    downloadLabel,
+    "file": {
+      "url": file.asset->url,
+      "originalFilename": file.asset->originalFilename,
+      "mimeType": file.asset->mimeType
+    }
   },
   galleryProvider,
   "galleryImages": galleryImages[]{
