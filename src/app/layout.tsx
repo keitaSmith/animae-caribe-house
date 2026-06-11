@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 import '../styles/index.css';
 
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en">
       <body>
         {children}
+        <SpeedInsights />
         <Analytics />
       </body>
     </html>
