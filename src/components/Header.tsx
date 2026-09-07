@@ -25,6 +25,7 @@ export default function Header({currentFestivalYear}: HeaderProps) {
   const navItems = buildNavItems(currentFestivalYear);
   const hasLandingHero = pathname === '/' || pathname === '/house' || pathname === '/festival';
   const hasShowreelHero = pathname === '/house' || pathname === '/festival';
+  const useDarkHeader = !hasLandingHero || isScrolled || menuOpen;
 
   useEffect(() => {
     const syncScrollState = () => {
@@ -118,7 +119,7 @@ export default function Header({currentFestivalYear}: HeaderProps) {
 
   const headerClassName = [
     'site-header',
-    isScrolled ? 'is-scrolled' : 'is-top',
+    useDarkHeader ? 'is-scrolled' : 'is-top',
     menuOpen ? 'menu-open' : '',
   ]
     .filter(Boolean)
@@ -126,7 +127,7 @@ export default function Header({currentFestivalYear}: HeaderProps) {
   const showHeaderShowreel = canOpenShowreel && (hasShowreelHero ? !heroInView : false);
   const showreelClassName = ['nav-showreel', showHeaderShowreel ? 'is-visible' : 'is-hidden'].join(' ');
   const brandLogoSrc =
-    isScrolled || menuOpen
+    useDarkHeader
       ? '/assets/anime-caribe-logo-black.png'
       : '/assets/anime-caribe-logo-white.png';
 
